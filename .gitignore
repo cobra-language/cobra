@@ -1,0 +1,56 @@
+JENKINS_OUTPUT/*
+PROV_PROFILES_UPDATE_OUTPUT/*
+fastlane/README.md
+fastlane/report.xml
+# Xcode
+.DS_Store
+*/build/*
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+profile
+*.moved-aside
+DerivedData
+.idea/
+*.hmap
+*/__output__/*
+scripts/archive/*
+*.xcscmblueprint
+IDEWorkspaceChecks.plist
+BeeShop/BeeShop/Resource/Shopee-App/pre_packaged_rn_bundle/*
+fastlane/archive
+
+# Prebuild
+BeeShop/Pods/*
+BeeShop/DevPodForSpodGem/*
+BeeShop/Podfile
+
+# ignore files produced by rake tasks
+scripts/temp/*
+
+# ignore language validation result folders
+scripts/language/invalid_translation_keys/*
+scripts/language/usage_translation_keys/*
+
+# ignore files in pre-packaged bundle folder
+BeeShop/Targets/RN_Bundle/*
+
+# ignore linkmap file
+*.linkmap
+
+# Pods
+BeeShop/Pods/SSZRTCFramework/SSZRTCFramework/SSZRTC.framework.dSYM.zip
+
+# Build Performance
+scripts/BuildPhase/Cache/*
+
+# Ruby 
+.bundle
+vendor/*

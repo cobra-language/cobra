@@ -1,9 +1,16 @@
-/*
- * Copyright (c) the Cobra project authors.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
+//===- SMLoc.h - Source location for use with diagnostics -------*- C++ -*-===//
+//
+//                     The LLVM Compiler Infrastructure
+//
+// This file is distributed under the University of Illinois Open Source
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+//
+// This file declares the SMLoc class.  This class encapsulates a location in
+// source code for use in diagnostics.
+//
+//===----------------------------------------------------------------------===//
 
 #ifndef SMLoc_hpp
 #define SMLoc_hpp

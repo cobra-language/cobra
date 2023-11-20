@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 namespace cobra {
-namespace Parser {
+namespace parser {
 
 class Parser {
   

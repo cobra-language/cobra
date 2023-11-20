@@ -9,6 +9,9 @@
 #include <string>
 #include <fstream>
 #include "VM.hpp"
+#include "Lexer.hpp"
+
+using namespace cobra;
 
 static std::string loadFile(std::string path) {
   std::ifstream file{path};
@@ -19,8 +22,9 @@ static std::string loadFile(std::string path) {
 }
 
 int main(int argc, const char * argv[]) {
-    loadFile(argv[0]);
-    // insert code here...
-    std::cout << "Hello, World!\n";
-    return 0;
+  std::string source = loadFile(argv[0]);
+  parser::Lexer jsLexer(source);
+  while (jsLexer.advance()->getKind() != parser::TokenKind::eof)
+    
+  return 0;
 }

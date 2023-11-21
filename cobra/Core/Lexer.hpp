@@ -20,11 +20,12 @@ class Lexer;
 
 enum class TokenKind {
   error = 0,
+  none,
   eof,
   line,
   
   // symbols
-  dot,                 // .
+  period,              // .
   dotdot,              // ..
   comma,               // ,
   collon,              // :
@@ -125,11 +126,12 @@ enum class TokenKind {
 };
 
 class Token {
-  TokenKind kind_;
+  TokenKind kind_{TokenKind::none};
   SMRange range_{};
   
 public:
-  Token(TokenKind kind, std::string &lexeme);
+  Token() = default;
+  ~Token() = default;
   
   TokenKind getKind() const {
     return kind_;
@@ -137,6 +139,7 @@ public:
   
 private:
   std::string lexeme_;
+  
   void setStart(const char *start) {
     range_.Start = SMLoc::getFromPointer(start);
   }
@@ -180,6 +183,7 @@ private:
   char curChar;
   
   const char *bufferStart_;
+  const char *bufferEnd_;
   const char *curCharPtr_;
   
   bool newLineBeforeCurrentToken_ = false;
@@ -191,6 +195,8 @@ private:
   const char *skipBlockComment(const char *start);
   
   void scanNumber();
+  
+  void scanIdentifierParts();
   
   void scanString();
   

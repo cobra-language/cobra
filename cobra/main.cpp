@@ -22,7 +22,7 @@ static std::string loadFile(std::string path) {
 }
 
 int main(int argc, const char * argv[]) {
-  std::string source = loadFile(argv[0]);
+  std::string source = loadFile(argv[1]);
   parser::Lexer jsLexer(source);
   while (jsLexer.advance()->getKind() != parser::TokenKind::eof)
     

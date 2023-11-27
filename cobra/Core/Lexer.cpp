@@ -14,6 +14,16 @@ Lexer::Lexer(std::string &source) : source_(source), curChar(0), bufferStart_(so
 
 }
 
+bool Lexer::isDigit(const char c) const {
+   return c >= '0' && c <= '9';
+}
+
+bool Lexer::isAlpha(char c) const {
+  return (c >= 'a' && c <= 'z')
+  || (c >= 'A' && c <= 'Z')
+  || (c == '_');
+}
+
 const Token *Lexer::advance() {
   
   newLineBeforeCurrentToken_ = false;
@@ -50,7 +60,10 @@ const Token *Lexer::advance() {
       PUNC_L1_1(')', TokenKind::r_paren);
       PUNC_L1_1('[', TokenKind::l_square);
       PUNC_L1_1(']', TokenKind::r_square);
+      PUNC_L1_1(';', TokenKind::semi);
       PUNC_L1_1(',', TokenKind::comma);
+      PUNC_L1_1('~', TokenKind::tilde);
+      PUNC_L1_1(':', TokenKind::colon);
         
       PUNC_L2_2('&', TokenKind::amp, '=', TokenKind::ampequal);
       PUNC_L2_2('|', TokenKind::pipe, '=', TokenKind::pipeequal);
@@ -123,6 +136,13 @@ const Token *Lexer::advance() {
         continue;
         
       case '/':
+        if (curCharPtr_[1] == '/') { // Line comment?
+          scanLineComment(curCharPtr_);
+          continue;
+        } else if (curCharPtr_[1] == '*') { // Block comment?
+          curCharPtr_ = skipBlockComment(curCharPtr_);
+          continue;
+        } else {
           token_.setStart(curCharPtr_);
           if (curCharPtr_[1] == '=') {
             token_.setPunctuator(TokenKind::slashequal);
@@ -131,6 +151,7 @@ const Token *Lexer::advance() {
             token_.setPunctuator(TokenKind::slash);
             curCharPtr_ += 1;
           }
+        }
         break;
         
       case '#':
@@ -210,6 +231,12 @@ const Token *Lexer::advance() {
         token_.setStart(curCharPtr_);
         scanIdentifierParts();
         break;
+        
+      case '\'':
+      case '"':
+        token_.setStart(curCharPtr_);
+        scanString();
+        break;
       
       default:{
         
@@ -220,6 +247,8 @@ const Token *Lexer::advance() {
     // Always terminate the loop unless "continue" was used.
     break;
   } // for(;;)
+  
+  finishToken(curCharPtr_);
   
   return &token_;
 }
@@ -262,131 +291,74 @@ endLoop:
 
 const char *Lexer::skipBlockComment(const char *start) {
   assert(start[0] == '/' && start[1] == '*');
-  SMLoc blockCommentStart = SMLoc::getFromPointer(start);
   const char *cur = start + 2;
   
+  for (;;) {
+    switch ((unsigned char)*cur) {
+      case 0:
+        if (cur == bufferEnd_) {
+          goto endLoop;
+        } else {
+          ++cur;
+        }
+        break;
+
+      case '\r':
+      case '\n':
+        ++cur;
+        newLineBeforeCurrentToken_ = true;
+        break;
+
+      case '*':
+        ++cur;
+        if (*cur == '/') {
+          ++cur;
+          goto endLoop;
+        }
+        break;
+
+      default:
+
+          ++cur;
+        break;
+    }
+  }
+endLoop:
   
   return cur;
 }
 
 void Lexer::scanNumber() {
-  // A somewhat ugly state machine for scanning a number
-
-  unsigned radix = 10;
-  bool real = false;
-  bool ok = true;
-  const char *rawStart = curCharPtr_;
   const char *start = curCharPtr_;
 
-  // True when we encounter the numeric literal separator: '_'.
-  bool seenSeparator = false;
-
-  // True when we encounter a legacy octal number (starts with '0').
-  bool legacyOctal = false;
-
-  // Detect the radix
-  if (*curCharPtr_ == '0') {
-    if ((curCharPtr_[1] | 32) == 'x') {
-      radix = 16;
-      curCharPtr_ += 2;
-      start += 2;
-    } else if ((curCharPtr_[1] | 32) == 'o') {
-      radix = 8;
-      curCharPtr_ += 2;
-      start += 2;
-    } else if ((curCharPtr_[1] | 32) == 'b') {
-      radix = 2;
-      curCharPtr_ += 2;
-      start += 2;
-    } else if (curCharPtr_[1] == '.') {
-      curCharPtr_ += 2;
-      goto fraction;
-    } else if ((curCharPtr_[1] | 32) == 'e') {
-      curCharPtr_ += 2;
-      goto exponent;
-    } else {
-      radix = 8;
-      legacyOctal = true;
+  while(isDigit(peakChar())) {
+    ++curCharPtr_;
+  }
+  
+  if((peakChar() == '.') && curCharPtr_[1] >= '0' && curCharPtr_[1] <= '9') {
+    ++curCharPtr_;
+    while(isDigit(peakChar())) {
       ++curCharPtr_;
     }
   }
-
-  while (isdigit(*curCharPtr_) ||
-         (radix == 16 && (*curCharPtr_ | 32) >= 'a' &&
-          (*curCharPtr_ | 32) <= 'f') ||
-         (*curCharPtr_ == '_')) {
-    seenSeparator |= *curCharPtr_ == '_';
-    ++curCharPtr_;
-  }
-
-  if (radix == 10 || legacyOctal) {
-    // It is not necessarily an integer.
-    // We could have interpreted as legacyOctal initially but will have to
-    // change to decimal later.
-    if (*curCharPtr_ == '.') {
-      ++curCharPtr_;
-      goto fraction;
-    }
-
-    if ((*curCharPtr_ | 32) == 'e') {
-      ++curCharPtr_;
-      goto exponent;
-    }
-  }
+    
+  std::string substr(start, curCharPtr_);
+  auto val = std::stod(substr);
   
-fraction:
-  // We arrive here after we have consumed the decimal dot ".".
-  //
-  real = true;
-  while (isdigit(*curCharPtr_) || *curCharPtr_ == '_') {
-    seenSeparator |= *curCharPtr_ == '_';
-    ++curCharPtr_;
-  }
-
-  if ((*curCharPtr_ | 32) == 'e') {
-    ++curCharPtr_;
-    goto exponent;
-  } else {
-    goto end;
-  }
-
-exponent:
-  // We arrive here after we have consumed the exponent character 'e' or 'E'.
-  //
-  real = true;
-  if (*curCharPtr_ == '+' || *curCharPtr_ == '-')
-    ++curCharPtr_;
-  if (isdigit(*curCharPtr_)) {
-    do {
-      seenSeparator |= *curCharPtr_ == '_';
-      ++curCharPtr_;
-    } while (isdigit(*curCharPtr_) || *curCharPtr_ == '_');
-  } else {
-    ok = false;
-  }
-
-  goto end;
-  
-end:
-  
-  double val;
-  
-  if (!ok) {
-    val = std::numeric_limits<double>::quiet_NaN();
-  } else if (!real && radix == 10 && curCharPtr_ - start <= 9) {
-    // If this is a decimal integer of at most 9 digits (log10(2**31-1), it
-    // can fit in a 32-bit integer. Use a faster conversion.
-    int32_t ival = *start - '0';
-    while (++start != curCharPtr_)
-      ival = ival * 10 + (*start - '0');
-    val = ival;
-  }
-  
-  
+  token_.setNumericLiteral(val);
 }
 
 void Lexer::scanIdentifierParts() {
+  const char *start = curCharPtr_;
   
+  char c = peakChar();
+  while (isDigit(c) || isAlpha(c)) {
+    ++curCharPtr_;
+    c = peakChar();
+  }
+  
+  std::string substr(start, curCharPtr_);
+  token_.setIdentifier(substr);
 }
 
 void Lexer::scanString() {

@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string>
 #include "SMLoc.hpp"
+#include "CBValue.hpp"
 
 namespace cobra {
 namespace parser {
@@ -28,7 +29,7 @@ enum class TokenKind {
   period,              // .
   dotdot,              // ..
   comma,               // ,
-  collon,              // :
+  colon,               // :
   semi,                // ;
   hash,                // #
   l_paren,             // (
@@ -109,7 +110,7 @@ enum class TokenKind {
   rw_continue,         // continue
   rw_return,           // return
   
-  name,                // identifier
+  identifier,          // identifier
   
   numeric_literal,     // number literal
   string_literal,      // string literal
@@ -128,6 +129,8 @@ enum class TokenKind {
 class Token {
   TokenKind kind_{TokenKind::none};
   SMRange range_{};
+  double numeric_{};
+  std::string ident_;
   
 public:
   Token() = default;
@@ -139,7 +142,7 @@ public:
   
 private:
   std::string lexeme_;
-  
+    
   void setStart(const char *start) {
     range_.Start = SMLoc::getFromPointer(start);
   }
@@ -157,6 +160,16 @@ private:
   
   void setEof() {
     kind_ = TokenKind::eof;
+  }
+  
+  void setNumericLiteral(double literal) {
+    kind_ = TokenKind::numeric_literal;
+    numeric_ = literal;
+  }
+  
+  void setIdentifier(std::string ident) {
+    kind_ = TokenKind::identifier;
+    ident_ = ident;
   }
   
   friend class Lexer;
@@ -188,6 +201,9 @@ private:
   
   bool newLineBeforeCurrentToken_ = false;
   
+  bool isDigit(char c) const;
+  bool isAlpha(char c) const;
+  
   char peakChar();
   
   void scanLineComment(const char *start);
@@ -199,6 +215,10 @@ private:
   void scanIdentifierParts();
   
   void scanString();
+  
+  inline void finishToken(const char *end) {
+    token_.setEnd(end);
+  }
   
 };
 

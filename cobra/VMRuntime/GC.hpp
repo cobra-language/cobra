@@ -5,9 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Interpreter_hpp
-#define Interpreter_hpp
+#ifndef GC_hpp
+#define GC_hpp
 
-#include <stdio.h>
 
-#endif /* Interpreter_hpp */
+#endif /* GC_hpp */

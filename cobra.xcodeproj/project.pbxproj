@@ -14,6 +14,12 @@
 		AD14CF802B08BADB00137FDC /* Paser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD14CF792B08BADB00137FDC /* Paser.cpp */; };
 		AD14CF812B08BADB00137FDC /* GC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD14CF7B2B08BADB00137FDC /* GC.cpp */; };
 		AD14CF822B08BADB00137FDC /* VM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD14CF7C2B08BADB00137FDC /* VM.cpp */; };
+		AD2207102B1B1F26007ED860 /* CBObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD22070E2B1B1F26007ED860 /* CBObject.cpp */; };
+		AD2207132B1B1F88007ED860 /* Allocator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD2207112B1B1F88007ED860 /* Allocator.cpp */; };
+		AD2207162B1B269C007ED860 /* CBFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD2207142B1B269C007ED860 /* CBFunction.cpp */; };
+		AD2207192B1B26AA007ED860 /* CBString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD2207172B1B26AA007ED860 /* CBString.cpp */; };
+		AD22071D2B1B29D6007ED860 /* PrimitiveBox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD22071B2B1B29D6007ED860 /* PrimitiveBox.cpp */; };
+		AD2207202B1B2DAD007ED860 /* Runtime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD22071E2B1B2DAD007ED860 /* Runtime.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -46,6 +52,17 @@
 		AD14CF7B2B08BADB00137FDC /* GC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GC.cpp; sourceTree = "<group>"; };
 		AD14CF7C2B08BADB00137FDC /* VM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VM.cpp; sourceTree = "<group>"; };
 		AD14CF7D2B08BADB00137FDC /* Interpreter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Interpreter.hpp; sourceTree = "<group>"; };
+		AD22070E2B1B1F26007ED860 /* CBObject.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBObject.cpp; sourceTree = "<group>"; };
+		AD22070F2B1B1F26007ED860 /* CBObject.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBObject.hpp; sourceTree = "<group>"; };
+		AD2207112B1B1F88007ED860 /* Allocator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Allocator.cpp; sourceTree = "<group>"; };
+		AD2207122B1B1F88007ED860 /* Allocator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Allocator.hpp; sourceTree = "<group>"; };
+		AD2207142B1B269C007ED860 /* CBFunction.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBFunction.cpp; sourceTree = "<group>"; };
+		AD2207152B1B269C007ED860 /* CBFunction.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBFunction.hpp; sourceTree = "<group>"; };
+		AD2207172B1B26AA007ED860 /* CBString.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBString.cpp; sourceTree = "<group>"; };
+		AD22071B2B1B29D6007ED860 /* PrimitiveBox.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PrimitiveBox.cpp; sourceTree = "<group>"; };
+		AD22071C2B1B29D6007ED860 /* PrimitiveBox.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PrimitiveBox.hpp; sourceTree = "<group>"; };
+		AD22071E2B1B2DAD007ED860 /* Runtime.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Runtime.cpp; sourceTree = "<group>"; };
+		AD22071F2B1B2DAD007ED860 /* Runtime.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Runtime.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +104,7 @@
 		AD14CF6A2B08BABA00137FDC /* cobra */ = {
 			isa = PBXGroup;
 			children = (
+				AD22071A2B1B2743007ED860 /* VMRuntime */,
 				AD0F9A8D2B10A3DA00BA198B /* test */,
 				AD14CF722B08BADB00137FDC /* Core */,
 				AD14CF6B2B08BABA00137FDC /* main.cpp */,
@@ -97,21 +115,39 @@
 		AD14CF722B08BADB00137FDC /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				AD14CF7B2B08BADB00137FDC /* GC.cpp */,
-				AD14CF782B08BADB00137FDC /* GC.hpp */,
-				AD14CF742B08BADB00137FDC /* Interpreter.cpp */,
-				AD14CF7D2B08BADB00137FDC /* Interpreter.hpp */,
 				AD14CF772B08BADB00137FDC /* Lexer.cpp */,
 				AD14CF7A2B08BADB00137FDC /* Lexer.hpp */,
 				AD14CF792B08BADB00137FDC /* Paser.cpp */,
 				AD14CF762B08BADB00137FDC /* Paser.hpp */,
 				AD14CF752B08BADB00137FDC /* SMLoc.hpp */,
-				AD14CF7C2B08BADB00137FDC /* VM.cpp */,
-				AD14CF732B08BADB00137FDC /* VM.hpp */,
-				AD0F9A902B10C21900BA198B /* CBValue.cpp */,
-				AD0F9A912B10C21900BA198B /* CBValue.hpp */,
+				AD2207112B1B1F88007ED860 /* Allocator.cpp */,
+				AD2207122B1B1F88007ED860 /* Allocator.hpp */,
 			);
 			path = Core;
+			sourceTree = "<group>";
+		};
+		AD22071A2B1B2743007ED860 /* VMRuntime */ = {
+			isa = PBXGroup;
+			children = (
+				AD14CF7C2B08BADB00137FDC /* VM.cpp */,
+				AD14CF732B08BADB00137FDC /* VM.hpp */,
+				AD14CF7B2B08BADB00137FDC /* GC.cpp */,
+				AD14CF782B08BADB00137FDC /* GC.hpp */,
+				AD0F9A902B10C21900BA198B /* CBValue.cpp */,
+				AD0F9A912B10C21900BA198B /* CBValue.hpp */,
+				AD2207142B1B269C007ED860 /* CBFunction.cpp */,
+				AD2207152B1B269C007ED860 /* CBFunction.hpp */,
+				AD2207172B1B26AA007ED860 /* CBString.cpp */,
+				AD22070E2B1B1F26007ED860 /* CBObject.cpp */,
+				AD22070F2B1B1F26007ED860 /* CBObject.hpp */,
+				AD22071B2B1B29D6007ED860 /* PrimitiveBox.cpp */,
+				AD22071C2B1B29D6007ED860 /* PrimitiveBox.hpp */,
+				AD14CF7D2B08BADB00137FDC /* Interpreter.hpp */,
+				AD14CF742B08BADB00137FDC /* Interpreter.cpp */,
+				AD22071E2B1B2DAD007ED860 /* Runtime.cpp */,
+				AD22071F2B1B2DAD007ED860 /* Runtime.hpp */,
+			);
+			path = VMRuntime;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -172,10 +208,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				AD14CF812B08BADB00137FDC /* GC.cpp in Sources */,
+				AD2207102B1B1F26007ED860 /* CBObject.cpp in Sources */,
 				AD14CF7F2B08BADB00137FDC /* Lexer.cpp in Sources */,
+				AD22071D2B1B29D6007ED860 /* PrimitiveBox.cpp in Sources */,
 				AD14CF802B08BADB00137FDC /* Paser.cpp in Sources */,
 				AD14CF7E2B08BADB00137FDC /* Interpreter.cpp in Sources */,
+				AD2207132B1B1F88007ED860 /* Allocator.cpp in Sources */,
+				AD2207162B1B269C007ED860 /* CBFunction.cpp in Sources */,
+				AD2207192B1B26AA007ED860 /* CBString.cpp in Sources */,
 				AD0F9A922B10C21900BA198B /* CBValue.cpp in Sources */,
+				AD2207202B1B2DAD007ED860 /* Runtime.cpp in Sources */,
 				AD14CF822B08BADB00137FDC /* VM.cpp in Sources */,
 				AD14CF6C2B08BABA00137FDC /* main.cpp in Sources */,
 			);

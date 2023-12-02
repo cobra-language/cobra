@@ -5,13 +5,4 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef VM_hpp
-#define VM_hpp
-
-#include <stdio.h>
-
-class VM {
-    
-};
-
-#endif /* VM_hpp */
+#include "CBFunction.hpp"

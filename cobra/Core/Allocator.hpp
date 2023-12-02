@@ -5,9 +5,18 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef GC_hpp
-#define GC_hpp
+#ifndef Allocator_hpp
+#define Allocator_hpp
 
 #include <stdio.h>
 
-#endif /* GC_hpp */
+namespace cobra {
+
+class ArenaAllocator {
+  
+  
+};
+
+}
+
+#endif /* Allocator_hpp */

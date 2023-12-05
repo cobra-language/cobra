@@ -5,20 +5,4 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef CBObject_hpp
-#define CBObject_hpp
-
-#include "CBValue.hpp"
-#include "GCCell.hpp"
-
-namespace cobra {
-namespace vm {
-
-class CBObject {
-  
-};
-
-}
-}
-
-#endif /* CBObject_hpp */
+#include "Tree.hpp"

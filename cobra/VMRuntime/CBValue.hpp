@@ -209,21 +209,6 @@ typedef enum {
   CBFiberKind,
 } CBValueKind;
 
-typedef struct CBObject {
-  int kind;
-} CBObject;
-
-#define DECLARE_BUFFER(name, type)                                             \
-typedef struct                                                             \
-{                                                                          \
-type* data;                                                              \
-int count;                                                               \
-int capacity;                                                            \
-} name##Buffer;
-
-DECLARE_BUFFER(Uint, uint32_t)
-DECLARE_BUFFER(Byte, uint8_t)
-
 
 }
 }

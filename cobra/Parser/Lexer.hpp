@@ -12,6 +12,7 @@
 #include <string>
 #include "SMLoc.hpp"
 #include "CBValue.hpp"
+#include "Allocator.hpp"
 
 namespace cobra {
 namespace parser {
@@ -177,7 +178,7 @@ private:
 
 class Lexer {
 public:
-  explicit Lexer(std::string &source);
+  explicit Lexer(const char* buffer, std::size_t bufferSize, Allocator& allocator);
   
   const Token *getCurToken() const {
     return &token_;
@@ -186,15 +187,12 @@ public:
   const Token *advance();
   
 private:
-  
-  std::string source_;
+  Allocator &allocator_;
   
   Token token_;
   
   size_t curPos_ = 0;
-  
-  char curChar;
-  
+    
   const char *bufferStart_;
   const char *bufferEnd_;
   const char *curCharPtr_;

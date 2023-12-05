@@ -9,6 +9,7 @@
 #define PrimitiveBox_hpp
 
 #include "CBObject.hpp"
+#include <string>
 
 namespace cobra {
 namespace vm {
@@ -17,7 +18,19 @@ class CBString final : public CBObject {
 public:
   using Super = CBObject;
   
+  explicit CBString(std::string value) : value_(std::move(value)) {}
   
+  static constexpr CBValueKind getCellKind() {
+    return CBValueKind::CBStringKind;
+  }
+  static bool classof(const GCCell *cell) {
+    return cell->getKind() == CBValueKind::CBStringKind;
+  }
+  
+  std::string &value() { return value_; }
+  
+private:
+  std::string value_;
   
 };
 

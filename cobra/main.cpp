@@ -8,8 +8,8 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include "VM.hpp"
-#include "Lexer.hpp"
+#include "VMRuntime/VM.hpp"
+#include "Paser.hpp"
 
 using namespace cobra;
 
@@ -22,14 +22,16 @@ static std::string loadFile(std::string path) {
 }
 
 int main(int argc, const char * argv[]) {
+  
   std::string source = loadFile(argv[1]);
-  parser::Lexer jsLexer(source);
+  Allocator allocator;
+  parser::Parser cbParser(source.c_str(), source.size(), allocator);
   
-  auto to = jsLexer.advance();
-  
-  while (to->getKind() != parser::TokenKind::eof) {
-    to = jsLexer.advance();
-  }
+//  auto to = cbLexer.advance();
+//
+//  while (to->getKind() != parser::TokenKind::eof) {
+//    to = cbLexer.advance();
+//  }
     
   return 0;
 }

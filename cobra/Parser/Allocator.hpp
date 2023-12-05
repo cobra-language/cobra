@@ -5,20 +5,20 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Paser_hpp
-#define Paser_hpp
+#ifndef Allocator_hpp
+#define Allocator_hpp
 
 #include <stdio.h>
 
 namespace cobra {
-namespace parser {
 
-class Parser {
+class Allocator {
+public:
+  
   
   
 };
 
 }
-}
 
-#endif /* Paser_hpp */
+#endif /* Allocator_hpp */

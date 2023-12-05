@@ -5,18 +5,4 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Allocator_hpp
-#define Allocator_hpp
-
-#include <stdio.h>
-
-namespace cobra {
-
-class ArenaAllocator {
-  
-  
-};
-
-}
-
-#endif /* Allocator_hpp */
+#include "CodeBlock.hpp"

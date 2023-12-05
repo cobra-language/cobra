@@ -5,4 +5,17 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "Paser.hpp"
+#ifndef ASTBuilder_hpp
+#define ASTBuilder_hpp
+
+namespace cobra {
+namespace Tree {
+
+class ASTBuilder {
+  
+};
+
+}
+}
+
+#endif /* ASTBuilder_hpp */

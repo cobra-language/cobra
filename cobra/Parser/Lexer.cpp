@@ -10,7 +10,7 @@
 namespace cobra {
 namespace parser {
 
-Lexer::Lexer(std::string &source) : source_(source), curChar(0), bufferStart_(source.c_str()), bufferEnd_(source.c_str() + source.length()), curCharPtr_(source.c_str()) {
+Lexer::Lexer(const char* buffer, std::size_t bufferSize, Allocator& allocator) : bufferStart_(buffer), bufferEnd_(buffer+bufferSize), curCharPtr_(buffer), allocator_(allocator) {
 
 }
 

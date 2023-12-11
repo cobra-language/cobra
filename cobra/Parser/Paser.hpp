@@ -20,16 +20,36 @@ class Parser {
 public:
   explicit Parser(const char* buffer, std::size_t bufferSize, Allocator& allocator);
   
+  Tree::Node *parse();
+  
 private:
   Lexer lexer_;
   
   const Token *tok_{};
   
-  Tree::Node *parse();
+  void advance() {
+    tok_ = lexer_.advance();
+  }
+  
+  bool checkAndEat(TokenKind kind);
+  
+  bool check(TokenKind kind) const {
+    return tok_->getKind() == kind;
+  }
   
   Tree::Node *parseProgram();
   
-  Tree::Node *parseStatementList();
+  Tree::Node *parseStatement();
+  
+  Tree::Node *parseStatementList(Tree::NodeList &stmtList);
+  
+  Tree::VariableDeclarationNode *parseVariableStatement();
+  
+  Tree::VariableDeclarationNode *parseLexicalDeclaration();
+  
+  bool parseVariableDeclarationList(Tree::NodeList &declList);
+  
+  Tree::VariableDeclaratorNode *parseVariableDeclaration();
   
   
 };

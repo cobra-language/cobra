@@ -9,12 +9,20 @@
 #define Tree_hpp
 
 #include <stdint.h>
+#include <vector>
 
 namespace cobra {
 namespace Tree {
 
+class ASTVisitor;
+class Node;
+
 enum class NoneType { None = 1 };
 const NoneType None = NoneType::None;
+
+using NodePtr = Node *;
+using NodeList = std::vector<Node>;
+
 
 enum class NodeKind : uint32_t {
   Empty,
@@ -29,11 +37,23 @@ enum class NodeKind : uint32_t {
 };
 
 class Node {
-    Node(const Node &) = delete;
-    void operator=(const Node &) = delete;
+//  Node(const Node &) = delete;
+//  void operator=(const Node &) = delete;
   
-    NodeKind kind_;
+  NodeKind kind_;
   
+public:
+  Node(NodeKind kind) : kind_(kind) {}
+//  virtual void visit(ASTVisitor &V) = 0;
+  
+  
+};
+
+class VariableDeclaratorNode : public Node {
+  
+};
+
+class VariableDeclarationNode : public Node {
   
 };
 

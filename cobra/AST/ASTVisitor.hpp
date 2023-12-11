@@ -15,10 +15,10 @@ namespace Tree {
 
 class ASTVisitor {
 public:
-  explicit ASTVisitor() = default;
-  ~ASTVisitor() = default;
+  ASTVisitor() = default;
+  virtual ~ASTVisitor() = default;
   
-  virtual bool visitNode(Node* node) { return true; }
+  virtual bool visitNode(Node *node) { return true; }
   
   
 };

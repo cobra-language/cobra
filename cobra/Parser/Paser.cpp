@@ -23,13 +23,63 @@ Tree::Node *Parser::parse() {
   
 }
 
+bool Parser::checkAndEat(TokenKind kind) {
+  if (tok_->getKind() == kind) {
+    advance();
+    return true;
+  }
+  return false;
+}
+
 Tree::Node *Parser::parseProgram() {
+  Tree::NodeList stmtList;
   
-  auto res = parseStatementList();
+  auto res = parseStatementList(stmtList);
   return res;
 }
 
-Tree::Node *Parser::parseStatementList() {
+Tree::Node *Parser::parseStatement() {
+  switch (tok_->getKind()) {
+    case TokenKind::l_brace:
+      
+      break;
+      
+    case TokenKind::rw_var:
+      return parseVariableStatement();
+    default:
+      break;
+  }
+  return res;
+}
+
+Tree::Node *Parser::parseStatementList(Tree::NodeList &stmtList) {
+  auto stmt = parseStatement();
+  stmtList.push_back(*stmt);
+  return &node;
+}
+
+Tree::VariableDeclarationNode *Parser::parseVariableStatement() {
+  return parseLexicalDeclaration();
+}
+
+Tree::VariableDeclarationNode *Parser::parseLexicalDeclaration() {
+  assert(check(TokenKind::rw_var));
+  
+  Tree::NodeList declList;
+  if (parseVariableDeclarationList(declList)) {
+    
+  }
+  
+}
+
+bool Parser::parseVariableDeclarationList(Tree::NodeList &declList) {
+  do {
+    auto decl = parseVariableDeclaration();
+    declList.push_back(*decl);
+  } while (checkAndEat(TokenKind::comma));
+}
+
+Tree::VariableDeclaratorNode *Parser::parseVariableDeclaration() {
   
   
 }

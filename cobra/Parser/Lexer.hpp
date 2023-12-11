@@ -90,6 +90,7 @@ enum class TokenKind {
   rw_end,              // end
   
   rw_null,             // null
+  rw_var,              // var
   rw_in,               // in
   rw_is,               // is
   rw_and,              // and

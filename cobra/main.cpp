@@ -26,6 +26,7 @@ int main(int argc, const char * argv[]) {
   std::string source = loadFile(argv[1]);
   Allocator allocator;
   parser::Parser cbParser(source.c_str(), source.size(), allocator);
+  cbParser.parse();
   
 //  auto to = cbLexer.advance();
 //

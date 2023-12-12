@@ -199,14 +199,22 @@ public:
     return &token_;
   }
   
+  SMLoc getCurLoc() const {
+    return SMLoc::getFromPointer(curCharPtr_);
+  }
+  
+  SMLoc getPrevTokenEndLoc() const {
+    return prevTokenEndLoc_;
+  }
+  
   const Token *advance();
   
 private:
   Allocator &allocator_;
   
   Token token_;
-  
-  size_t curPos_ = 0;
+    
+  SMLoc prevTokenEndLoc_;
     
   const char *bufferStart_;
   const char *bufferEnd_;

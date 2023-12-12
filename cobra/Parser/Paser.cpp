@@ -41,8 +41,20 @@ std::optional<Tree::Node *> Parser::parseProgram() {
 }
 
 std::optional<bool> Parser::parseStatementList(Tree::NodeList &stmtList) {
+  while (!match(TokenKind::eof)) {
+    if (!parseStatementListItem(stmtList)) {
+      return std::nullopt;
+    }
+  }
+  return true;
+}
+
+bool Parser::parseStatementListItem(Tree::NodeList &stmtList) {
   auto stmt = parseStatement();
+  if (!stmt)
+    return false;
   stmtList.push_back(*stmt.value());
+  
   return true;
 }
 
@@ -75,8 +87,10 @@ std::optional<Tree::VariableDeclarationNode *> Parser::parseLexicalDeclaration()
   
   Tree::NodeList declList;
   if (!parseVariableDeclarationList(declList)) {
-    
+    std::nullopt;
   }
+  
+  
  
   return std::nullopt;
 }

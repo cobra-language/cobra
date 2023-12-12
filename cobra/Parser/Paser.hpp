@@ -61,6 +61,10 @@ private:
     return rng.End;
   }
   
+  SMLoc getPrevTokenEndLoc() const {
+    return lexer_.getPrevTokenEndLoc();
+  }
+  
   void advance() {
     tok_ = lexer_.advance();
   }
@@ -74,6 +78,8 @@ private:
   std::optional<Tree::Node *> parseProgram();
   
   std::optional<bool> parseStatementList(Tree::NodeList &stmtList);
+  
+  bool parseStatementListItem(Tree::NodeList &stmtList);
   
   std::optional<Tree::Node *> parseStatement();
   

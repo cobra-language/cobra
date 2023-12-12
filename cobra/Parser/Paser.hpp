@@ -20,36 +20,74 @@ class Parser {
 public:
   explicit Parser(const char* buffer, std::size_t bufferSize, Allocator& allocator);
   
-  Tree::Node *parse();
+  std::optional<Tree::Node *> parse();
   
 private:
   Lexer lexer_;
   
   const Token *tok_{};
   
+  template <class Node, class StartLoc, class EndLoc>
+  Node *setLocation(StartLoc start, EndLoc end, Node *node) {
+    node->setStartLoc(getStartLoc(start));
+    node->setEndLoc(getEndLoc(end));
+    node->setDebugLoc(getStartLoc(start));
+    return node;
+  }
+  
+  static SMLoc getStartLoc(const Token *tok) {
+    return tok->getStartLoc();
+  }
+  static SMLoc getStartLoc(const Tree::Node *from) {
+    return from->getStartLoc();
+  }
+  static SMLoc getStartLoc(SMLoc loc) {
+    return loc;
+  }
+  static SMLoc getStartLoc(const SMRange &rng) {
+    return rng.Start;
+  }
+
+  static SMLoc getEndLoc(const Token *tok) {
+    return tok->getEndLoc();
+  }
+  static SMLoc getEndLoc(const Tree::Node *from) {
+    return from->getEndLoc();
+  }
+  static SMLoc getEndLoc(SMLoc loc) {
+    return loc;
+  }
+  static SMLoc getEndLoc(const SMRange &rng) {
+    return rng.End;
+  }
+  
   void advance() {
     tok_ = lexer_.advance();
   }
   
-  bool checkAndEat(TokenKind kind);
+  bool matchAndEat(TokenKind kind);
   
-  bool check(TokenKind kind) const {
+  bool match(TokenKind kind) const {
     return tok_->getKind() == kind;
   }
   
-  Tree::Node *parseProgram();
+  std::optional<Tree::Node *> parseProgram();
   
-  Tree::Node *parseStatement();
+  std::optional<bool> parseStatementList(Tree::NodeList &stmtList);
   
-  Tree::Node *parseStatementList(Tree::NodeList &stmtList);
+  std::optional<Tree::Node *> parseStatement();
   
-  Tree::VariableDeclarationNode *parseVariableStatement();
+  std::optional<Tree::VariableDeclarationNode *> parseVariableStatement();
   
-  Tree::VariableDeclarationNode *parseLexicalDeclaration();
+  std::optional<Tree::VariableDeclarationNode *> parseLexicalDeclaration();
   
   bool parseVariableDeclarationList(Tree::NodeList &declList);
   
-  Tree::VariableDeclaratorNode *parseVariableDeclaration();
+  std::optional<Tree::VariableDeclaratorNode *> parseVariableDeclaration();
+  
+  std::optional<Tree::IdentifierNode *> parseBindingIdentifier();
+  
+  bool validateBindingIdentifier(SMRange range, std::string id, TokenKind kind);
   
   
 };

@@ -142,6 +142,20 @@ public:
     return kind_;
   }
   
+  SMLoc getStartLoc() const {
+    return range_.Start;
+  }
+  SMLoc getEndLoc() const {
+    return range_.End;
+  }
+  SMRange getSourceRange() const {
+    return range_;
+  }
+  
+  std::string getResWordOrIdentifier() const {
+    return ident_;
+  }
+  
 private:
   std::string lexeme_;
     

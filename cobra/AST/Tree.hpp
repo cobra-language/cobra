@@ -10,6 +10,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include "SMLoc.hpp"
 
 namespace cobra {
 namespace Tree {
@@ -42,11 +43,30 @@ class Node {
   
   NodeKind kind_;
   
+  SMRange sourceRange_{};
+  
 public:
   Node(NodeKind kind) : kind_(kind) {}
 //  virtual void visit(ASTVisitor &V) = 0;
   
-  
+  void setSourceRange(SMRange rng) {
+    sourceRange_ = rng;
+  }
+  SMRange getSourceRange() const {
+    return sourceRange_;
+  }
+  void setStartLoc(SMLoc loc) {
+    sourceRange_.Start = loc;
+  }
+  SMLoc getStartLoc() const {
+    return sourceRange_.Start;
+  }
+  void setEndLoc(SMLoc loc) {
+    sourceRange_.End = loc;
+  }
+  SMLoc getEndLoc() const {
+    return sourceRange_.End;
+  }
 };
 
 class VariableDeclaratorNode : public Node {
@@ -76,6 +96,11 @@ class ClassExpressionNode : public Node {
 class ClassPropertyNode : public Node {
 
 };
+
+class IdentifierNode : public Node {
+  
+};
+
 
 
 

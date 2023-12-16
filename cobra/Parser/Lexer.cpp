@@ -10,9 +10,14 @@
 namespace cobra {
 namespace parser {
 
+const std::map<std::string, TokenKind> TokenMap = {
+#define RESWORD(name)  {#name, TokenKind::rw_##name},
+#include "TokenKinds.def"
+};
+
 Lexer::Lexer(const char* buffer, std::size_t bufferSize, Allocator& allocator)
     : bufferStart_(buffer), bufferEnd_(buffer+bufferSize), curCharPtr_(buffer), allocator_(allocator) {
-
+  initializeReservedIdentifiers();
 }
 
 bool Lexer::isDigit(const char c) const {
@@ -23,6 +28,14 @@ bool Lexer::isAlpha(char c) const {
   return (c >= 'a' && c <= 'z')
   || (c >= 'A' && c <= 'Z')
   || (c == '_');
+
+}
+
+void Lexer::initializeReservedIdentifiers() {
+  // Add all reserved words to the identifier table
+#define RESWORD(name) resWordIdent(TokenKind::rw_##name) = getIdentifier(#name);
+#include "TokenKinds.def"
+
 }
 
 const Token *Lexer::advance() {
@@ -79,8 +92,8 @@ const Token *Lexer::advance() {
           token_.setPunctuator(TokenKind::minusequal);
           curCharPtr_ += 2;
         } else if (curCharPtr_[1] == '>') {
-          token_.setPunctuator(TokenKind::arrow);
-          curCharPtr_ += 2;
+//          token_.setPunctuator(TokenKind::arrow);
+//          curCharPtr_ += 2;
         } else {
           token_.setPunctuator(TokenKind::minus);
           curCharPtr_ += 1;
@@ -350,8 +363,12 @@ void Lexer::scanNumber() {
 }
 
 static TokenKind matchReservedWord(const char *str, unsigned len) {
+  auto name = std::string(str, len);
+  if (TokenMap.count(name)) {
+    return TokenMap.at(name);
+  }
   
-  return TokenKind::rw_var;
+  return TokenKind::identifier;
 }
 
 TokenKind Lexer::scanReservedWord(const char *start, unsigned length) {
@@ -371,8 +388,8 @@ void Lexer::scanIdentifierParts() {
   size_t length = curCharPtr_ - start;
   auto rw = scanReservedWord(start, (unsigned)length);
   
-  std::string substr(start, curCharPtr_);
-  token_.setIdentifier(substr);
+//  std::string substr(start, curCharPtr_);
+//  token_.setIdentifier(substr);
 }
 
 void Lexer::scanString() {

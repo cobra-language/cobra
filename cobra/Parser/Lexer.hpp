@@ -233,6 +233,8 @@ private:
   
   void scanNumber();
   
+  TokenKind scanReservedWord(const char *start, unsigned length);
+  
   void scanIdentifierParts();
   
   void scanString();

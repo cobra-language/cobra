@@ -24,8 +24,9 @@ static std::string loadFile(std::string path) {
 int main(int argc, const char * argv[]) {
   
   std::string source = loadFile(argv[1]);
-  Allocator allocator;
-  parser::Parser cbParser(source.c_str(), source.size(), allocator);
+  auto context = std::make_shared<Context>();
+  
+  parser::Parser cbParser(*context, source.c_str(), source.size());
   cbParser.parse();
   
 //  auto to = cbLexer.advance();

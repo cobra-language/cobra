@@ -1,2 +1,4 @@
-a = 0; b = 1
-temp = a; a = b; b += temp;
+var a = 0; b = 1
+var temp = a;
+a = b;
+b += temp;

@@ -349,6 +349,16 @@ void Lexer::scanNumber() {
   token_.setNumericLiteral(val);
 }
 
+static TokenKind matchReservedWord(const char *str, unsigned len) {
+  
+  return TokenKind::rw_var;
+}
+
+TokenKind Lexer::scanReservedWord(const char *start, unsigned length) {
+  TokenKind rw = matchReservedWord(start, length);
+  return rw;
+}
+
 void Lexer::scanIdentifierParts() {
   const char *start = curCharPtr_;
   
@@ -357,6 +367,9 @@ void Lexer::scanIdentifierParts() {
     ++curCharPtr_;
     c = peakChar();
   }
+  
+  size_t length = curCharPtr_ - start;
+  auto rw = scanReservedWord(start, (unsigned)length);
   
   std::string substr(start, curCharPtr_);
   token_.setIdentifier(substr);

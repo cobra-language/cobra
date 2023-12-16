@@ -12,13 +12,20 @@
 #include "Lexer.hpp"
 #include "Tree.hpp"
 #include <optional>
+#include "Context.hpp"
 
 namespace cobra {
 namespace parser {
 
 class Parser {
 public:
-  explicit Parser(const char* buffer, std::size_t bufferSize, Allocator& allocator);
+  explicit Parser(Context &context, const char* buffer, std::size_t bufferSize);
+  
+  ~Parser() = default;
+  
+  Context &getContext() {
+    return context_;
+  }
   
   std::optional<Tree::Node *> parse();
   
@@ -27,11 +34,12 @@ private:
   
   const Token *tok_{};
   
+  Context &context_;
+  
   template <class Node, class StartLoc, class EndLoc>
   Node *setLocation(StartLoc start, EndLoc end, Node *node) {
     node->setStartLoc(getStartLoc(start));
     node->setEndLoc(getEndLoc(end));
-    node->setDebugLoc(getStartLoc(start));
     return node;
   }
   
@@ -65,8 +73,10 @@ private:
     return lexer_.getPrevTokenEndLoc();
   }
   
-  void advance() {
+  SMRange advance() {
+    SMRange loc = tok_->getSourceRange();
     tok_ = lexer_.advance();
+    return loc;
   }
   
   bool matchAndEat(TokenKind kind);

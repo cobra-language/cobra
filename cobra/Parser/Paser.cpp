@@ -10,8 +10,8 @@
 namespace cobra {
 namespace parser {
 
-Parser::Parser(const char* buffer, std::size_t bufferSize, Allocator& allocator)
-    : lexer_(buffer, bufferSize, allocator) {
+Parser::Parser(Context &context, const char* buffer, std::size_t bufferSize)
+    : context_(context), lexer_(buffer, bufferSize, context.getAllocator()) {
   
 }
 
@@ -20,7 +20,6 @@ std::optional<Tree::Node *> Parser::parse() {
   auto res = parseProgram();
   
   return res;
-  
 }
 
 bool Parser::matchAndEat(TokenKind kind) {
@@ -85,14 +84,20 @@ std::optional<Tree::VariableDeclarationNode *> Parser::parseVariableStatement() 
 std::optional<Tree::VariableDeclarationNode *> Parser::parseLexicalDeclaration() {
   assert(match(TokenKind::rw_var));
   
+  auto kindIdent = tok_->getResWordOrIdentifier();
+  SMLoc startLoc = advance().Start;
+  
   Tree::NodeList declList;
   if (!parseVariableDeclarationList(declList)) {
-    std::nullopt;
+    return std::nullopt;
   }
   
-  
+  auto *res = setLocation(
+      startLoc,
+      getPrevTokenEndLoc(),
+      new (context_) Tree::VariableDeclarationNode(kindIdent, std::move(declList)));
  
-  return std::nullopt;
+  return res;
 }
 
 bool Parser::parseVariableDeclarationList(Tree::NodeList &declList) {
@@ -107,6 +112,16 @@ bool Parser::parseVariableDeclarationList(Tree::NodeList &declList) {
 std::optional<Tree::VariableDeclaratorNode *> Parser::parseVariableDeclaration() {
   Tree::Node *target;
   SMLoc startLoc = tok_->getStartLoc();
+  
+  auto optIdent = parseBindingIdentifier();
+  target = *optIdent;
+  
+  if (!match(TokenKind::equal)) {
+    return setLocation(
+        startLoc,
+        getPrevTokenEndLoc(),
+        new (context_) Tree::VariableDeclaratorNode(nullptr, target));
+  }
   
   return std::nullopt;
 }

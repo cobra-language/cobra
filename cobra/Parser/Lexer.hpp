@@ -20,113 +20,122 @@ namespace parser {
 class Token;
 class Lexer;
 
+//enum class TokenKind {
+//  error = 0,
+//  none,
+//  eof,
+//  line,
+//
+//  // symbols
+//  period,              // .
+//  dotdot,              // ..
+//  comma,               // ,
+//  colon,               // :
+//  semi,                // ;
+//  hash,                // #
+//  l_paren,             // (
+//  r_paren,             // )
+//  l_square,            // [
+//  r_square,            // ]
+//  l_brace,             // {
+//  r_brace,             // }
+//  percent,             // %
+//
+//  tilde,               // ~
+//  amp,                 // &
+//  pipe,                // |
+//  caret,               // ^
+//  arrow,               // ->
+//
+//  plus,                // +
+//  minus,               // -
+//  star,                // *
+//  slash,               // /
+//  starstar,            // **
+//  bslash,              // \.
+//  equal,               // =
+//  greater,             // >
+//  less,                // <
+//
+//  equalequal,          // ==
+//  exclaimequal,        // !=
+//  greaterequal,        // >=
+//  lessequal,           // <=
+//
+//  plusequal,           // +=
+//  minusequal,          // -=
+//  starequal,           // *=
+//  slashequal,          // /=
+//  percentequal,        // %=
+//  starstarequal,       // **=
+//
+//  ampequal,            // &=
+//  pipeequal,           // |=
+//  caretequal,          // ^=
+//
+//  greatergreater,      // >>
+//  lessless,            // <<
+//
+//  greatergreaterequal, // >>=
+//  lesslessequal,       // <<=
+//
+//  // Keywords.
+//  rw_class,            // class
+//  rw_from,             // from
+//  rw_import,           // import
+//  rw_as,               // as
+//  rw_def,              // def
+//  rw_native,           // native (C function declaration)
+//  rw_fn,               // function (literal function)
+//  rw_end,              // end
+//
+//  rw_null,             // null
+//  rw_var,              // var
+//  rw_in,               // in
+//  rw_is,               // is
+//  rw_and,              // and
+//  rw_or,               // or
+//  rw_not,              // not / !
+//  rw_true,             // true
+//  rw_false,            // false
+//  rw_self,             // self
+//  rw_super,            // super
+//
+//  rw_do,               // do
+//  rw_then,             // then
+//  rw_while,            // while
+//  rw_for,              // for
+//  rw_if,               // if
+//  rw_elif,             // elif
+//  rw_else,             // else
+//  rw_break,            // break
+//  rw_continue,         // continue
+//  rw_return,           // return
+//
+//  identifier,          // identifier
+//
+//  numeric_literal,     // number literal
+//  string_literal,      // string literal
+//
+//  /* String interpolation
+//   *  "a ${b} c $d e"
+//   * tokenized as:
+//   *   TK_STR_INTERP  "a "
+//   *   TK_NAME        b
+//   *   TK_STR_INTERP  " c "
+//   *   TK_NAME        d
+//   *   TK_STRING     " e" */
+//  string_interp,
+//};
+
 enum class TokenKind {
-  error = 0,
-  none,
-  eof,
-  line,
-  
-  // symbols
-  period,              // .
-  dotdot,              // ..
-  comma,               // ,
-  colon,               // :
-  semi,                // ;
-  hash,                // #
-  l_paren,             // (
-  r_paren,             // )
-  l_square,            // [
-  r_square,            // ]
-  l_brace,             // {
-  r_brace,             // }
-  percent,             // %
-  
-  tilde,               // ~
-  amp,                 // &
-  pipe,                // |
-  caret,               // ^
-  arrow,               // ->
-  
-  plus,                // +
-  minus,               // -
-  star,                // *
-  slash,               // /
-  starstar,            // **
-  bslash,              // \.
-  equal,               // =
-  greater,             // >
-  less,                // <
-  
-  equalequal,          // ==
-  exclaimequal,        // !=
-  greaterequal,        // >=
-  lessequal,           // <=
-  
-  plusequal,           // +=
-  minusequal,          // -=
-  starequal,           // *=
-  slashequal,          // /=
-  percentequal,        // %=
-  starstarequal,       // **=
-  
-  ampequal,            // &=
-  pipeequal,           // |=
-  caretequal,          // ^=
-  
-  greatergreater,      // >>
-  lessless,            // <<
-  
-  greatergreaterequal, // >>=
-  lesslessequal,       // <<=
-  
-  // Keywords.
-  rw_class,            // class
-  rw_from,             // from
-  rw_import,           // import
-  rw_as,               // as
-  rw_def,              // def
-  rw_native,           // native (C function declaration)
-  rw_fn,               // function (literal function)
-  rw_end,              // end
-  
-  rw_null,             // null
-  rw_var,              // var
-  rw_in,               // in
-  rw_is,               // is
-  rw_and,              // and
-  rw_or,               // or
-  rw_not,              // not / !
-  rw_true,             // true
-  rw_false,            // false
-  rw_self,             // self
-  rw_super,            // super
-  
-  rw_do,               // do
-  rw_then,             // then
-  rw_while,            // while
-  rw_for,              // for
-  rw_if,               // if
-  rw_elif,             // elif
-  rw_else,             // else
-  rw_break,            // break
-  rw_continue,         // continue
-  rw_return,           // return
-  
-  identifier,          // identifier
-  
-  numeric_literal,     // number literal
-  string_literal,      // string literal
-  
-  /* String interpolation
-   *  "a ${b} c $d e"
-   * tokenized as:
-   *   TK_STR_INTERP  "a "
-   *   TK_NAME        b
-   *   TK_STR_INTERP  " c "
-   *   TK_NAME        d
-   *   TK_STRING     " e" */
-  string_interp,
+#define TOK(name, str) name,
+#include "TokenKinds.def"
 };
+
+inline constexpr int ord(TokenKind kind) {
+  return static_cast<int>(kind);
+}
 
 class Token {
   TokenKind kind_{TokenKind::none};
@@ -222,6 +231,21 @@ private:
   
   bool newLineBeforeCurrentToken_ = false;
   
+  std::string *resWordIdent_
+      [ord(TokenKind::_last_resword) - ord(TokenKind::_first_resword) + 1];
+
+  std::string *&resWordIdent(TokenKind kind) {
+    assert(
+        kind >= TokenKind::_first_resword && kind <= TokenKind::_last_resword);
+    return resWordIdent_[ord(kind) - ord(TokenKind::_first_resword)];
+  }
+  
+  std::string *getIdentifier(std::string name) {
+//    std::cout << name << std::endl;
+    std::string str("");
+    return &str;
+  }
+  
   bool isDigit(char c) const;
   bool isAlpha(char c) const;
   
@@ -238,6 +262,8 @@ private:
   void scanIdentifierParts();
   
   void scanString();
+  
+  void initializeReservedIdentifiers();
   
   inline void finishToken(const char *end) {
     token_.setEnd(end);

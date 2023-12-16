@@ -80,6 +80,7 @@
 		AD2207312B1F8DB2007ED860 /* ASTVisitor.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ASTVisitor.cpp; sourceTree = "<group>"; };
 		AD2207322B1F8DB2007ED860 /* ASTVisitor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ASTVisitor.hpp; sourceTree = "<group>"; };
 		AD2207362B2981AF007ED860 /* Context.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Context.hpp; sourceTree = "<group>"; };
+		AD22074D2B2D6DAF007ED860 /* TokenKinds.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TokenKinds.def; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,6 +140,7 @@
 				AD14CF762B08BADB00137FDC /* Paser.hpp */,
 				AD14CF752B08BADB00137FDC /* SMLoc.hpp */,
 				AD2207122B1B1F88007ED860 /* Allocator.hpp */,
+				AD22074D2B2D6DAF007ED860 /* TokenKinds.def */,
 			);
 			path = Parser;
 			sourceTree = "<group>";

@@ -142,6 +142,7 @@ class Token {
   SMRange range_{};
   double numeric_{};
   std::string ident_;
+  std::string stringLiteral_;
   
 public:
   Token() = default;
@@ -161,8 +162,23 @@ public:
     return range_;
   }
   
+  double getNumericLiteral() const {
+    assert(getKind() == TokenKind::numeric_literal);
+    return numeric_;
+  }
+  
+  std::string getIdentifier() const {
+    assert(getKind() == TokenKind::identifier);
+    return ident_;
+  }
+  
   std::string getResWordOrIdentifier() const {
     return ident_;
+  }
+  
+  std::string getStringLiteral() const {
+    assert(getKind() == TokenKind::string_literal);
+    return stringLiteral_;
   }
   
 private:
@@ -194,6 +210,12 @@ private:
   
   void setIdentifier(std::string ident) {
     kind_ = TokenKind::identifier;
+    ident_ = ident;
+  }
+  
+  void setResWord(TokenKind kind, std::string ident) {
+    assert(kind > TokenKind::_first_resword && kind < TokenKind::_last_resword);
+    kind_ = kind;
     ident_ = ident;
   }
   

@@ -1,4 +1,4 @@
-var a = 0; b = 1
+var a : number = 0; b = 1
 var temp = a;
 a = b;
 b += temp;

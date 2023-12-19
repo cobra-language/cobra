@@ -87,6 +87,16 @@ private:
   
   std::optional<Tree::Node *> parseProgram();
   
+  std::optional<Tree::Node *> parseTypeAnnotation(std::optional<SMLoc> wrappedStart = std::nullopt);
+    
+  std::optional<Tree::Node *> parseUnionType();
+  
+  std::optional<Tree::Node *> parseIntersectionType();
+  
+  std::optional<Tree::Node *> parsePostfixType();
+  
+  std::optional<Tree::Node *> parsePrimaryType();
+  
   std::optional<bool> parseStatementList(Tree::NodeList &stmtList);
   
   bool parseStatementListItem(Tree::NodeList &stmtList);
@@ -104,6 +114,22 @@ private:
   std::optional<Tree::IdentifierNode *> parseBindingIdentifier();
   
   bool validateBindingIdentifier(SMRange range, std::string id, TokenKind kind);
+  
+  std::optional<Tree::Node *> parseAssignmentExpression();
+  
+  std::optional<Tree::Node *> parseConditionalExpression();
+  
+  std::optional<Tree::Node *> parseBinaryExpression();
+  
+  std::optional<Tree::Node *> parseUnaryExpression();
+  
+  std::optional<Tree::Node *> parseUpdateExpression();
+  
+  std::optional<Tree::Node *> parseLeftHandSideExpression();
+  
+  std::optional<Tree::Node *> parseNewExpressionOrOptionalExpression();
+  
+  std::optional<Tree::Node *> parsePrimaryExpression();
   
   
 };

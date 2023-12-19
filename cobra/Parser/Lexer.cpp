@@ -364,11 +364,8 @@ void Lexer::scanNumber() {
 
 static TokenKind matchReservedWord(const char *str, unsigned len) {
   auto name = std::string(str, len);
-  if (TokenMap.count(name)) {
-    return TokenMap.at(name);
-  }
-  
-  return TokenKind::identifier;
+  auto it = TokenMap.find(name);
+  return it == TokenMap.end() ? TokenKind::identifier : it->second;
 }
 
 TokenKind Lexer::scanReservedWord(const char *start, unsigned length) {
@@ -387,6 +384,11 @@ void Lexer::scanIdentifierParts() {
   
   size_t length = curCharPtr_ - start;
   auto rw = scanReservedWord(start, (unsigned)length);
+  if (rw != TokenKind::identifier) {
+    token_.setResWord(rw, *resWordIdent(rw));
+  } else {
+    token_.setIdentifier(std::string(start, (unsigned)length));
+  }
   
 //  std::string substr(start, curCharPtr_);
 //  token_.setIdentifier(substr);

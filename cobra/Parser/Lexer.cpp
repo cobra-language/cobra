@@ -15,9 +15,13 @@ const std::map<std::string, TokenKind> TokenMap = {
 #include "TokenKinds.def"
 };
 
+const std::map<TokenKind, std::string> resWordIdentMap = {
+#define RESWORD(name)  {TokenKind::rw_##name, #name},
+#include "TokenKinds.def"
+};
+
 Lexer::Lexer(const char* buffer, std::size_t bufferSize, Allocator& allocator)
     : bufferStart_(buffer), bufferEnd_(buffer+bufferSize), curCharPtr_(buffer), allocator_(allocator) {
-  initializeReservedIdentifiers();
 }
 
 bool Lexer::isDigit(const char c) const {
@@ -28,13 +32,6 @@ bool Lexer::isAlpha(char c) const {
   return (c >= 'a' && c <= 'z')
   || (c >= 'A' && c <= 'Z')
   || (c == '_');
-
-}
-
-void Lexer::initializeReservedIdentifiers() {
-  // Add all reserved words to the identifier table
-#define RESWORD(name) resWordIdent(TokenKind::rw_##name) = getIdentifier(#name);
-#include "TokenKinds.def"
 
 }
 
@@ -215,7 +212,7 @@ const Token *Lexer::advance() {
       case '.':
         token_.setStart(curCharPtr_);
         if (curCharPtr_[1] >= '0' && curCharPtr_[1] <= '9') {
-          scanNumber();
+          lexNumber();
         } else if (curCharPtr_[1] == '.') {
           token_.setPunctuator(TokenKind::dotdot);
           curCharPtr_ += 3;
@@ -229,7 +226,7 @@ const Token *Lexer::advance() {
       case '5': case '6': case '7': case '8': case '9':
         // clang-format on
         token_.setStart(curCharPtr_);
-        scanNumber();
+        lexNumber();
         break;
         
       case '_': case '$':
@@ -243,13 +240,13 @@ const Token *Lexer::advance() {
       case 'V': case 'W': case 'X': case 'Y': case 'Z':
         // clang-format on
         token_.setStart(curCharPtr_);
-        scanIdentifierParts();
+        lexIdentifier();
         break;
         
       case '\'':
       case '"':
         token_.setStart(curCharPtr_);
-        scanString();
+        lexStringLiteral();
         break;
       
       default:{
@@ -342,7 +339,7 @@ endLoop:
   return cur;
 }
 
-void Lexer::scanNumber() {
+void Lexer::lexNumber() {
   const char *start = curCharPtr_;
 
   while(isDigit(peakChar())) {
@@ -362,6 +359,10 @@ void Lexer::scanNumber() {
   token_.setNumericLiteral(val);
 }
 
+std::string resWordIdent(TokenKind kind) {
+  return resWordIdentMap.at(kind);
+}
+
 static TokenKind matchReservedWord(const char *str, unsigned len) {
   auto name = std::string(str, len);
   auto it = TokenMap.find(name);
@@ -373,7 +374,7 @@ TokenKind Lexer::scanReservedWord(const char *start, unsigned length) {
   return rw;
 }
 
-void Lexer::scanIdentifierParts() {
+void Lexer::lexIdentifier() {
   const char *start = curCharPtr_;
   
   char c = peakChar();
@@ -385,7 +386,7 @@ void Lexer::scanIdentifierParts() {
   size_t length = curCharPtr_ - start;
   auto rw = scanReservedWord(start, (unsigned)length);
   if (rw != TokenKind::identifier) {
-    token_.setResWord(rw, *resWordIdent(rw));
+    token_.setResWord(rw, resWordIdent(rw));
   } else {
     token_.setIdentifier(std::string(start, (unsigned)length));
   }
@@ -394,7 +395,7 @@ void Lexer::scanIdentifierParts() {
 //  token_.setIdentifier(substr);
 }
 
-void Lexer::scanString() {
+void Lexer::lexStringLiteral() {
   
 }
 

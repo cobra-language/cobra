@@ -253,19 +253,9 @@ private:
   
   bool newLineBeforeCurrentToken_ = false;
   
-  std::string *resWordIdent_
-      [ord(TokenKind::_last_resword) - ord(TokenKind::_first_resword) + 1];
-
-  std::string *&resWordIdent(TokenKind kind) {
-    assert(
-        kind >= TokenKind::_first_resword && kind <= TokenKind::_last_resword);
-    return resWordIdent_[ord(kind) - ord(TokenKind::_first_resword)];
-  }
-  
   std::string *getIdentifier(std::string name) {
-//    std::cout << name << std::endl;
-    std::string str("");
-    return &str;
+    
+    return &name;
   }
   
   bool isDigit(char c) const;
@@ -277,13 +267,13 @@ private:
   
   const char *skipBlockComment(const char *start);
   
-  void scanNumber();
+  void lexNumber();
   
   TokenKind scanReservedWord(const char *start, unsigned length);
   
-  void scanIdentifierParts();
+  void lexIdentifier();
   
-  void scanString();
+  void lexStringLiteral();
   
   void initializeReservedIdentifiers();
   

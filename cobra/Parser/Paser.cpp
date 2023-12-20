@@ -83,11 +83,7 @@ std::optional<Tree::Node *> Parser::parseIntersectionType() {
 std::optional<Tree::Node *> Parser::parsePostfixType() {
   SMLoc start = tok_->getStartLoc();
   auto optPrimary = parsePrimaryType();
-  if (!optPrimary)
-    return std::nullopt;
-  
-  
-  return std::nullopt;
+  return optPrimary;
 }
 
 std::optional<Tree::Node *> Parser::parsePrimaryType() {
@@ -181,6 +177,14 @@ std::optional<Tree::VariableDeclarationNode *> Parser::parseVariableStatement() 
   return parseLexicalDeclaration();
 }
 
+bool Parser::eatSemi() {
+  if (tok_->getKind() == TokenKind::semi) {
+    advance();
+    return true;
+  }
+  return false;
+}
+
 std::optional<Tree::VariableDeclarationNode *> Parser::parseLexicalDeclaration() {
   assert(match(TokenKind::rw_var));
   
@@ -191,6 +195,9 @@ std::optional<Tree::VariableDeclarationNode *> Parser::parseLexicalDeclaration()
   if (!parseVariableDeclarationList(declList)) {
     return std::nullopt;
   }
+  
+  if (!eatSemi())
+    return std::nullopt;
   
   auto *res = setLocation(
       startLoc,
@@ -206,7 +213,7 @@ bool Parser::parseVariableDeclarationList(Tree::NodeList &declList) {
     declList.push_back(*decl.value());
   } while (matchAndEat(TokenKind::comma));
   
-  return false;
+  return true;
 }
 
 std::optional<Tree::VariableDeclaratorNode *> Parser::parseVariableDeclaration() {
@@ -356,6 +363,14 @@ std::optional<Tree::Node *> Parser::parseNewExpressionOrOptionalExpression() {
 
 std::optional<Tree::Node *> Parser::parsePrimaryExpression() {
   switch (tok_->getKind()) {
+    case TokenKind::identifier: {
+      auto *res = setLocation(
+          tok_,
+          tok_,
+          new (context_) Tree::IdentifierNode(tok_->getIdentifier(), nullptr, false));
+      advance();
+      return res;
+    }
     case TokenKind::rw_true:
     case TokenKind::rw_false: {
       auto *res = setLocation(

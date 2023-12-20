@@ -241,6 +241,21 @@ public:
   
 };
 
+class BinaryExpression : public Node {
+public:
+  NodePtr left_;
+  NodePtr right_;
+  NodeLabel operator_;
+  explicit BinaryExpression(NodePtr left, NodePtr right, NodeLabel _operator)
+      : Node(NodeKind::Identifier),
+      left_(std::move(left)) ,
+      right_(std::move(right)) ,
+      operator_(std::move(_operator)) {
+    
+  }
+  
+};
+
 
 
 

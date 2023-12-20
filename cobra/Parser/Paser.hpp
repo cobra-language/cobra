@@ -103,6 +103,8 @@ private:
   
   std::optional<Tree::Node *> parseStatement();
   
+  bool eatSemi();
+  
   std::optional<Tree::VariableDeclarationNode *> parseVariableStatement();
   
   std::optional<Tree::VariableDeclarationNode *> parseLexicalDeclaration();

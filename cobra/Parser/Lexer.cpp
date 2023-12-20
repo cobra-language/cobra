@@ -15,9 +15,13 @@ const std::map<std::string, TokenKind> TokenMap = {
 #include "TokenKinds.def"
 };
 
+const std::map<TokenKind, std::string> resWordIdentMap = {
+#define RESWORD(name)  {TokenKind::rw_##name, #name},
+#include "TokenKinds.def"
+};
+
 Lexer::Lexer(const char* buffer, std::size_t bufferSize, Allocator& allocator)
     : bufferStart_(buffer), bufferEnd_(buffer+bufferSize), curCharPtr_(buffer), allocator_(allocator) {
-  initializeReservedIdentifiers();
 }
 
 bool Lexer::isDigit(const char c) const {
@@ -28,13 +32,6 @@ bool Lexer::isAlpha(char c) const {
   return (c >= 'a' && c <= 'z')
   || (c >= 'A' && c <= 'Z')
   || (c == '_');
-
-}
-
-void Lexer::initializeReservedIdentifiers() {
-  // Add all reserved words to the identifier table
-#define RESWORD(name) resWordIdent(TokenKind::rw_##name) = getIdentifier(#name);
-#include "TokenKinds.def"
 
 }
 
@@ -362,6 +359,10 @@ void Lexer::lexNumber() {
   token_.setNumericLiteral(val);
 }
 
+std::string resWordIdent(TokenKind kind) {
+  return resWordIdentMap.at(kind);
+}
+
 static TokenKind matchReservedWord(const char *str, unsigned len) {
   auto name = std::string(str, len);
   auto it = TokenMap.find(name);
@@ -385,7 +386,7 @@ void Lexer::lexIdentifier() {
   size_t length = curCharPtr_ - start;
   auto rw = scanReservedWord(start, (unsigned)length);
   if (rw != TokenKind::identifier) {
-    token_.setResWord(rw, *resWordIdent(rw));
+    token_.setResWord(rw, resWordIdent(rw));
   } else {
     token_.setIdentifier(std::string(start, (unsigned)length));
   }

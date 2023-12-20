@@ -215,7 +215,7 @@ const Token *Lexer::advance() {
       case '.':
         token_.setStart(curCharPtr_);
         if (curCharPtr_[1] >= '0' && curCharPtr_[1] <= '9') {
-          scanNumber();
+          lexNumber();
         } else if (curCharPtr_[1] == '.') {
           token_.setPunctuator(TokenKind::dotdot);
           curCharPtr_ += 3;
@@ -229,7 +229,7 @@ const Token *Lexer::advance() {
       case '5': case '6': case '7': case '8': case '9':
         // clang-format on
         token_.setStart(curCharPtr_);
-        scanNumber();
+        lexNumber();
         break;
         
       case '_': case '$':
@@ -243,13 +243,13 @@ const Token *Lexer::advance() {
       case 'V': case 'W': case 'X': case 'Y': case 'Z':
         // clang-format on
         token_.setStart(curCharPtr_);
-        scanIdentifierParts();
+        lexIdentifier();
         break;
         
       case '\'':
       case '"':
         token_.setStart(curCharPtr_);
-        scanString();
+        lexStringLiteral();
         break;
       
       default:{
@@ -342,7 +342,7 @@ endLoop:
   return cur;
 }
 
-void Lexer::scanNumber() {
+void Lexer::lexNumber() {
   const char *start = curCharPtr_;
 
   while(isDigit(peakChar())) {
@@ -373,7 +373,7 @@ TokenKind Lexer::scanReservedWord(const char *start, unsigned length) {
   return rw;
 }
 
-void Lexer::scanIdentifierParts() {
+void Lexer::lexIdentifier() {
   const char *start = curCharPtr_;
   
   char c = peakChar();
@@ -394,7 +394,7 @@ void Lexer::scanIdentifierParts() {
 //  token_.setIdentifier(substr);
 }
 
-void Lexer::scanString() {
+void Lexer::lexStringLiteral() {
   
 }
 

@@ -263,9 +263,7 @@ private:
   }
   
   std::string *getIdentifier(std::string name) {
-//    std::cout << name << std::endl;
-    std::string str("");
-    return &str;
+    return &name;
   }
   
   bool isDigit(char c) const;
@@ -277,13 +275,13 @@ private:
   
   const char *skipBlockComment(const char *start);
   
-  void scanNumber();
+  void lexNumber();
   
   TokenKind scanReservedWord(const char *start, unsigned length);
   
-  void scanIdentifierParts();
+  void lexIdentifier();
   
-  void scanString();
+  void lexStringLiteral();
   
   void initializeReservedIdentifiers();
   

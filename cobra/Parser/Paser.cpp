@@ -83,11 +83,7 @@ std::optional<Tree::Node *> Parser::parseIntersectionType() {
 std::optional<Tree::Node *> Parser::parsePostfixType() {
   SMLoc start = tok_->getStartLoc();
   auto optPrimary = parsePrimaryType();
-  if (!optPrimary)
-    return std::nullopt;
-  
-  
-  return std::nullopt;
+  return optPrimary;
 }
 
 std::optional<Tree::Node *> Parser::parsePrimaryType() {
@@ -206,7 +202,7 @@ bool Parser::parseVariableDeclarationList(Tree::NodeList &declList) {
     declList.push_back(*decl.value());
   } while (matchAndEat(TokenKind::comma));
   
-  return false;
+  return true;
 }
 
 std::optional<Tree::VariableDeclaratorNode *> Parser::parseVariableDeclaration() {

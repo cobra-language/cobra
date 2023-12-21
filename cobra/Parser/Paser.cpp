@@ -6,6 +6,7 @@
  */
 
 #include "Paser.hpp"
+#include <iostream>
 
 namespace cobra {
 namespace parser {
@@ -299,7 +300,46 @@ std::optional<Tree::Node *> Parser::parseConditionalExpression() {
   return optTest;
 }
 
+namespace {
+
+inline unsigned getPrecedence(TokenKind kind) {
+  // Record the precedence of all binary operators.
+  static const unsigned precedence[] = {
+#define TOK(...) 0,
+#define BINOP(name, str, precedence) precedence,
+
+// There are two reserved words that are binary operators.
+#define RESWORD(name)                                       \
+  (TokenKind::rw_##name == TokenKind::rw_in ||              \
+           TokenKind::rw_##name == TokenKind::rw_instanceof \
+       ? 8                                                  \
+       : 0),
+#include "TokenKinds.def"
+  };
+  
+  return precedence[static_cast<unsigned>(kind)];
+}
+
+}
+
 std::optional<Tree::Node *> Parser::parseBinaryExpression() {
+  struct PrecedenceStackEntry {
+    /// Left hand side expression.
+    Tree::NodePtr expr;
+    // Operator for this expression.
+    TokenKind opKind;
+    // Start location for the left hand side expression.
+    SMLoc exprStartLoc;
+
+    PrecedenceStackEntry(
+        Tree::NodePtr expr,
+        TokenKind opKind,
+        SMLoc exprStartLoc)
+        : expr(expr), opKind(opKind), exprStartLoc(exprStartLoc) {}
+  };
+  
+  std::vector<PrecedenceStackEntry> stack{};
+  
   SMLoc topExprStartLoc = tok_->getStartLoc();
   Tree::Node *topExpr = nullptr;
   auto optExpr = parseUnaryExpression();
@@ -307,8 +347,36 @@ std::optional<Tree::Node *> Parser::parseBinaryExpression() {
     return std::nullopt;
   topExpr = optExpr.value();
   
-  
   SMLoc topExprEndLoc = getPrevTokenEndLoc();
+  
+  while (unsigned precedence = getPrecedence(tok_->getKind())) {
+    while (!stack.empty() && precedence <= getPrecedence(stack.back().opKind)) {
+      topExpr = setLocation(
+            stack.back().exprStartLoc,
+            topExprEndLoc,
+            new (context_) Tree::BinaryExpressionNode(stack.back().expr, topExpr, ""));
+    }
+    
+    stack.push_back({topExpr, tok_->getKind(), topExprStartLoc});
+    advance();
+    
+    topExprStartLoc = tok_->getStartLoc();
+    
+    auto optRightExpr = parseUnaryExpression();
+    if (!optRightExpr)
+      return std::nullopt;
+    topExpr = optRightExpr.value();
+    
+    topExprEndLoc = getPrevTokenEndLoc();
+  }
+  
+  while (!stack.empty()) {
+    topExpr = setLocation(
+          stack.back().exprStartLoc,
+          topExprEndLoc,
+          new (context_) Tree::BinaryExpressionNode(stack.back().expr, topExpr, ""));
+    stack.pop_back();
+  }
   
   return topExpr;
 }
@@ -329,19 +397,28 @@ std::optional<Tree::Node *> Parser::parseUnaryExpression() {
       
     case TokenKind::plusplus:
     case TokenKind::minusminus: {
-      return std::nullopt;
+      advance();
+      auto expr = parseUnaryExpression();
+      if (!expr)
+        return std::nullopt;
+
+      return setLocation(
+          startLoc,
+          getPrevTokenEndLoc(),
+          new (context_)
+              Tree::PostfixUnaryExpressionNode("++", expr.value(), true));
     }
       
     case TokenKind::less:
       return std::nullopt;
       
     default:
-      return parseUpdateExpression();
+      return parsePostfixExpression();
   }
   
 }
 
-std::optional<Tree::Node *> Parser::parseUpdateExpression() {
+std::optional<Tree::Node *> Parser::parsePostfixExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   auto optLHandExpr = parseLeftHandSideExpression();
   return optLHandExpr;
@@ -404,6 +481,8 @@ std::optional<Tree::Node *> Parser::parsePrimaryExpression() {
       
   }
 }
+
+
 
 
 

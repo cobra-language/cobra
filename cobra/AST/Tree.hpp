@@ -37,6 +37,8 @@ enum class NodeKind : uint32_t {
   WhileStatement,
   LoopStatement,
   UnaryExpression,
+  PostfixUnaryExpression,
+  BinaryExpression,
   ClassDeclaration,
   FunctionDeclaration,
   ReturnStatement,
@@ -226,13 +228,13 @@ public:
   }
 };
 
-class UnaryExpression : public Node {
+class UnaryExpressionNode : public Node {
 public:
   NodeLabel operator_;
   NodePtr argument_;
   NodeBoolean prefix_;
-  explicit UnaryExpression(NodeLabel _operator, NodePtr argument, NodeBoolean prefix)
-      : Node(NodeKind::Identifier),
+  explicit UnaryExpressionNode(NodeLabel _operator, NodePtr argument, NodeBoolean prefix)
+      : Node(NodeKind::UnaryExpression),
       operator_(std::move(_operator)),
       argument_(std::move(argument)) ,
       prefix_(std::move(prefix)) {
@@ -241,13 +243,28 @@ public:
   
 };
 
-class BinaryExpression : public Node {
+class PostfixUnaryExpressionNode : public Node {
+public:
+  NodeLabel operator_;
+  NodePtr argument_;
+  NodeBoolean prefix_;
+  explicit PostfixUnaryExpressionNode(NodeLabel _operator, NodePtr argument, NodeBoolean prefix)
+      : Node(NodeKind::PostfixUnaryExpression),
+      operator_(std::move(_operator)),
+      argument_(std::move(argument)) ,
+      prefix_(std::move(prefix)) {
+    
+  }
+  
+};
+
+class BinaryExpressionNode : public Node {
 public:
   NodePtr left_;
   NodePtr right_;
   NodeLabel operator_;
-  explicit BinaryExpression(NodePtr left, NodePtr right, NodeLabel _operator)
-      : Node(NodeKind::Identifier),
+  explicit BinaryExpressionNode(NodePtr left, NodePtr right, NodeLabel _operator)
+      : Node(NodeKind::BinaryExpression),
       left_(std::move(left)) ,
       right_(std::move(right)) ,
       operator_(std::move(_operator)) {

@@ -125,7 +125,7 @@ private:
   
   std::optional<Tree::Node *> parseUnaryExpression();
   
-  std::optional<Tree::Node *> parseUpdateExpression();
+  std::optional<Tree::Node *> parsePostfixExpression();
   
   std::optional<Tree::Node *> parseLeftHandSideExpression();
   

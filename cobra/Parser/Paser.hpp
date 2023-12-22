@@ -133,6 +133,8 @@ private:
   
   std::optional<Tree::Node *> parsePrimaryExpression();
   
+  std::optional<Tree::Node *> parseExpression();
+  
   
 };
 

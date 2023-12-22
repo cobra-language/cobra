@@ -448,6 +448,7 @@ std::optional<Tree::Node *> Parser::parsePrimaryExpression() {
       advance();
       return res;
     }
+      
     case TokenKind::rw_true:
     case TokenKind::rw_false: {
       auto *res = setLocation(
@@ -458,6 +459,7 @@ std::optional<Tree::Node *> Parser::parsePrimaryExpression() {
       advance();
       return res;
     }
+      
     case TokenKind::numeric_literal: {
       auto *res = setLocation(
           tok_,
@@ -474,20 +476,33 @@ std::optional<Tree::Node *> Parser::parsePrimaryExpression() {
           new (context_) Tree::StringLiteralNode(tok_->getStringLiteral()));
       advance();
       return res;
-      
     }
+      
+    case TokenKind::l_paren: {
+      advance();
+      auto optExpr = parseExpression();
+      return optExpr;
+    }
+
     default:
       return std::nullopt;
       
   }
 }
 
-
-
-
-
-
-
+std::optional<Tree::Node *> Parser::parseExpression() {
+  SMLoc startLoc = tok_->getStartLoc();
+  auto optExpr = parseAssignmentExpression();
+  
+  if (!match(TokenKind::comma))
+    return optExpr.value();
+  
+  while (match(TokenKind::comma)) {
+    
+  }
+  
+  return optExpr;
+}
 
 
 }

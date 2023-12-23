@@ -73,11 +73,17 @@ private:
     return lexer_.getPrevTokenEndLoc();
   }
   
+  std::string getTokenIdent(TokenKind kind) const {
+    return tokenKindStr(kind);
+  }
+  
   SMRange advance() {
     SMRange loc = tok_->getSourceRange();
     tok_ = lexer_.advance();
     return loc;
   }
+  
+  bool eat(TokenKind kind);
   
   bool matchAndEat(TokenKind kind);
   

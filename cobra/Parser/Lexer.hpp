@@ -137,6 +137,8 @@ inline constexpr int ord(TokenKind kind) {
   return static_cast<int>(kind);
 }
 
+std::string tokenKindStr(TokenKind kind);
+
 class Token {
   TokenKind kind_{TokenKind::none};
   SMRange range_{};
@@ -278,6 +280,7 @@ private:
   void initializeReservedIdentifiers();
   
   inline void finishToken(const char *end) {
+    prevTokenEndLoc_ = token_.getEndLoc();
     token_.setEnd(end);
   }
   

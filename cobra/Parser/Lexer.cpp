@@ -10,6 +10,16 @@
 namespace cobra {
 namespace parser {
 
+std::string g_tokenStr[] = {
+#define TOK(name, str) str,
+#include "TokenKinds.def"
+};
+
+std::string tokenKindStr(TokenKind kind) {
+  assert(kind <= TokenKind::_last_token);
+  return g_tokenStr[static_cast<unsigned>(kind)];
+}
+
 const std::map<std::string, TokenKind> TokenMap = {
 #define RESWORD(name)  {#name, TokenKind::rw_##name},
 #include "TokenKinds.def"

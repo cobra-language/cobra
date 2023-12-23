@@ -23,6 +23,14 @@ std::optional<Tree::Node *> Parser::parse() {
   return res;
 }
 
+bool Parser::eat(TokenKind kind) {
+  if (tok_->getKind() == kind) {
+    advance();
+    return true;
+  }
+  return false;
+}
+
 bool Parser::matchAndEat(TokenKind kind) {
   if (tok_->getKind() == kind) {
     advance();
@@ -289,9 +297,32 @@ bool Parser::validateBindingIdentifier(SMRange range, std::string id, TokenKind 
 }
 
 std::optional<Tree::Node *> Parser::parseAssignmentExpression() {
-  auto res = parseConditionalExpression();
+  struct State {
+    SMLoc leftStartLoc = {};
+    std::optional<Tree::Node *> optLeftExpr = std::nullopt;
+    std::string *op = nullptr;
+    SMLoc debugLoc = {};
+
+    explicit State() {}
+  };
   
-  return res;
+  auto optRes = parseConditionalExpression();
+  
+  std::vector<State> stack;
+  
+  stack.emplace_back();
+  
+  for (;;) {
+    if (!optRes)
+      return std::nullopt;
+    if (!stack.back().op) {
+      stack.pop_back();
+      break;
+    }
+    stack.emplace_back();
+  }
+  
+  return optRes;
 }
 
 std::optional<Tree::Node *> Parser::parseConditionalExpression() {
@@ -371,10 +402,11 @@ std::optional<Tree::Node *> Parser::parseBinaryExpression() {
   }
   
   while (!stack.empty()) {
+    std::string opIdent = getTokenIdent(stack.back().opKind);
     topExpr = setLocation(
           stack.back().exprStartLoc,
           topExprEndLoc,
-          new (context_) Tree::BinaryExpressionNode(stack.back().expr, topExpr, ""));
+          new (context_) Tree::BinaryExpressionNode(stack.back().expr, topExpr, opIdent));
     stack.pop_back();
   }
   
@@ -397,6 +429,7 @@ std::optional<Tree::Node *> Parser::parseUnaryExpression() {
       
     case TokenKind::plusplus:
     case TokenKind::minusminus: {
+      std::string op = getTokenIdent(tok_->getKind());
       advance();
       auto expr = parseUnaryExpression();
       if (!expr)
@@ -406,11 +439,14 @@ std::optional<Tree::Node *> Parser::parseUnaryExpression() {
           startLoc,
           getPrevTokenEndLoc(),
           new (context_)
-              Tree::PostfixUnaryExpressionNode("++", expr.value(), true));
+              Tree::PostfixUnaryExpressionNode(op, expr.value(), true));
     }
       
     case TokenKind::less:
       return std::nullopt;
+      
+    case TokenKind::identifier:
+      
       
     default:
       return parsePostfixExpression();
@@ -481,6 +517,10 @@ std::optional<Tree::Node *> Parser::parsePrimaryExpression() {
     case TokenKind::l_paren: {
       advance();
       auto optExpr = parseExpression();
+      if (!eat(TokenKind::r_paren)) {
+        return std::nullopt;
+      }
+      
       return optExpr;
     }
 

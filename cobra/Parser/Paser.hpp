@@ -91,6 +91,21 @@ private:
     return tok_->getKind() == kind;
   }
   
+  bool match(TokenKind kind1, TokenKind kind2) const {
+    return tok_->getKind() == kind1 || tok_->getKind() == kind2;
+  }
+
+  template <typename T>
+  inline bool matchN(T t) const {
+    return match(t);
+  }
+  /// Convenience function to compare against more than 2 token kinds. We still
+  /// use check() for 2 or 1 kinds because it is more typesafe.
+  template <typename Head, typename... Tail>
+  inline bool matchN(Head h, Tail... tail) const {
+    return match(h) || matchkN(tail...);
+  }
+  
   std::optional<Tree::Node *> parseProgram();
   
   std::optional<Tree::Node *> parseTypeAnnotation(std::optional<SMLoc> wrappedStart = std::nullopt);
@@ -109,19 +124,33 @@ private:
   
   std::optional<Tree::Node *> parseStatement();
   
+  std::optional<Tree::FunctionDeclarationNode *> parseFunctionDeclaration();
+  
+  bool parseParameters(Tree::NodeList &paramList);
+  
+  std::optional<Tree::ParameterDeclarationNode *> parseParameter();
+  
+  std::optional<Tree::BlockStatementNode *> parseBlock();
+    
+  std::optional<Tree::BlockStatementNode *> parseFunctionBody();
+  
   bool eatSemi();
   
   std::optional<Tree::VariableDeclarationNode *> parseVariableStatement();
-  
-  std::optional<Tree::VariableDeclarationNode *> parseLexicalDeclaration();
-  
+    
   bool parseVariableDeclarationList(Tree::NodeList &declList);
   
   std::optional<Tree::VariableDeclaratorNode *> parseVariableDeclaration();
+    
+  std::optional<Tree::Node *> parseIdentifierOrPattern();
   
   std::optional<Tree::IdentifierNode *> parseBindingIdentifier();
-  
+    
   bool validateBindingIdentifier(SMRange range, std::string id, TokenKind kind);
+  
+  std::optional<Tree::IfStatementNode *> parseIfStatement();
+  
+  std::optional<Tree::Node *> parseReturnStatement();
   
   std::optional<Tree::Node *> parseAssignmentExpression();
   

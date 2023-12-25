@@ -76,7 +76,7 @@ const Token *Lexer::advance() {
         break;
         
       PUNC_L1_1('}', TokenKind::r_brace);
-      PUNC_L1_1('{', TokenKind::r_brace);
+      PUNC_L1_1('{', TokenKind::l_brace);
       PUNC_L1_1('(', TokenKind::l_paren);
       PUNC_L1_1(')', TokenKind::r_paren);
       PUNC_L1_1('[', TokenKind::l_square);

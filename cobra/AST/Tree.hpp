@@ -36,15 +36,18 @@ enum class NodeKind : uint32_t {
   Empty,
   WhileStatement,
   LoopStatement,
-  UnaryExpression,
-  PostfixUnaryExpression,
-  BinaryExpression,
-  ClassDeclaration,
-  FunctionDeclaration,
+  BlockStatement,
   ReturnStatement,
   SwitchStatement,
   IfStatement,
+  UnaryExpression,
+  PostfixUnaryExpression,
+  BinaryExpression,
   VariableDeclarator,
+  ParameterDeclaration,
+  FunctionLike,
+  FunctionDeclaration,
+  ClassDeclaration,
   Identifier,
   AnyKeyword,
   BooleanKeyword,
@@ -180,8 +183,6 @@ public:
       : Node(NodeKind::VariableDeclarator), init_(std::move(init)), id_(std::move(id)) {
     
   }
-  
-  
 };
 
 class VariableDeclarationNode : public Node {
@@ -194,12 +195,71 @@ public:
   }
 };
 
+class ParameterDeclarationNode : public Node {
+public:
+  NodePtr init_;
+  NodePtr id_;
+  explicit ParameterDeclarationNode(NodePtr init, NodePtr id)
+      : Node(NodeKind::ParameterDeclaration), init_(std::move(init)), id_(std::move(id)) {
+    
+  }
+};
+
+class FunctionLikeNode : public Node {
+  NodeList body_;
+  explicit FunctionLikeNode(NodeList body)
+      : Node(NodeKind::FunctionLike), body_(std::move(body)) {
+    
+  }
+  
+};
+
+class FunctionDeclarationNode : public Node {
+public:
+  NodePtr id_;
+  NodeList params_;
+  NodePtr body_;
+  NodePtr returnType_;
+  explicit FunctionDeclarationNode(NodePtr id, NodeList params, NodePtr body, NodePtr returnType)
+      : Node(NodeKind::FunctionDeclaration),
+      id_(std::move(id)),
+      params_(std::move(params)),
+      body_(std::move(body)),
+      returnType_(std::move(returnType)) {
+    
+  }
+  
+};
+
 class ClassDeclarationNode : public Node {
 
 };
 
 class StatementNode : public Node {
 
+};
+
+class BlockStatementNode : public Node {
+public:
+  NodeList body_;
+  explicit BlockStatementNode(NodeList body)
+      : Node(NodeKind::BlockStatement), body_(std::move(body)) {
+    
+  }
+};
+
+class IfStatementNode : public Node {
+public:
+  NodePtr test_;
+  NodePtr consequent_;
+  NodePtr alternate_;
+  explicit IfStatementNode(NodePtr test, NodePtr consequent, NodePtr alternate)
+      : Node(NodeKind::IfStatement),
+      test_(std::move(test)),
+      consequent_(std::move(consequent)) ,
+      alternate_(std::move(alternate)) {
+    
+  }
 };
 
 class ExpressionNode : public Node {

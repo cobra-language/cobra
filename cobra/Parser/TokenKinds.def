@@ -137,6 +137,8 @@ PUNCTUATOR(exclaim,             "!")
 PUNCTUATOR(tilde,               "~")
 PUNCTUATOR(question,            "?")
 PUNCTUATOR(colon,               ":")
+
+// Assignment operators
 PUNCTUATOR(equal,               "=")
 PUNCTUATOR(plusequal,           "+=")
 PUNCTUATOR(minusequal,          "-=")
@@ -149,6 +151,8 @@ PUNCTUATOR(greatergreaterequal, ">>=")
 PUNCTUATOR(greatergreatergreaterequal, ">>>=")
 PUNCTUATOR(ampequal,            "&=")
 PUNCTUATOR(pipeequal,           "|=")
+
+
 PUNCTUATOR(ampampequal,         "&&=")
 PUNCTUATOR(pipepipeequal,       "||=")
 PUNCTUATOR(questionquestionequal, "\?\?=")

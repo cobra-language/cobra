@@ -183,6 +183,10 @@ public:
     return stringLiteral_;
   }
   
+  static bool isAssignmentOp(TokenKind kind) {
+    return kind >= TokenKind::equal && kind <= TokenKind::pipeequal;
+  }
+  
 private:
   std::string lexeme_;
     

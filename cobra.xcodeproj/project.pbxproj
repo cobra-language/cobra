@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD0ECD782B39656800BA20B3 /* num.co in Sources */ = {isa = PBXBuildFile; fileRef = AD0ECD772B39656800BA20B3 /* num.co */; };
 		AD0F9A922B10C21900BA198B /* CBValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD0F9A902B10C21900BA198B /* CBValue.cpp */; };
 		AD14CF6C2B08BABA00137FDC /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD14CF6B2B08BABA00137FDC /* main.cpp */; };
 		AD14CF7E2B08BADB00137FDC /* Interpreter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD14CF742B08BADB00137FDC /* Interpreter.cpp */; };
@@ -40,8 +41,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		AD0F9A8E2B10A3DA00BA198B /* num.co */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = num.co; sourceTree = "<group>"; };
-		AD0F9A8F2B10A3DA00BA198B /* helloworld.co */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = helloworld.co; sourceTree = "<group>"; };
+		AD0ECD772B39656800BA20B3 /* num.co */ = {isa = PBXFileReference; lastKnownFileType = text; path = num.co; sourceTree = "<group>"; };
+		AD0F9A8F2B10A3DA00BA198B /* fibonacci.co */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = fibonacci.co; sourceTree = "<group>"; };
 		AD0F9A902B10C21900BA198B /* CBValue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBValue.cpp; sourceTree = "<group>"; };
 		AD0F9A912B10C21900BA198B /* CBValue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBValue.hpp; sourceTree = "<group>"; };
 		AD14CF682B08BABA00137FDC /* cobra */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cobra; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -97,8 +98,8 @@
 		AD0F9A8D2B10A3DA00BA198B /* test */ = {
 			isa = PBXGroup;
 			children = (
-				AD0F9A8E2B10A3DA00BA198B /* num.co */,
-				AD0F9A8F2B10A3DA00BA198B /* helloworld.co */,
+				AD0F9A8F2B10A3DA00BA198B /* fibonacci.co */,
+				AD0ECD772B39656800BA20B3 /* num.co */,
 			);
 			path = test;
 			sourceTree = "<group>";
@@ -220,6 +221,7 @@
 				TargetAttributes = {
 					AD14CF672B08BABA00137FDC = {
 						CreatedOnToolsVersion = 14.3;
+						LastSwiftMigration = 1430;
 					};
 				};
 			};
@@ -246,6 +248,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD0ECD782B39656800BA20B3 /* num.co in Sources */,
 				AD14CF812B08BADB00137FDC /* GC.cpp in Sources */,
 				AD2207102B1B1F26007ED860 /* CBObject.cpp in Sources */,
 				AD14CF7F2B08BADB00137FDC /* Lexer.cpp in Sources */,
@@ -382,20 +385,25 @@
 		AD14CF702B08BABA00137FDC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5NHR9YMUN2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
 		AD14CF712B08BABA00137FDC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5NHR9YMUN2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

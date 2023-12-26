@@ -103,7 +103,7 @@ private:
   /// use check() for 2 or 1 kinds because it is more typesafe.
   template <typename Head, typename... Tail>
   inline bool matchN(Head h, Tail... tail) const {
-    return match(h) || matchkN(tail...);
+    return match(h) || matchN(tail...);
   }
   
   std::optional<Tree::Node *> parseProgram();
@@ -118,7 +118,7 @@ private:
   
   std::optional<Tree::Node *> parsePrimaryType();
   
-  std::optional<bool> parseStatementList(Tree::NodeList &stmtList);
+  std::optional<bool> parseStatementList(TokenKind until, Tree::NodeList &stmtList);
   
   bool parseStatementListItem(Tree::NodeList &stmtList);
   
@@ -148,6 +148,8 @@ private:
     
   bool validateBindingIdentifier(SMRange range, std::string id, TokenKind kind);
   
+  std::optional<Tree::Node *> parseExpressionOrLabelledStatement();
+  
   std::optional<Tree::IfStatementNode *> parseIfStatement();
   
   std::optional<Tree::Node *> parseReturnStatement();
@@ -162,14 +164,19 @@ private:
   
   std::optional<Tree::Node *> parsePostfixExpression();
   
+  std::optional<Tree::Node *> parseCallExpression(SMLoc startLoc, Tree::NodePtr expr);
+  
   std::optional<Tree::Node *> parseLeftHandSideExpression();
   
-  std::optional<Tree::Node *> parseNewExpressionOrOptionalExpression();
+  std::optional<Tree::Node *> parseMemberExpression();
+  
+  std::optional<Tree::Node *> parseMemberExpressionContinuation(SMLoc startLoc, Tree::Node *expr);
   
   std::optional<Tree::Node *> parsePrimaryExpression();
   
   std::optional<Tree::Node *> parseExpression();
   
+  bool parseArguments(Tree::NodeList &argList, SMLoc &endLoc);
   
 };
 

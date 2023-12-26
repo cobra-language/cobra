@@ -34,6 +34,7 @@ using NodeList = std::vector<Node>;
 
 enum class NodeKind : uint32_t {
   Empty,
+  ExpressionStatement,
   WhileStatement,
   LoopStatement,
   BlockStatement,
@@ -43,6 +44,9 @@ enum class NodeKind : uint32_t {
   UnaryExpression,
   PostfixUnaryExpression,
   BinaryExpression,
+  CallExpression,
+  MemberExpression,
+  SpreadElement,
   VariableDeclarator,
   ParameterDeclaration,
   FunctionLike,
@@ -112,6 +116,11 @@ public:
   
 };
 
+class StatementDecoration {};
+
+class FunctionLikeDecoration {};
+
+class MemberExpressionLikeDecoration {};
 
 class AnyKeywordNode : public Node {
 public:
@@ -205,23 +214,22 @@ public:
   }
 };
 
-class FunctionLikeNode : public Node {
-  NodeList body_;
-  explicit FunctionLikeNode(NodeList body)
-      : Node(NodeKind::FunctionLike), body_(std::move(body)) {
+class FunctionLikeNode : public Node, public FunctionLikeDecoration {
+public:
+  explicit FunctionLikeNode(NodeKind kind) : Node(kind) {
     
   }
   
 };
 
-class FunctionDeclarationNode : public Node {
+class FunctionDeclarationNode : public FunctionLikeNode {
 public:
   NodePtr id_;
   NodeList params_;
   NodePtr body_;
   NodePtr returnType_;
   explicit FunctionDeclarationNode(NodePtr id, NodeList params, NodePtr body, NodePtr returnType)
-      : Node(NodeKind::FunctionDeclaration),
+      : FunctionLikeNode(NodeKind::FunctionDeclaration),
       id_(std::move(id)),
       params_(std::move(params)),
       body_(std::move(body)),
@@ -235,8 +243,24 @@ class ClassDeclarationNode : public Node {
 
 };
 
-class StatementNode : public Node {
+class StatementNode : public Node, public StatementDecoration {
+public:
+  explicit StatementNode(NodeKind kind) : Node(kind) {
+    
+  }
 
+};
+
+class ExpressionStatementNode : public StatementNode {
+public:
+  NodePtr expression_;
+  NodeString directive_;
+  explicit ExpressionStatementNode(NodePtr expression, NodeString directive)
+      : StatementNode(NodeKind::ExpressionStatement),
+      expression_(std::move(expression)),
+      directive_(std::move(directive)) {
+    
+  }
 };
 
 class BlockStatementNode : public Node {
@@ -262,6 +286,16 @@ public:
   }
 };
 
+class ReturnStatementNode : public Node {
+public:
+  NodePtr argument_;
+  explicit ReturnStatementNode(NodePtr argument)
+      : Node(NodeKind::ReturnStatement),
+      argument_(std::move(argument)) {
+    
+  }
+};
+
 class ExpressionNode : public Node {
 
 };
@@ -270,8 +304,53 @@ class ClassExpressionNode : public Node {
 
 };
 
+class CallExpressionNode : public Node {
+public:
+  NodePtr callee_;
+  NodeList argument_;
+  explicit CallExpressionNode(NodePtr callee, NodeList argument)
+      : Node(NodeKind::CallExpression),
+      callee_(std::move(callee)),
+      argument_(std::move(argument)) {
+    
+  }
+};
+
+class MemberExpressionLikeNode : public Node, public MemberExpressionLikeDecoration {
+public:
+  explicit MemberExpressionLikeNode(NodeKind kind) : Node(kind) {
+    
+  }
+  
+};
+
+class MemberExpressionNode : public MemberExpressionLikeNode {
+public:
+  NodePtr object_;
+  NodePtr property_;
+  NodeBoolean computed_;
+  explicit MemberExpressionNode(NodePtr object, NodePtr property, NodeBoolean computed)
+      : MemberExpressionLikeNode(NodeKind::MemberExpression),
+      object_(std::move(object)),
+      property_(std::move(property)),
+      computed_(std::move(computed)) {
+    
+  }
+  
+};
+
 class ClassPropertyNode : public Node {
 
+};
+
+class SpreadElementNode : public Node {
+public:
+  NodePtr argument_;
+  explicit SpreadElementNode(NodePtr argument)
+      : Node(NodeKind::SpreadElement),
+      argument_(std::move(argument)) {
+    
+  }
 };
 
 class IdentifierNode : public Node {

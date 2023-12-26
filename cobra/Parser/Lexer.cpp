@@ -223,8 +223,8 @@ const Token *Lexer::advance() {
         token_.setStart(curCharPtr_);
         if (curCharPtr_[1] >= '0' && curCharPtr_[1] <= '9') {
           lexNumber();
-        } else if (curCharPtr_[1] == '.') {
-          token_.setPunctuator(TokenKind::dotdot);
+        } else if (curCharPtr_[1] == '.' && curCharPtr_[2] == '.') {
+          token_.setPunctuator(TokenKind::dotdotdot);
           curCharPtr_ += 3;
         } else {
           token_.setPunctuator(TokenKind::period);

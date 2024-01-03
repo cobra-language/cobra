@@ -10,4 +10,14 @@
 
 #include <stdio.h>
 
+namespace cobra {
+namespace Lowering {
+
+class IRBuilder {
+  
+};
+
+}
+}
+
 #endif /* IRBuilder_hpp */

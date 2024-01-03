@@ -6,3 +6,10 @@
  */
 
 #include "IRGen.hpp"
+
+using namespace cobra;
+using namespace Lowering;
+
+void IRGenModul::visit(Tree::Node *D) {
+  
+}

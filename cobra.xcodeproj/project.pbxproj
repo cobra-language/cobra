@@ -26,6 +26,11 @@
 		AD22072C2B1DE350007ED860 /* ASTBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD22072A2B1DE350007ED860 /* ASTBuilder.cpp */; };
 		AD2207302B1DF32F007ED860 /* Tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD22072E2B1DF32F007ED860 /* Tree.cpp */; };
 		AD2207332B1F8DB2007ED860 /* ASTVisitor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD2207312B1F8DB2007ED860 /* ASTVisitor.cpp */; };
+		AD4DE9902B3C2B7500C4770B /* Instrs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD4DE98E2B3C2B7500C4770B /* Instrs.cpp */; };
+		AD4DE9932B3C391400C4770B /* IRBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD4DE9912B3C391400C4770B /* IRBuilder.cpp */; };
+		AD4DE9962B3C392100C4770B /* IRGen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD4DE9942B3C392100C4770B /* IRGen.cpp */; };
+		AD4DE99A2B428B6400C4770B /* Scope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD4DE9982B428B6400C4770B /* Scope.cpp */; };
+		ADF0E64A2B3BC2D600E34609 /* IR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ADF0E6482B3BC2D600E34609 /* IR.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -82,6 +87,18 @@
 		AD2207322B1F8DB2007ED860 /* ASTVisitor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ASTVisitor.hpp; sourceTree = "<group>"; };
 		AD2207362B2981AF007ED860 /* Context.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Context.hpp; sourceTree = "<group>"; };
 		AD22074D2B2D6DAF007ED860 /* TokenKinds.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TokenKinds.def; sourceTree = "<group>"; };
+		AD4DE98E2B3C2B7500C4770B /* Instrs.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Instrs.cpp; sourceTree = "<group>"; };
+		AD4DE98F2B3C2B7500C4770B /* Instrs.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Instrs.hpp; sourceTree = "<group>"; };
+		AD4DE9912B3C391400C4770B /* IRBuilder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IRBuilder.cpp; sourceTree = "<group>"; };
+		AD4DE9922B3C391400C4770B /* IRBuilder.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IRBuilder.hpp; sourceTree = "<group>"; };
+		AD4DE9942B3C392100C4770B /* IRGen.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IRGen.cpp; sourceTree = "<group>"; };
+		AD4DE9952B3C392100C4770B /* IRGen.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IRGen.hpp; sourceTree = "<group>"; };
+		AD4DE9972B3ECACF00C4770B /* Instrs.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Instrs.def; sourceTree = "<group>"; };
+		AD4DE9982B428B6400C4770B /* Scope.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Scope.cpp; sourceTree = "<group>"; };
+		AD4DE9992B428B6400C4770B /* Scope.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Scope.hpp; sourceTree = "<group>"; };
+		AD4DE99C2B44252B00C4770B /* ValueKinds.def */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ValueKinds.def; sourceTree = "<group>"; };
+		ADF0E6482B3BC2D600E34609 /* IR.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IR.cpp; sourceTree = "<group>"; };
+		ADF0E6492B3BC2D600E34609 /* IR.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IR.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,9 +140,11 @@
 		AD14CF6A2B08BABA00137FDC /* cobra */ = {
 			isa = PBXGroup;
 			children = (
+				AD0F9A8D2B10A3DA00BA198B /* test */,
+				ADF0E64B2B3BC5E700E34609 /* LLVM */,
+				ADF0E6472B3BC2B000E34609 /* Frontend */,
 				AD22072D2B1DE42F007ED860 /* AST */,
 				AD22071A2B1B2743007ED860 /* VMRuntime */,
-				AD0F9A8D2B10A3DA00BA198B /* test */,
 				AD14CF722B08BADB00137FDC /* Parser */,
 				AD14CF6B2B08BABA00137FDC /* main.cpp */,
 			);
@@ -190,6 +209,32 @@
 			path = AST;
 			sourceTree = "<group>";
 		};
+		ADF0E6472B3BC2B000E34609 /* Frontend */ = {
+			isa = PBXGroup;
+			children = (
+				ADF0E6482B3BC2D600E34609 /* IR.cpp */,
+				ADF0E6492B3BC2D600E34609 /* IR.hpp */,
+				AD4DE9982B428B6400C4770B /* Scope.cpp */,
+				AD4DE99C2B44252B00C4770B /* ValueKinds.def */,
+				AD4DE9992B428B6400C4770B /* Scope.hpp */,
+				AD4DE98E2B3C2B7500C4770B /* Instrs.cpp */,
+				AD4DE98F2B3C2B7500C4770B /* Instrs.hpp */,
+				AD4DE9972B3ECACF00C4770B /* Instrs.def */,
+				AD4DE9912B3C391400C4770B /* IRBuilder.cpp */,
+				AD4DE9922B3C391400C4770B /* IRBuilder.hpp */,
+				AD4DE9942B3C392100C4770B /* IRGen.cpp */,
+				AD4DE9952B3C392100C4770B /* IRGen.hpp */,
+			);
+			path = Frontend;
+			sourceTree = "<group>";
+		};
+		ADF0E64B2B3BC5E700E34609 /* LLVM */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = LLVM;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -248,16 +293,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD4DE9932B3C391400C4770B /* IRBuilder.cpp in Sources */,
 				AD0ECD782B39656800BA20B3 /* num.co in Sources */,
 				AD14CF812B08BADB00137FDC /* GC.cpp in Sources */,
 				AD2207102B1B1F26007ED860 /* CBObject.cpp in Sources */,
 				AD14CF7F2B08BADB00137FDC /* Lexer.cpp in Sources */,
 				AD22071D2B1B29D6007ED860 /* PrimitiveBox.cpp in Sources */,
+				AD4DE9902B3C2B7500C4770B /* Instrs.cpp in Sources */,
 				AD2207292B1DD7E2007ED860 /* CodeBlock.cpp in Sources */,
 				AD14CF802B08BADB00137FDC /* Paser.cpp in Sources */,
+				AD4DE9962B3C392100C4770B /* IRGen.cpp in Sources */,
 				AD14CF7E2B08BADB00137FDC /* Interpreter.cpp in Sources */,
 				AD2207262B1DD3B1007ED860 /* String.cpp in Sources */,
+				AD4DE99A2B428B6400C4770B /* Scope.cpp in Sources */,
 				AD2207302B1DF32F007ED860 /* Tree.cpp in Sources */,
+				ADF0E64A2B3BC2D600E34609 /* IR.cpp in Sources */,
 				AD2207162B1B269C007ED860 /* CBFunction.cpp in Sources */,
 				AD2207332B1F8DB2007ED860 /* ASTVisitor.cpp in Sources */,
 				AD2207192B1B26AA007ED860 /* CBString.cpp in Sources */,

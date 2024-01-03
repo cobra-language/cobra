@@ -1,0 +1,37 @@
+/*
+ * Copyright (c) the Cobra project authors.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#ifndef DEF_VALUE
+#define DEF_VALUE(NAME, PARENT)
+#endif
+#ifndef MARK_FIRST
+#define MARK_FIRST(NAME)
+#endif
+#ifndef MARK_LAST
+#define MARK_LAST(NAME)
+#endif
+
+#ifndef TERMINATOR
+#define TERMINATOR(NAME, PARENT) DEF_VALUE(NAME, PARENT)
+#endif
+
+#if defined(INCLUDE_ALL_INSTRS) || defined(INCLUDE_HBC_INSTRS)
+#define INCLUDE_HBC_BACKEND
+#endif
+
+
+
+
+
+// Don't undef these if this file is being included in ValueKinds.def, since
+// these macros are still used after the #include.
+#ifndef INCLUDED_FROM_VALUEKINDS
+#undef DEF_VALUE
+#undef MARK_FIRST
+#undef MARK_LAST
+#undef TERMINATOR
+#endif

@@ -10,6 +10,16 @@
 using namespace cobra;
 using namespace Lowering;
 
-void IRGenModul::visit(Tree::Node *D) {
+IRGenModul::IRGenModul(Module *M) : Mod(M), Builder(Mod) {
+  
+}
+
+void IRGenModul::visit(Tree::FunctionDeclarationNode *fd) { emitFunction(fd); }
+
+void IRGenModul::visit(Tree::VariableDeclaratorNode *vd) {
+  
+}
+
+void IRGenModul::emitFunction(Tree::FunctionDeclarationNode *fd) {
   
 }

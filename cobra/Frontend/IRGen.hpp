@@ -20,15 +20,18 @@ class IRGenModul : public Tree::ASTVisitor {
   IRGenModul(const IRGenModul &) = delete;
   void operator=(const IRGenModul &) = delete;
   
-  Module *M;
+  Module *Mod;
   IRBuilder Builder;
   Tree::Node *Root;
   
 public:
-  explicit IRGenModul(Module *Mod) : M(Mod) {}
+  explicit IRGenModul(Module *M);
   
-  void visit(Tree::Node *D);
+  void visit(Tree::FunctionDeclarationNode *fd);
+  void visit(Tree::VariableDeclaratorNode *vd);
   
+  
+  void emitFunction(Tree::FunctionDeclarationNode *fd);
   
 };
 

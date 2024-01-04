@@ -9,11 +9,20 @@
 #define IRBuilder_hpp
 
 #include <stdio.h>
+#include "IR.hpp"
 
 namespace cobra {
 namespace Lowering {
 
 class IRBuilder {
+  IRBuilder(const IRBuilder &) = delete;
+  void operator=(const IRBuilder &) = delete;
+  
+  Module *M;
+  BasicBlock *BB{};
+  
+public:
+  explicit IRBuilder(Module *Mod) : M(Mod) {}
   
 };
 

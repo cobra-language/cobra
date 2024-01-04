@@ -74,7 +74,6 @@ class Node {
   
 public:
   Node(NodeKind kind) : kind_(kind) {}
-//  virtual void visit(ASTVisitor &V) = 0;
   
   void setSourceRange(SMRange rng) {
     sourceRange_ = rng;

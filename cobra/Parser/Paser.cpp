@@ -135,13 +135,23 @@ std::optional<Tree::Node *> Parser::parsePrimaryType() {
   }
 }
 
-std::optional<Tree::Node *> Parser::parseProgram() {
+std::optional<Tree::ProgramNode *> Parser::parseProgram() {
+  SMLoc startLoc = tok_->getStartLoc();
   Tree::NodeList stmtList;
   
   if(!parseStatementList(TokenKind::eof, stmtList))
     return std::nullopt;
   
-  return std::nullopt;
+  SMLoc endLoc = startLoc;
+  if (!stmtList.empty()) {
+    endLoc = stmtList.back().getEndLoc();
+  }
+  
+  auto *program = setLocation(
+      startLoc,
+      endLoc,
+      new (context_) Tree::ProgramNode(std::move(stmtList)));
+  return program;
 }
 
 std::optional<bool> Parser::parseStatementList(TokenKind until, Tree::NodeList &stmtList) {
@@ -814,6 +824,9 @@ std::optional<Tree::Node *> Parser::parseExpression() {
   if (!match(TokenKind::comma))
     return optExpr.value();
   
+  Tree::NodeList exprList;
+  exprList.push_back(*optExpr.value());
+  
   while (match(TokenKind::comma)) {
     
   }
@@ -835,9 +848,9 @@ bool Parser::parseArguments(Tree::NodeList &argList, SMLoc &endLoc) {
     
     if (isSpread) {
       argList.push_back(*setLocation(
-                                     argStart,
-                                     getPrevTokenEndLoc(),
-                                     new (context_) Tree::SpreadElementNode(arg.value())));
+         argStart,
+         getPrevTokenEndLoc(),
+         new (context_) Tree::SpreadElementNode(arg.value())));
     } else {
       argList.push_back(*arg.value());
     }

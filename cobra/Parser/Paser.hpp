@@ -106,7 +106,7 @@ private:
     return match(h) || matchN(tail...);
   }
   
-  std::optional<Tree::Node *> parseProgram();
+  std::optional<Tree::ProgramNode *> parseProgram();
   
   std::optional<Tree::Node *> parseTypeAnnotation(std::optional<SMLoc> wrappedStart = std::nullopt);
     

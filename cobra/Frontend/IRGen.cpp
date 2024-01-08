@@ -10,7 +10,11 @@
 using namespace cobra;
 using namespace Lowering;
 
-IRGenModul::IRGenModul(Module *M) : Mod(M), Builder(Mod) {
+IRGenModul::IRGenModul(Tree::Node *root, Module *M) : Root(root), Mod(M), Builder(Mod) {
+  
+}
+
+void IRGenModul::visit() {
   
 }
 

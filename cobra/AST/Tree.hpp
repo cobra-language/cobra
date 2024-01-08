@@ -34,6 +34,7 @@ using NodeList = std::vector<Node>;
 
 enum class NodeKind : uint32_t {
   Empty,
+  Program,
   ExpressionStatement,
   WhileStatement,
   LoopStatement,
@@ -219,6 +220,16 @@ public:
     
   }
   
+};
+
+class ProgramNode : public FunctionLikeNode {
+public:
+  NodeList body_;
+  explicit ProgramNode(NodeList body)
+      : FunctionLikeNode(NodeKind::Program),
+      body_(std::move(body)) {
+    
+  }
 };
 
 class FunctionDeclarationNode : public FunctionLikeNode {

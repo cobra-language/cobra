@@ -10,8 +10,10 @@
 #include <fstream>
 #include "VMRuntime/VM.hpp"
 #include "Paser.hpp"
+#include "IRGen.hpp"
 
 using namespace cobra;
+using namespace Lowering;
 
 static std::string loadFile(std::string path) {
   std::ifstream file{path};
@@ -25,9 +27,15 @@ int main(int argc, const char * argv[]) {
   
   std::string source = loadFile(argv[1]);
   auto context = std::make_shared<Context>();
+  Module M(context);
   
   parser::Parser cbParser(*context, source.c_str(), source.size());
-  cbParser.parse();
+  auto parsedCb = cbParser.parse();
+  
+  Tree::NodePtr ast = parsedCb.value();
+    
+  IRGenModul irGen(ast, &M);
+  irGen.visit();
   
 //  auto to = cbLexer.advance();
 //

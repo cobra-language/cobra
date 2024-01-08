@@ -25,8 +25,9 @@ class IRGenModul : public Tree::ASTVisitor {
   Tree::Node *Root;
   
 public:
-  explicit IRGenModul(Module *M);
+  explicit IRGenModul(Tree::Node *root, Module *M);
   
+  void visit();
   void visit(Tree::FunctionDeclarationNode *fd);
   void visit(Tree::VariableDeclaratorNode *vd);
   

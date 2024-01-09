@@ -29,6 +29,7 @@ endif()
 target_link_libraries(cobra
   cobraAST
   cobraParser
+  cobraFrontend
   ${LIBREADLINE}
 )
 

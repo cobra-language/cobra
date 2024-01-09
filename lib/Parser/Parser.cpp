@@ -144,7 +144,7 @@ std::optional<ProgramNode *> Parser::parseProgram() {
   
   SMLoc endLoc = startLoc;
   if (!stmtList.empty()) {
-    endLoc = stmtList.back().getEndLoc();
+    endLoc = stmtList.back()->getEndLoc();
   }
   
   auto *program = setLocation(
@@ -167,7 +167,7 @@ bool Parser::parseStatementListItem(NodeList &stmtList) {
   auto stmt = parseStatement();
   if (!stmt)
     return false;
-  stmtList.push_back(*stmt.value());
+  stmtList.push_back(stmt.value());
   
   return true;
 }
@@ -217,7 +217,7 @@ bool Parser::parseParameters(NodeList &paramList) {
     if (!optElem)
       return false;
 
-    paramList.push_back(*optElem.value());
+    paramList.push_back(optElem.value());
 
     if (!matchAndEat(TokenKind::comma))
       break;
@@ -343,7 +343,7 @@ bool Parser::eatSemi() {
 bool Parser::parseVariableDeclarationList(NodeList &declList) {
   do {
     auto decl = parseVariableDeclaration();
-    declList.push_back(*decl.value());
+    declList.push_back(decl.value());
   } while (matchAndEat(TokenKind::comma));
   
   return true;
@@ -825,7 +825,7 @@ std::optional<Node *> Parser::parseExpression() {
     return optExpr.value();
   
   NodeList exprList;
-  exprList.push_back(*optExpr.value());
+  exprList.push_back(optExpr.value());
   
   while (match(TokenKind::comma)) {
     
@@ -847,12 +847,12 @@ bool Parser::parseArguments(NodeList &argList, SMLoc &endLoc) {
       return false;
     
     if (isSpread) {
-      argList.push_back(*setLocation(
+      argList.push_back(setLocation(
          argStart,
          getPrevTokenEndLoc(),
          new (context_) SpreadElementNode(arg.value())));
     } else {
-      argList.push_back(*arg.value());
+      argList.push_back(arg.value());
     }
     
     if (!matchAndEat(TokenKind::comma))

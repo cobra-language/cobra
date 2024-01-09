@@ -6,6 +6,8 @@
  */
 
 #include "cobra/IRGen/IRGen.h"
+#include <iostream>
+#include <fstream>
 
 using namespace cobra;
 using namespace Lowering;
@@ -17,15 +19,11 @@ IRGenModul::IRGenModul(Node *root, Module *M) : Mod(M), Builder(Mod), Root(root)
 void IRGenModul::visit() {
   ProgramNode *Program = dynamic_cast<ProgramNode *>(Root);
   
-  auto num = Program->body_.size();
-  
-  for (auto &Node : Program->body_) {
-    
-    auto a = &Node;
-    switch (Node.getKind()) {
+  for (auto Node : Program->body_) {
+    switch (Node->getKind()) {
       case NodeKind::FunctionDeclaration:
-//        auto fd = dynamic_cast<FunctionDeclarationNode *>(&Node);
-//        visit(fd);
+        auto fd = dynamic_cast<FunctionDeclarationNode *>(Node);
+        visit(fd);
         break;
     }
   }

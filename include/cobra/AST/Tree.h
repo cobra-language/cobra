@@ -25,8 +25,7 @@ using NodeString = std::string;
 using NodePtr = Node *;
 using NodeBoolean = bool;
 using NodeNumber = double;
-using NodeList = std::vector<Node>;
-
+using NodeList = std::vector<Node *>;
 
 enum class NodeKind : uint32_t {
   Empty,

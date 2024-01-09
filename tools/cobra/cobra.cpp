@@ -32,7 +32,7 @@ int main(int argc, const char * argv[]) {
   parser::Parser cbParser(*context, source.c_str(), source.size());
   auto parsedCb = cbParser.parse();
   
-  Tree::NodePtr ast = parsedCb.value();
+  NodePtr ast = parsedCb.value();
     
   IRGenModul irGen(ast, &M);
   irGen.visit();

@@ -9,13 +9,11 @@
 #define ASTBuilder_hpp
 
 namespace cobra {
-namespace Tree {
 
 class ASTBuilder {
   
 };
 
-}
 }
 
 #endif /* ASTBuilder_hpp */

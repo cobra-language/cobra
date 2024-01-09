@@ -15,13 +15,9 @@
 #include "cobra/VM/Context.h"
 
 namespace cobra {
-namespace Tree {
 
 class ASTVisitor;
 class Node;
-
-enum class NoneType { None = 1 };
-const NoneType None = NoneType::None;
 
 using NodeLabel = std::string;
 
@@ -75,6 +71,8 @@ class Node {
   
 public:
   Node(NodeKind kind) : kind_(kind) {}
+  
+  virtual ~Node() = default;
   
   void setSourceRange(SMRange rng) {
     sourceRange_ = rng;
@@ -423,9 +421,6 @@ public:
 };
 
 
-
-
-}
 }
 
 #endif /* Tree_hpp */

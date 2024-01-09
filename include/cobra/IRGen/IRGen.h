@@ -18,16 +18,17 @@
 namespace cobra {
 namespace Lowering {
 
-class IRGenModul : public ASTVisitor {
-  IRGenModul(const IRGenModul &) = delete;
-  void operator=(const IRGenModul &) = delete;
+class TreeIRGen : public ASTVisitor {
+  TreeIRGen(const TreeIRGen &) = delete;
+  void operator=(const TreeIRGen &) = delete;
   
   Module *Mod;
   IRBuilder Builder;
   Node *Root;
+  Function *curFunction{};
   
 public:
-  explicit IRGenModul(Node *root, Module *M);
+  explicit TreeIRGen(Node *root, Module *M);
   
   void visit();
   void visit(FunctionDeclarationNode *fd);
@@ -35,6 +36,16 @@ public:
   
   
   void emitFunction(FunctionDeclarationNode *fd);
+  
+  void emitFunctionPreamble(BasicBlock *entry);
+  
+  void emitParameters(FunctionLikeNode *funcNode);
+  
+  void emitfunctionBody(Node *stmt);
+  
+  void emitStatement(Node *stmt, bool isLoopBody);
+  
+  BlockStatementNode *getBlockStatement(FunctionLikeNode *node);
   
 };
 

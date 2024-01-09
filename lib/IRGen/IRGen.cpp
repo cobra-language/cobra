@@ -12,11 +12,11 @@
 using namespace cobra;
 using namespace Lowering;
 
-IRGenModul::IRGenModul(Node *root, Module *M) : Mod(M), Builder(Mod), Root(root) {
+TreeIRGen::TreeIRGen(Node *root, Module *M) : Mod(M), Builder(Mod), Root(root) {
   
 }
 
-void IRGenModul::visit() {
+void TreeIRGen::visit() {
   ProgramNode *Program = dynamic_cast<ProgramNode *>(Root);
   
   for (auto Node : Program->body_) {
@@ -29,13 +29,15 @@ void IRGenModul::visit() {
   }
 }
 
-void IRGenModul::visit(FunctionDeclarationNode *fd) { emitFunction(fd); }
+void TreeIRGen::visit(FunctionDeclarationNode *fd) { emitFunction(fd); }
 
-void IRGenModul::visit(VariableDeclaratorNode *vd) {
+void TreeIRGen::visit(VariableDeclaratorNode *vd) {
   
 }
 
-void IRGenModul::emitFunction(FunctionDeclarationNode *fd) {
-  auto id = dynamic_cast<IdentifierNode *>(fd->id_);
-  auto name = id->name_;
+BlockStatementNode *TreeIRGen::getBlockStatement(FunctionLikeNode *node) {
+  switch (node->getKind()) {
+    case NodeKind::FunctionDeclaration:
+      return dynamic_cast<BlockStatementNode *>(dynamic_cast<FunctionDeclarationNode *>(node)->body_);
+  }
 }

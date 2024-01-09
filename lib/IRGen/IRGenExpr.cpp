@@ -5,12 +5,4 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/AST/Tree.h"
-
-using namespace cobra;
-
-namespace Tree {
-
-
-
-}
+#include "cobra/IRGen/IRGen.h"

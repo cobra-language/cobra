@@ -178,7 +178,8 @@ class BasicBlock : public Value {
   void operator=(const BasicBlock &) = delete;
   
 public:
- using InstListType = std::list<Instruction *>;
+  using InstListType = std::list<Instruction *>;
+  using iterator = InstListType::iterator;
   
 private:
  InstListType InstList{};
@@ -196,13 +197,42 @@ public:
     return Parent;
   }
   
-  using iterator = InstListType::iterator;
-  
   inline iterator begin() {
     return InstList.begin();
   }
   inline iterator end() {
     return InstList.end();
+  }
+  inline size_t size() const {
+    return InstList.size();
+  }
+  inline bool empty() const {
+    return InstList.empty();
+  }
+  inline Instruction *front() {
+    return InstList.front();
+  }
+  inline const Instruction *front() const {
+    return InstList.front();
+  }
+  inline Instruction *back() {
+    return InstList.back();
+  }
+  inline const Instruction *back() const {
+    return InstList.back();
+  }
+  
+  iterator getIterator(Instruction *I) {
+    for (auto it = InstList.begin(), e = InstList.end(); it != e; it++) {
+      if (I == *it) {
+        return it;
+      }
+    }
+    return InstList.end();
+  }
+
+  static bool classof(const Value *V) {
+    return V->getKind() == ValueKind::BasicBlockKind;
   }
 };
 
@@ -217,11 +247,13 @@ public:
 private:
   Module *Parent;
   
+  std::string Name;
+  
   BasicBlockListType BasicBlockList{};
   ParameterListType Parameters;
   
 public:
-  explicit Function(Module *parent) : Value(ValueKind::FunctionKind), Parent(parent) {};
+  explicit Function(Module *parent, std::string name) : Value(ValueKind::FunctionKind), Parent(parent), Name(name) {};
   
   ~Function();
   
@@ -239,6 +271,18 @@ public:
   }
   inline iterator end() {
     return BasicBlockList.end();
+  }
+  inline size_t size() const {
+    return BasicBlockList.size();
+  }
+  inline bool empty() const {
+    return BasicBlockList.empty();
+  }
+  inline BasicBlock *front() {
+    return BasicBlockList.front();
+  }
+  inline BasicBlock *back() {
+    return BasicBlockList.back();
   }
   
 };

@@ -6,3 +6,11 @@
  */
 
 #include "cobra/AST/Tree.h"
+
+using namespace cobra;
+
+namespace Tree {
+
+
+
+}

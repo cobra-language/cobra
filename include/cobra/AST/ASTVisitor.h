@@ -11,7 +11,6 @@
 #include "cobra/AST/Tree.h"
 
 namespace cobra {
-namespace Tree {
 
 class ASTVisitor {
 public:
@@ -24,8 +23,6 @@ public:
   
 };
 
-
-}
 }
 
 #endif /* ASTVisitor_hpp */

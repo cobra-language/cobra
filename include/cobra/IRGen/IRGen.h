@@ -13,27 +13,39 @@
 #include "cobra/AST/ASTVisitor.h"
 #include "cobra/IR/IR.h"
 #include "cobra/IR/IRBuilder.h"
+#include "cobra/AST/Tree.h"
 
 namespace cobra {
 namespace Lowering {
 
-class IRGenModul : public Tree::ASTVisitor {
-  IRGenModul(const IRGenModul &) = delete;
-  void operator=(const IRGenModul &) = delete;
+class TreeIRGen : public ASTVisitor {
+  TreeIRGen(const TreeIRGen &) = delete;
+  void operator=(const TreeIRGen &) = delete;
   
   Module *Mod;
   IRBuilder Builder;
-  Tree::Node *Root;
+  Node *Root;
+  Function *curFunction{};
   
 public:
-  explicit IRGenModul(Tree::Node *root, Module *M);
+  explicit TreeIRGen(Node *root, Module *M);
   
   void visit();
-  void visit(Tree::FunctionDeclarationNode *fd);
-  void visit(Tree::VariableDeclaratorNode *vd);
+  void visit(FunctionDeclarationNode *fd);
+  void visit(VariableDeclaratorNode *vd);
   
   
-  void emitFunction(Tree::FunctionDeclarationNode *fd);
+  void emitFunction(FunctionDeclarationNode *fd);
+  
+  void emitFunctionPreamble(BasicBlock *entry);
+  
+  void emitParameters(FunctionLikeNode *funcNode);
+  
+  void emitfunctionBody(Node *stmt);
+  
+  void emitStatement(Node *stmt, bool isLoopBody);
+  
+  BlockStatementNode *getBlockStatement(FunctionLikeNode *node);
   
 };
 

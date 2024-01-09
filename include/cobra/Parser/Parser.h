@@ -27,7 +27,7 @@ public:
     return context_;
   }
   
-  std::optional<Tree::Node *> parse();
+  std::optional<Node *> parse();
   
 private:
   Lexer lexer_;
@@ -46,7 +46,7 @@ private:
   static SMLoc getStartLoc(const Token *tok) {
     return tok->getStartLoc();
   }
-  static SMLoc getStartLoc(const Tree::Node *from) {
+  static SMLoc getStartLoc(const Node *from) {
     return from->getStartLoc();
   }
   static SMLoc getStartLoc(SMLoc loc) {
@@ -59,7 +59,7 @@ private:
   static SMLoc getEndLoc(const Token *tok) {
     return tok->getEndLoc();
   }
-  static SMLoc getEndLoc(const Tree::Node *from) {
+  static SMLoc getEndLoc(const Node *from) {
     return from->getEndLoc();
   }
   static SMLoc getEndLoc(SMLoc loc) {
@@ -106,77 +106,77 @@ private:
     return match(h) || matchN(tail...);
   }
   
-  std::optional<Tree::ProgramNode *> parseProgram();
+  std::optional<ProgramNode *> parseProgram();
   
-  std::optional<Tree::Node *> parseTypeAnnotation(std::optional<SMLoc> wrappedStart = std::nullopt);
+  std::optional<Node *> parseTypeAnnotation(std::optional<SMLoc> wrappedStart = std::nullopt);
     
-  std::optional<Tree::Node *> parseUnionType();
+  std::optional<Node *> parseUnionType();
   
-  std::optional<Tree::Node *> parseIntersectionType();
+  std::optional<Node *> parseIntersectionType();
   
-  std::optional<Tree::Node *> parsePostfixType();
+  std::optional<Node *> parsePostfixType();
   
-  std::optional<Tree::Node *> parsePrimaryType();
+  std::optional<Node *> parsePrimaryType();
   
-  std::optional<bool> parseStatementList(TokenKind until, Tree::NodeList &stmtList);
+  std::optional<bool> parseStatementList(TokenKind until, NodeList &stmtList);
   
-  bool parseStatementListItem(Tree::NodeList &stmtList);
+  bool parseStatementListItem(NodeList &stmtList);
   
-  std::optional<Tree::Node *> parseStatement();
+  std::optional<Node *> parseStatement();
   
-  std::optional<Tree::FunctionDeclarationNode *> parseFunctionDeclaration();
+  std::optional<FunctionDeclarationNode *> parseFunctionDeclaration();
   
-  bool parseParameters(Tree::NodeList &paramList);
+  bool parseParameters(NodeList &paramList);
   
-  std::optional<Tree::ParameterDeclarationNode *> parseParameter();
+  std::optional<ParameterDeclarationNode *> parseParameter();
   
-  std::optional<Tree::BlockStatementNode *> parseBlock();
+  std::optional<BlockStatementNode *> parseBlock();
     
-  std::optional<Tree::BlockStatementNode *> parseFunctionBody();
+  std::optional<BlockStatementNode *> parseFunctionBody();
   
   bool eatSemi();
   
-  std::optional<Tree::VariableDeclarationNode *> parseVariableStatement();
+  std::optional<VariableDeclarationNode *> parseVariableStatement();
     
-  bool parseVariableDeclarationList(Tree::NodeList &declList);
+  bool parseVariableDeclarationList(NodeList &declList);
   
-  std::optional<Tree::VariableDeclaratorNode *> parseVariableDeclaration();
+  std::optional<VariableDeclaratorNode *> parseVariableDeclaration();
     
-  std::optional<Tree::Node *> parseIdentifierOrPattern();
+  std::optional<Node *> parseIdentifierOrPattern();
   
-  std::optional<Tree::IdentifierNode *> parseBindingIdentifier();
+  std::optional<IdentifierNode *> parseBindingIdentifier();
     
   bool validateBindingIdentifier(SMRange range, std::string id, TokenKind kind);
   
-  std::optional<Tree::Node *> parseExpressionOrLabelledStatement();
+  std::optional<Node *> parseExpressionOrLabelledStatement();
   
-  std::optional<Tree::IfStatementNode *> parseIfStatement();
+  std::optional<IfStatementNode *> parseIfStatement();
   
-  std::optional<Tree::Node *> parseReturnStatement();
+  std::optional<Node *> parseReturnStatement();
   
-  std::optional<Tree::Node *> parseAssignmentExpression();
+  std::optional<Node *> parseAssignmentExpression();
   
-  std::optional<Tree::Node *> parseConditionalExpression();
+  std::optional<Node *> parseConditionalExpression();
   
-  std::optional<Tree::Node *> parseBinaryExpression();
+  std::optional<Node *> parseBinaryExpression();
   
-  std::optional<Tree::Node *> parseUnaryExpression();
+  std::optional<Node *> parseUnaryExpression();
   
-  std::optional<Tree::Node *> parsePostfixExpression();
+  std::optional<Node *> parsePostfixExpression();
   
-  std::optional<Tree::Node *> parseCallExpression(SMLoc startLoc, Tree::NodePtr expr);
+  std::optional<Node *> parseCallExpression(SMLoc startLoc, NodePtr expr);
   
-  std::optional<Tree::Node *> parseLeftHandSideExpression();
+  std::optional<Node *> parseLeftHandSideExpression();
   
-  std::optional<Tree::Node *> parseMemberExpression();
+  std::optional<Node *> parseMemberExpression();
   
-  std::optional<Tree::Node *> parseMemberExpressionContinuation(SMLoc startLoc, Tree::Node *expr);
+  std::optional<Node *> parseMemberExpressionContinuation(SMLoc startLoc, Node *expr);
   
-  std::optional<Tree::Node *> parsePrimaryExpression();
+  std::optional<Node *> parsePrimaryExpression();
   
-  std::optional<Tree::Node *> parseExpression();
+  std::optional<Node *> parseExpression();
   
-  bool parseArguments(Tree::NodeList &argList, SMLoc &endLoc);
+  bool parseArguments(NodeList &argList, SMLoc &endLoc);
   
 };
 

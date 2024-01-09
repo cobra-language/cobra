@@ -16,7 +16,7 @@ Parser::Parser(Context &context, const char* buffer, std::size_t bufferSize)
   
 }
 
-std::optional<Tree::Node *> Parser::parse() {
+std::optional<Node *> Parser::parse() {
   tok_ = lexer_.advance();
   auto res = parseProgram();
   
@@ -39,9 +39,9 @@ bool Parser::matchAndEat(TokenKind kind) {
   return false;
 }
 
-std::optional<Tree::Node *> Parser::parseTypeAnnotation(std::optional<SMLoc> wrappedStart) {
+std::optional<Node *> Parser::parseTypeAnnotation(std::optional<SMLoc> wrappedStart) {
   SMLoc start = tok_->getStartLoc();
-  Tree::Node *result = nullptr;
+  Node *result = nullptr;
   
   if (match(TokenKind::identifier)) {
     
@@ -57,7 +57,7 @@ std::optional<Tree::Node *> Parser::parseTypeAnnotation(std::optional<SMLoc> wra
   return result;
 }
 
-std::optional<Tree::Node *> Parser::parseUnionType() {
+std::optional<Node *> Parser::parseUnionType() {
   SMLoc start = tok_->getStartLoc();
   matchAndEat(TokenKind::pipe);
   
@@ -73,7 +73,7 @@ std::optional<Tree::Node *> Parser::parseUnionType() {
   return std::nullopt;
 }
 
-std::optional<Tree::Node *> Parser::parseIntersectionType() {
+std::optional<Node *> Parser::parseIntersectionType() {
   SMLoc start = tok_->getStartLoc();
   matchAndEat(TokenKind::amp);
   
@@ -89,13 +89,13 @@ std::optional<Tree::Node *> Parser::parseIntersectionType() {
   return std::nullopt;
 }
 
-std::optional<Tree::Node *> Parser::parsePostfixType() {
+std::optional<Node *> Parser::parsePostfixType() {
   SMLoc start = tok_->getStartLoc();
   auto optPrimary = parsePrimaryType();
   return optPrimary;
 }
 
-std::optional<Tree::Node *> Parser::parsePrimaryType() {
+std::optional<Node *> Parser::parsePrimaryType() {
   SMLoc start = tok_->getStartLoc();
   switch (tok_->getKind()) {
     case TokenKind::identifier:
@@ -103,58 +103,58 @@ std::optional<Tree::Node *> Parser::parsePrimaryType() {
         return setLocation(
             start,
             advance().End,
-            new (context_) Tree::AnyKeywordNode());
+            new (context_) AnyKeywordNode());
       }
       if (tok_->getResWordOrIdentifier() == "boolean") {
         return setLocation(
             start,
             advance().End,
-            new (context_) Tree::BooleanKeywordNode());
+            new (context_) BooleanKeywordNode());
       }
       if (tok_->getResWordOrIdentifier() == "number") {
         return setLocation(
             start,
             advance().End,
-            new (context_) Tree::NumberKeywordNode());
+            new (context_) NumberKeywordNode());
       }
       if (tok_->getResWordOrIdentifier() == "string") {
         return setLocation(
             start,
             advance().End,
-            new (context_) Tree::StringKeywordNode());
+            new (context_) StringKeywordNode());
       }
       
     case TokenKind::rw_void:
       return setLocation(
           start,
           advance().End,
-          new (context_) Tree::VoidKeywordNode());
+          new (context_) VoidKeywordNode());
       
     default:
       return std::nullopt;
   }
 }
 
-std::optional<Tree::ProgramNode *> Parser::parseProgram() {
+std::optional<ProgramNode *> Parser::parseProgram() {
   SMLoc startLoc = tok_->getStartLoc();
-  Tree::NodeList stmtList;
+  NodeList stmtList;
   
   if(!parseStatementList(TokenKind::eof, stmtList))
     return std::nullopt;
   
   SMLoc endLoc = startLoc;
   if (!stmtList.empty()) {
-    endLoc = stmtList.back().getEndLoc();
+    endLoc = stmtList.back()->getEndLoc();
   }
   
   auto *program = setLocation(
       startLoc,
       endLoc,
-      new (context_) Tree::ProgramNode(std::move(stmtList)));
+      new (context_) ProgramNode(std::move(stmtList)));
   return program;
 }
 
-std::optional<bool> Parser::parseStatementList(TokenKind until, Tree::NodeList &stmtList) {
+std::optional<bool> Parser::parseStatementList(TokenKind until, NodeList &stmtList) {
   while (!match(TokenKind::eof) && !match(until)) {
     if (!parseStatementListItem(stmtList)) {
       return std::nullopt;
@@ -163,23 +163,23 @@ std::optional<bool> Parser::parseStatementList(TokenKind until, Tree::NodeList &
   return true;
 }
 
-bool Parser::parseStatementListItem(Tree::NodeList &stmtList) {
+bool Parser::parseStatementListItem(NodeList &stmtList) {
   auto stmt = parseStatement();
   if (!stmt)
     return false;
-  stmtList.push_back(*stmt.value());
+  stmtList.push_back(stmt.value());
   
   return true;
 }
 
-std::optional<Tree::FunctionDeclarationNode *> Parser::parseFunctionDeclaration() {
+std::optional<FunctionDeclarationNode *> Parser::parseFunctionDeclaration() {
   SMLoc startLoc = advance().Start;
   
   auto optId = parseBindingIdentifier();
   if (!optId)
     return std::nullopt;
   
-  Tree::NodeList paramList;
+  NodeList paramList;
   if (!parseParameters(paramList)) {
     return std::nullopt;
   }
@@ -197,17 +197,17 @@ std::optional<Tree::FunctionDeclarationNode *> Parser::parseFunctionDeclaration(
   if (!body)
     return std::nullopt;
   
-  auto *decl = new (context_) Tree::FunctionDeclarationNode(
+  auto *decl = new (context_) FunctionDeclarationNode(
       optId ? *optId : nullptr,
       std::move(paramList),
       body.value(),
       returnType.value());
   
   auto node = setLocation(startLoc, body.value(), decl);
-  return dynamic_cast<Tree::FunctionDeclarationNode *>(node);
+  return dynamic_cast<FunctionDeclarationNode *>(node);
 }
 
-bool Parser::parseParameters(Tree::NodeList &paramList) {
+bool Parser::parseParameters(NodeList &paramList) {
   assert(match(TokenKind::l_paren));
   
   advance();
@@ -217,7 +217,7 @@ bool Parser::parseParameters(Tree::NodeList &paramList) {
     if (!optElem)
       return false;
 
-    paramList.push_back(*optElem.value());
+    paramList.push_back(optElem.value());
 
     if (!matchAndEat(TokenKind::comma))
       break;
@@ -230,8 +230,8 @@ bool Parser::parseParameters(Tree::NodeList &paramList) {
   return true;
 }
 
-std::optional<Tree::ParameterDeclarationNode *> Parser::parseParameter() {
-  Tree::Node *target;
+std::optional<ParameterDeclarationNode *> Parser::parseParameter() {
+  Node *target;
   SMLoc startLoc = tok_->getStartLoc();
   
   auto optIdentOrPat = parseIdentifierOrPattern();
@@ -245,7 +245,7 @@ std::optional<Tree::ParameterDeclarationNode *> Parser::parseParameter() {
     return setLocation(
         startLoc,
         getPrevTokenEndLoc(),
-        new (context_) Tree::ParameterDeclarationNode(nullptr, target));
+        new (context_) ParameterDeclarationNode(nullptr, target));
   };
   
   advance();
@@ -258,18 +258,18 @@ std::optional<Tree::ParameterDeclarationNode *> Parser::parseParameter() {
   return setLocation(
       startLoc,
       getPrevTokenEndLoc(),
-      new (context_) Tree::ParameterDeclarationNode(*expr, target));
+      new (context_) ParameterDeclarationNode(*expr, target));
 }
 
-std::optional<Tree::BlockStatementNode *> Parser::parseFunctionBody() {
+std::optional<BlockStatementNode *> Parser::parseFunctionBody() {
   return parseBlock();
 }
 
-std::optional<Tree::BlockStatementNode *> Parser::parseBlock() {
+std::optional<BlockStatementNode *> Parser::parseBlock() {
   assert(match(TokenKind::l_brace));
   SMLoc startLoc = advance().Start;
   
-  Tree::NodeList stmtList;
+  NodeList stmtList;
 
   if (!parseStatementList(TokenKind::r_brace, stmtList)) {
     return std::nullopt;
@@ -278,7 +278,7 @@ std::optional<Tree::BlockStatementNode *> Parser::parseBlock() {
   auto *body = setLocation(
       startLoc,
       tok_,
-      new (context_) Tree::BlockStatementNode(std::move(stmtList)));
+      new (context_) BlockStatementNode(std::move(stmtList)));
   
   if (!eat(TokenKind::r_brace))
     return std::nullopt;
@@ -286,7 +286,7 @@ std::optional<Tree::BlockStatementNode *> Parser::parseBlock() {
   return body;
 }
 
-std::optional<Tree::Node *> Parser::parseStatement() {
+std::optional<Node *> Parser::parseStatement() {
 #define _RET(parseFunc)       \
   if (auto res = (parseFunc)) \
     return res.value();    \
@@ -310,13 +310,13 @@ std::optional<Tree::Node *> Parser::parseStatement() {
   return std::nullopt;
 }
 
-std::optional<Tree::VariableDeclarationNode *> Parser::parseVariableStatement() {
+std::optional<VariableDeclarationNode *> Parser::parseVariableStatement() {
   assert(match(TokenKind::rw_var));
   
   auto kindIdent = tok_->getResWordOrIdentifier();
   SMLoc startLoc = advance().Start;
   
-  Tree::NodeList declList;
+  NodeList declList;
   if (!parseVariableDeclarationList(declList)) {
     return std::nullopt;
   }
@@ -327,7 +327,7 @@ std::optional<Tree::VariableDeclarationNode *> Parser::parseVariableStatement() 
   auto *res = setLocation(
       startLoc,
       getPrevTokenEndLoc(),
-      new (context_) Tree::VariableDeclarationNode(kindIdent, std::move(declList)));
+      new (context_) VariableDeclarationNode(kindIdent, std::move(declList)));
  
   return res;
 }
@@ -340,17 +340,17 @@ bool Parser::eatSemi() {
   return false;
 }
 
-bool Parser::parseVariableDeclarationList(Tree::NodeList &declList) {
+bool Parser::parseVariableDeclarationList(NodeList &declList) {
   do {
     auto decl = parseVariableDeclaration();
-    declList.push_back(*decl.value());
+    declList.push_back(decl.value());
   } while (matchAndEat(TokenKind::comma));
   
   return true;
 }
 
-std::optional<Tree::VariableDeclaratorNode *> Parser::parseVariableDeclaration() {
-  Tree::Node *target;
+std::optional<VariableDeclaratorNode *> Parser::parseVariableDeclaration() {
+  Node *target;
   SMLoc startLoc = tok_->getStartLoc();
   
   auto optIdentOrPat = parseIdentifierOrPattern();
@@ -363,7 +363,7 @@ std::optional<Tree::VariableDeclaratorNode *> Parser::parseVariableDeclaration()
     return setLocation(
         startLoc,
         getPrevTokenEndLoc(),
-        new (context_) Tree::VariableDeclaratorNode(nullptr, target));
+        new (context_) VariableDeclaratorNode(nullptr, target));
   };
   
   advance();
@@ -376,10 +376,10 @@ std::optional<Tree::VariableDeclaratorNode *> Parser::parseVariableDeclaration()
   return setLocation(
       startLoc,
       getPrevTokenEndLoc(),
-      new (context_) Tree::VariableDeclaratorNode(*expr, target));
+      new (context_) VariableDeclaratorNode(*expr, target));
 }
 
-std::optional<Tree::Node *> Parser::parseIdentifierOrPattern() {
+std::optional<Node *> Parser::parseIdentifierOrPattern() {
   if (match(TokenKind::l_square)) {
     return std::nullopt;
   } else if (match(TokenKind::l_brace)) {
@@ -389,7 +389,7 @@ std::optional<Tree::Node *> Parser::parseIdentifierOrPattern() {
   return parseBindingIdentifier();
 }
 
-std::optional<Tree::IdentifierNode *> Parser::parseBindingIdentifier() {
+std::optional<IdentifierNode *> Parser::parseBindingIdentifier() {
   SMRange identRng = tok_->getSourceRange();
   
   std::string id = tok_->getResWordOrIdentifier();
@@ -401,7 +401,7 @@ std::optional<Tree::IdentifierNode *> Parser::parseBindingIdentifier() {
   
   advance();
   
-  Tree::Node *type = nullptr;
+  Node *type = nullptr;
   bool optional = false;
   
   if (match(TokenKind::question)) {
@@ -420,14 +420,14 @@ std::optional<Tree::IdentifierNode *> Parser::parseBindingIdentifier() {
   return setLocation(
       identRng,
       getPrevTokenEndLoc(),
-      new (context_) Tree::IdentifierNode(id, type, optional));
+      new (context_) IdentifierNode(id, type, optional));
 }
 
 bool Parser::validateBindingIdentifier(SMRange range, std::string id, TokenKind kind) {
   return kind == TokenKind::identifier;
 }
 
-std::optional<Tree::Node *> Parser::parseExpressionOrLabelledStatement() {
+std::optional<Node *> Parser::parseExpressionOrLabelledStatement() {
   bool startsWithIdentifier = match(TokenKind::identifier);
   
   SMLoc startLoc = tok_->getStartLoc();
@@ -442,10 +442,10 @@ std::optional<Tree::Node *> Parser::parseExpressionOrLabelledStatement() {
       startLoc,
       getPrevTokenEndLoc(),
       new (context_)
-          Tree::ExpressionStatementNode(optExpr.value(), nullptr));
+          ExpressionStatementNode(optExpr.value(), nullptr));
 }
 
-std::optional<Tree::IfStatementNode *> Parser::parseIfStatement() {
+std::optional<IfStatementNode *> Parser::parseIfStatement() {
   assert(match(TokenKind::rw_if));
   SMLoc startLoc = advance().Start;
 
@@ -471,7 +471,7 @@ std::optional<Tree::IfStatementNode *> Parser::parseIfStatement() {
     return setLocation(
         startLoc,
         optAlternate.value(),
-        new (context_) Tree::IfStatementNode(
+        new (context_) IfStatementNode(
             optTest.value(),
             optConsequent.value(),
             optAlternate.value()));
@@ -479,12 +479,12 @@ std::optional<Tree::IfStatementNode *> Parser::parseIfStatement() {
     return setLocation(
         startLoc,
         optConsequent.value(),
-        new (context_) Tree::IfStatementNode(
+        new (context_) IfStatementNode(
             optTest.value(), optConsequent.value(), nullptr));
   }
 }
 
-std::optional<Tree::Node *> Parser::parseReturnStatement() {
+std::optional<Node *> Parser::parseReturnStatement() {
   assert(match(TokenKind::rw_return));
   SMLoc startLoc = advance().Start;
   
@@ -492,7 +492,7 @@ std::optional<Tree::Node *> Parser::parseReturnStatement() {
     return setLocation(
         startLoc,
         getPrevTokenEndLoc(),
-        new (context_) Tree::ReturnStatementNode(nullptr));
+        new (context_) ReturnStatementNode(nullptr));
   
   auto optArg = parseExpression();
   if (!optArg)
@@ -504,13 +504,13 @@ std::optional<Tree::Node *> Parser::parseReturnStatement() {
   return setLocation(
       startLoc,
       getPrevTokenEndLoc(),
-      new (context_) Tree::ReturnStatementNode(optArg.value()));
+      new (context_) ReturnStatementNode(optArg.value()));
 }
 
-std::optional<Tree::Node *> Parser::parseAssignmentExpression() {
+std::optional<Node *> Parser::parseAssignmentExpression() {
   struct State {
     SMLoc leftStartLoc = {};
-    std::optional<Tree::Node *> optLeftExpr = std::nullopt;
+    std::optional<Node *> optLeftExpr = std::nullopt;
     std::string *op = nullptr;
     SMLoc debugLoc = {};
 
@@ -539,7 +539,7 @@ std::optional<Tree::Node *> Parser::parseAssignmentExpression() {
   return optRes;
 }
 
-std::optional<Tree::Node *> Parser::parseConditionalExpression() {
+std::optional<Node *> Parser::parseConditionalExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   auto optExpr = parseBinaryExpression();
   
@@ -575,17 +575,17 @@ inline unsigned getPrecedence(TokenKind kind) {
 
 }
 
-std::optional<Tree::Node *> Parser::parseBinaryExpression() {
+std::optional<Node *> Parser::parseBinaryExpression() {
   struct PrecedenceStackEntry {
     /// Left hand side expression.
-    Tree::NodePtr expr;
+    NodePtr expr;
     // Operator for this expression.
     TokenKind opKind;
     // Start location for the left hand side expression.
     SMLoc exprStartLoc;
 
     PrecedenceStackEntry(
-        Tree::NodePtr expr,
+        NodePtr expr,
         TokenKind opKind,
         SMLoc exprStartLoc)
         : expr(expr), opKind(opKind), exprStartLoc(exprStartLoc) {}
@@ -594,7 +594,7 @@ std::optional<Tree::Node *> Parser::parseBinaryExpression() {
   std::vector<PrecedenceStackEntry> stack{};
   
   SMLoc topExprStartLoc = tok_->getStartLoc();
-  Tree::Node *topExpr = nullptr;
+  Node *topExpr = nullptr;
   auto optExpr = parseUnaryExpression();
   if (!optExpr)
     return std::nullopt;
@@ -608,7 +608,7 @@ std::optional<Tree::Node *> Parser::parseBinaryExpression() {
       topExpr = setLocation(
             stack.back().exprStartLoc,
             topExprEndLoc,
-            new (context_) Tree::BinaryExpressionNode(stack.back().expr, topExpr, opIdent));
+            new (context_) BinaryExpressionNode(stack.back().expr, topExpr, opIdent));
       topExprStartLoc = topExpr->getStartLoc();
       stack.pop_back();
     }
@@ -631,14 +631,14 @@ std::optional<Tree::Node *> Parser::parseBinaryExpression() {
     topExpr = setLocation(
           stack.back().exprStartLoc,
           topExprEndLoc,
-          new (context_) Tree::BinaryExpressionNode(stack.back().expr, topExpr, opIdent));
+          new (context_) BinaryExpressionNode(stack.back().expr, topExpr, opIdent));
     stack.pop_back();
   }
   
   return topExpr;
 }
 
-std::optional<Tree::Node *> Parser::parseUnaryExpression() {
+std::optional<Node *> Parser::parseUnaryExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   
   switch (tok_->getKind()) {
@@ -664,7 +664,7 @@ std::optional<Tree::Node *> Parser::parseUnaryExpression() {
           startLoc,
           getPrevTokenEndLoc(),
           new (context_)
-              Tree::PostfixUnaryExpressionNode(op, expr.value(), true));
+              PostfixUnaryExpressionNode(op, expr.value(), true));
     }
       
     case TokenKind::less:
@@ -679,17 +679,17 @@ std::optional<Tree::Node *> Parser::parseUnaryExpression() {
   
 }
 
-std::optional<Tree::Node *> Parser::parsePostfixExpression() {
+std::optional<Node *> Parser::parsePostfixExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   auto optLHandExpr = parseLeftHandSideExpression();
   return optLHandExpr;
 }
 
-std::optional<Tree::Node *> Parser::parseCallExpression(SMLoc startLoc, Tree::NodePtr expr) {
+std::optional<Node *> Parser::parseCallExpression(SMLoc startLoc, NodePtr expr) {
   assert(match(TokenKind::l_paren));
   
   while (match(TokenKind::l_paren)) {
-    Tree::NodeList argList;
+    NodeList argList;
     SMLoc endLoc;
     if (!parseArguments(argList, endLoc))
       return std::nullopt;
@@ -697,13 +697,13 @@ std::optional<Tree::Node *> Parser::parseCallExpression(SMLoc startLoc, Tree::No
     expr = setLocation(
         startLoc,
         endLoc,
-        new (context_) Tree::CallExpressionNode(expr, std::move(argList)));
+        new (context_) CallExpressionNode(expr, std::move(argList)));
   }
   
   return expr;
 }
 
-std::optional<Tree::Node *> Parser::parseLeftHandSideExpression() {
+std::optional<Node *> Parser::parseLeftHandSideExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   
   auto optExpr = parseMemberExpression();
@@ -721,7 +721,7 @@ std::optional<Tree::Node *> Parser::parseLeftHandSideExpression() {
   return expr;
 }
 
-std::optional<Tree::Node *> Parser::parseMemberExpression() {
+std::optional<Node *> Parser::parseMemberExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   
   auto primExpr = parsePrimaryExpression();
@@ -732,12 +732,12 @@ std::optional<Tree::Node *> Parser::parseMemberExpression() {
   return parseMemberExpressionContinuation(startLoc, primExpr.value());
 }
 
-std::optional<Tree::Node *> Parser::parseMemberExpressionContinuation(SMLoc startLoc, Tree::Node *expr) {
+std::optional<Node *> Parser::parseMemberExpressionContinuation(SMLoc startLoc, Node *expr) {
   while (matchN(TokenKind::l_square, TokenKind::period)) {
     if (matchAndEat(TokenKind::l_square)) {
       
     } else {
-      Tree::Node *id = nullptr;
+      Node *id = nullptr;
       if (!match(TokenKind::identifier, TokenKind::private_identifier)) {
         if (match(TokenKind::private_identifier)) {
           return std::nullopt;
@@ -745,7 +745,7 @@ std::optional<Tree::Node *> Parser::parseMemberExpressionContinuation(SMLoc star
           id = setLocation(
               tok_,
               tok_,
-              new (context_) Tree::IdentifierNode(
+              new (context_) IdentifierNode(
                   tok_->getResWordOrIdentifier(), nullptr, false));
           advance();
         }
@@ -753,7 +753,7 @@ std::optional<Tree::Node *> Parser::parseMemberExpressionContinuation(SMLoc star
         return setLocation(
             startLoc,
             id,
-            new (context_) Tree::MemberExpressionNode(expr, id, false));
+            new (context_) MemberExpressionNode(expr, id, false));
       }
     }
   }
@@ -761,13 +761,13 @@ std::optional<Tree::Node *> Parser::parseMemberExpressionContinuation(SMLoc star
   return expr;
 }
 
-std::optional<Tree::Node *> Parser::parsePrimaryExpression() {
+std::optional<Node *> Parser::parsePrimaryExpression() {
   switch (tok_->getKind()) {
     case TokenKind::identifier: {
       auto *res = setLocation(
           tok_,
           tok_,
-          new (context_) Tree::IdentifierNode(tok_->getIdentifier(), nullptr, false));
+          new (context_) IdentifierNode(tok_->getIdentifier(), nullptr, false));
       advance();
       return res;
     }
@@ -777,7 +777,7 @@ std::optional<Tree::Node *> Parser::parsePrimaryExpression() {
       auto *res = setLocation(
           tok_,
           tok_,
-          new (context_) Tree::BooleanLiteralNode(
+          new (context_) BooleanLiteralNode(
               tok_->getKind() == TokenKind::rw_true));
       advance();
       return res;
@@ -787,7 +787,7 @@ std::optional<Tree::Node *> Parser::parsePrimaryExpression() {
       auto *res = setLocation(
           tok_,
           tok_,
-          new (context_) Tree::NumericLiteralNode(tok_->getNumericLiteral()));
+          new (context_) NumericLiteralNode(tok_->getNumericLiteral()));
       advance();
       return res;
     }
@@ -796,7 +796,7 @@ std::optional<Tree::Node *> Parser::parsePrimaryExpression() {
       auto *res = setLocation(
           tok_,
           tok_,
-          new (context_) Tree::StringLiteralNode(tok_->getStringLiteral()));
+          new (context_) StringLiteralNode(tok_->getStringLiteral()));
       advance();
       return res;
     }
@@ -817,15 +817,15 @@ std::optional<Tree::Node *> Parser::parsePrimaryExpression() {
   }
 }
 
-std::optional<Tree::Node *> Parser::parseExpression() {
+std::optional<Node *> Parser::parseExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   auto optExpr = parseAssignmentExpression();
   
   if (!match(TokenKind::comma))
     return optExpr.value();
   
-  Tree::NodeList exprList;
-  exprList.push_back(*optExpr.value());
+  NodeList exprList;
+  exprList.push_back(optExpr.value());
   
   while (match(TokenKind::comma)) {
     
@@ -834,7 +834,7 @@ std::optional<Tree::Node *> Parser::parseExpression() {
   return optExpr;
 }
 
-bool Parser::parseArguments(Tree::NodeList &argList, SMLoc &endLoc) {
+bool Parser::parseArguments(NodeList &argList, SMLoc &endLoc) {
   assert(match(TokenKind::l_paren));
   advance();
   
@@ -847,12 +847,12 @@ bool Parser::parseArguments(Tree::NodeList &argList, SMLoc &endLoc) {
       return false;
     
     if (isSpread) {
-      argList.push_back(*setLocation(
+      argList.push_back(setLocation(
          argStart,
          getPrevTokenEndLoc(),
-         new (context_) Tree::SpreadElementNode(arg.value())));
+         new (context_) SpreadElementNode(arg.value())));
     } else {
-      argList.push_back(*arg.value());
+      argList.push_back(arg.value());
     }
     
     if (!matchAndEat(TokenKind::comma))

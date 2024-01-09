@@ -12,21 +12,34 @@
 #include "cobra/IR/IR.h"
 
 namespace cobra {
-namespace Lowering {
 
 class IRBuilder {
   IRBuilder(const IRBuilder &) = delete;
   void operator=(const IRBuilder &) = delete;
   
   Module *M;
-  BasicBlock *BB{};
+  BasicBlock::iterator InsertionPoint{};
+  BasicBlock *Block{};
   
 public:
   explicit IRBuilder(Module *Mod) : M(Mod) {}
   
+  Module *getModule() {
+    return M;
+  }
+  
+  BasicBlock *createBasicBlock(Function *Parent);
+  
+  Function *createFunction(std::string Name);
+  
+  void setInsertionBlock(BasicBlock *BB);
+  
+  BasicBlock *getInsertionBlock();
+  
+  void setInsertionPoint(Instruction *IP);
+  
 };
 
-}
 }
 
 #endif /* IRBuilder_hpp */

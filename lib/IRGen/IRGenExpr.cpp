@@ -5,15 +5,4 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef ASTBuilder_hpp
-#define ASTBuilder_hpp
-
-namespace cobra {
-
-class ASTBuilder {
-  
-};
-
-}
-
-#endif /* ASTBuilder_hpp */
+#include "cobra/IRGen/IRGen.h"

@@ -6,24 +6,38 @@
  */
 
 #include "cobra/IRGen/IRGen.h"
+#include <iostream>
+#include <fstream>
 
 using namespace cobra;
 using namespace Lowering;
 
-IRGenModul::IRGenModul(Tree::Node *root, Module *M) : Mod(M), Builder(Mod), Root(root) {
+TreeIRGen::TreeIRGen(Node *root, Module *M) : Mod(M), Builder(Mod), Root(root) {
   
 }
 
-void IRGenModul::visit() {
+void TreeIRGen::visit() {
+  ProgramNode *Program = dynamic_cast<ProgramNode *>(Root);
+  
+  for (auto Node : Program->body_) {
+    switch (Node->getKind()) {
+      case NodeKind::FunctionDeclaration:
+        auto fd = dynamic_cast<FunctionDeclarationNode *>(Node);
+        visit(fd);
+        break;
+    }
+  }
+}
+
+void TreeIRGen::visit(FunctionDeclarationNode *fd) { emitFunction(fd); }
+
+void TreeIRGen::visit(VariableDeclaratorNode *vd) {
   
 }
 
-void IRGenModul::visit(Tree::FunctionDeclarationNode *fd) { emitFunction(fd); }
-
-void IRGenModul::visit(Tree::VariableDeclaratorNode *vd) {
-  
-}
-
-void IRGenModul::emitFunction(Tree::FunctionDeclarationNode *fd) {
-  
+BlockStatementNode *TreeIRGen::getBlockStatement(FunctionLikeNode *node) {
+  switch (node->getKind()) {
+    case NodeKind::FunctionDeclaration:
+      return dynamic_cast<BlockStatementNode *>(dynamic_cast<FunctionDeclarationNode *>(node)->body_);
+  }
 }

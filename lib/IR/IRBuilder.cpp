@@ -6,3 +6,32 @@
  */
 
 #include "cobra/IR/IRBuilder.h"
+
+using namespace cobra;
+
+BasicBlock *IRBuilder::createBasicBlock(Function *Parent) {
+  return new BasicBlock(Parent);
+}
+
+Function *IRBuilder::createFunction(std::string Name) {
+  return new Function(M, Name);
+}
+
+void IRBuilder::setInsertionBlock(BasicBlock *BB) {
+  if (BB) {
+    InsertionPoint = BB->end();
+    Block = BB;
+  } else {
+    InsertionPoint = BasicBlock::iterator();
+    Block = nullptr;
+  }
+}
+
+BasicBlock *IRBuilder::getInsertionBlock() {
+  return Block;
+}
+
+void IRBuilder::setInsertionPoint(Instruction *IP) {
+  InsertionPoint = IP->getParent()->getIterator(IP);
+  Block = IP->getParent();
+}

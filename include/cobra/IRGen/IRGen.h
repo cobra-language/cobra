@@ -24,11 +24,11 @@ class TreeIRGen : public ASTVisitor {
   
   Module *Mod;
   IRBuilder Builder;
-  Node *Root;
+  ASTNode *Root;
   Function *curFunction{};
   
 public:
-  explicit TreeIRGen(Node *root, Module *M);
+  explicit TreeIRGen(ASTNode *root, Module *M);
   
   void visit();
   void visit(FunctionDeclarationNode *fd);
@@ -41,9 +41,11 @@ public:
   
   void emitParameters(FunctionLikeNode *funcNode);
   
-  void emitfunctionBody(Node *stmt);
+  void emitfunctionBody(ASTNode *stmt);
   
-  void emitStatement(Node *stmt, bool isLoopBody);
+  void emitStatement(ASTNode *stmt, bool isLoopBody);
+  
+  NodeList getParams(FunctionLikeNode *node);
   
   BlockStatementNode *getBlockStatement(FunctionLikeNode *node);
   

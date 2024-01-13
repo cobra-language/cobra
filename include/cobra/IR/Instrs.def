@@ -23,7 +23,15 @@
 #define INCLUDE_HBC_BACKEND
 #endif
 
+MARK_FIRST(SingleOperandInst)
 
+DEF_VALUE(LoadStackInst, SingleOperandInst)
+
+MARK_LAST(SingleOperandInst)
+
+
+DEF_VALUE(StoreStackInst, Instruction)
+DEF_VALUE(AllocStackInst, Instruction)
 
 
 

@@ -17,15 +17,15 @@
 namespace cobra {
 
 class ASTVisitor;
-class Node;
+class ASTNode;
 
 using NodeLabel = std::string;
 
 using NodeString = std::string;
-using NodePtr = Node *;
+using NodePtr = ASTNode *;
 using NodeBoolean = bool;
 using NodeNumber = double;
-using NodeList = std::vector<Node *>;
+using NodeList = std::vector<ASTNode *>;
 
 enum class NodeKind : uint32_t {
   Empty,
@@ -60,7 +60,7 @@ enum class NodeKind : uint32_t {
   NumericLiteral
 };
 
-class Node {
+class ASTNode {
 //  Node(const Node &) = delete;
 //  void operator=(const Node &) = delete;
   
@@ -69,9 +69,9 @@ class Node {
   SMRange sourceRange_{};
   
 public:
-  Node(NodeKind kind) : kind_(kind) {}
+  ASTNode(NodeKind kind) : kind_(kind) {}
   
-  virtual ~Node() = default;
+  virtual ~ASTNode() = default;
   
   void setSourceRange(SMRange rng) {
     sourceRange_ = rng;
@@ -119,101 +119,101 @@ class FunctionLikeDecoration {};
 
 class MemberExpressionLikeDecoration {};
 
-class AnyKeywordNode : public Node {
+class AnyKeywordNode : public ASTNode {
 public:
-  explicit AnyKeywordNode() : Node(NodeKind::AnyKeyword) {
+  explicit AnyKeywordNode() : ASTNode(NodeKind::AnyKeyword) {
     
   }
 };
 
-class BooleanKeywordNode : public Node {
+class BooleanKeywordNode : public ASTNode {
 public:
-  explicit BooleanKeywordNode() : Node(NodeKind::BooleanKeyword) {
+  explicit BooleanKeywordNode() : ASTNode(NodeKind::BooleanKeyword) {
     
   }
 };
 
-class NumberKeywordNode : public Node {
+class NumberKeywordNode : public ASTNode {
 public:
-  explicit NumberKeywordNode() : Node(NodeKind::NumberKeyword) {
+  explicit NumberKeywordNode() : ASTNode(NodeKind::NumberKeyword) {
     
   }
 };
 
-class StringKeywordNode : public Node {
+class StringKeywordNode : public ASTNode {
 public:
-  explicit StringKeywordNode() : Node(NodeKind::StringKeyword) {
+  explicit StringKeywordNode() : ASTNode(NodeKind::StringKeyword) {
     
   }
 };
 
-class VoidKeywordNode : public Node {
+class VoidKeywordNode : public ASTNode {
 public:
-  explicit VoidKeywordNode() : Node(NodeKind::VoidKeyword) {
+  explicit VoidKeywordNode() : ASTNode(NodeKind::VoidKeyword) {
     
   }
 };
 
-class BooleanLiteralNode : public Node {
+class BooleanLiteralNode : public ASTNode {
 public:
   NodeBoolean value_;
   explicit BooleanLiteralNode(NodeBoolean value)
-      : Node(NodeKind::BooleanLiteral), value_(std::move(value)) {
+      : ASTNode(NodeKind::BooleanLiteral), value_(std::move(value)) {
     
   }
 };
 
-class StringLiteralNode : public Node {
+class StringLiteralNode : public ASTNode {
 public:
   NodeString value_;
   explicit StringLiteralNode(NodeString value)
-      : Node(NodeKind::StringLiteral), value_(std::move(value)) {
+      : ASTNode(NodeKind::StringLiteral), value_(std::move(value)) {
     
   }
 };
 
-class NumericLiteralNode : public Node {
+class NumericLiteralNode : public ASTNode {
 public:
   NodeNumber value_;
   explicit NumericLiteralNode(NodeNumber value)
-      : Node(NodeKind::NumericLiteral), value_(std::move(value)) {
+      : ASTNode(NodeKind::NumericLiteral), value_(std::move(value)) {
     
   }
 };
 
-class VariableDeclaratorNode : public Node {
+class VariableDeclaratorNode : public ASTNode {
 public:
   NodePtr init_;
   NodePtr id_;
   explicit VariableDeclaratorNode(NodePtr init, NodePtr id)
-      : Node(NodeKind::VariableDeclarator), init_(std::move(init)), id_(std::move(id)) {
+      : ASTNode(NodeKind::VariableDeclarator), init_(std::move(init)), id_(std::move(id)) {
     
   }
 };
 
-class VariableDeclarationNode : public Node {
+class VariableDeclarationNode : public ASTNode {
 public:
   NodeLabel label_;
   NodeList declarations_;
   explicit VariableDeclarationNode(NodeLabel label, NodeList declarations)
-      : Node(NodeKind::VariableDeclarator), label_(std::move(label)), declarations_(std::move(declarations)) {
+      : ASTNode(NodeKind::VariableDeclarator), label_(std::move(label)), declarations_(std::move(declarations)) {
     
   }
 };
 
-class ParameterDeclarationNode : public Node {
+class ParameterDeclarationNode : public ASTNode {
 public:
   NodePtr init_;
   NodePtr id_;
   explicit ParameterDeclarationNode(NodePtr init, NodePtr id)
-      : Node(NodeKind::ParameterDeclaration), init_(std::move(init)), id_(std::move(id)) {
+      : ASTNode(NodeKind::ParameterDeclaration), init_(std::move(init)), id_(std::move(id)) {
     
   }
 };
 
-class FunctionLikeNode : public Node, public FunctionLikeDecoration {
+class FunctionLikeNode : public ASTNode, public FunctionLikeDecoration {
 public:
-  explicit FunctionLikeNode(NodeKind kind) : Node(kind) {
+  explicit FunctionLikeNode(NodeKind kind) : ASTNode(kind) {
     
   }
   
@@ -246,13 +246,13 @@ public:
   
 };
 
-class ClassDeclarationNode : public Node {
+class ClassDeclarationNode : public ASTNode {
 
 };
 
-class StatementNode : public Node, public StatementDecoration {
+class StatementNode : public ASTNode, public StatementDecoration {
 public:
-  explicit StatementNode(NodeKind kind) : Node(kind) {
+  explicit StatementNode(NodeKind kind) : ASTNode(kind) {
     
   }
 
@@ -270,22 +270,22 @@ public:
   }
 };
 
-class BlockStatementNode : public Node {
+class BlockStatementNode : public ASTNode {
 public:
   NodeList body_;
   explicit BlockStatementNode(NodeList body)
-      : Node(NodeKind::BlockStatement), body_(std::move(body)) {
+      : ASTNode(NodeKind::BlockStatement), body_(std::move(body)) {
     
   }
 };
 
-class IfStatementNode : public Node {
+class IfStatementNode : public ASTNode {
 public:
   NodePtr test_;
   NodePtr consequent_;
   NodePtr alternate_;
   explicit IfStatementNode(NodePtr test, NodePtr consequent, NodePtr alternate)
-      : Node(NodeKind::IfStatement),
+      : ASTNode(NodeKind::IfStatement),
       test_(std::move(test)),
       consequent_(std::move(consequent)) ,
       alternate_(std::move(alternate)) {
@@ -293,39 +293,39 @@ public:
   }
 };
 
-class ReturnStatementNode : public Node {
+class ReturnStatementNode : public ASTNode {
 public:
   NodePtr argument_;
   explicit ReturnStatementNode(NodePtr argument)
-      : Node(NodeKind::ReturnStatement),
+      : ASTNode(NodeKind::ReturnStatement),
       argument_(std::move(argument)) {
     
   }
 };
 
-class ExpressionNode : public Node {
+class ExpressionNode : public ASTNode {
 
 };
 
-class ClassExpressionNode : public Node {
+class ClassExpressionNode : public ASTNode {
 
 };
 
-class CallExpressionNode : public Node {
+class CallExpressionNode : public ASTNode {
 public:
   NodePtr callee_;
   NodeList argument_;
   explicit CallExpressionNode(NodePtr callee, NodeList argument)
-      : Node(NodeKind::CallExpression),
+      : ASTNode(NodeKind::CallExpression),
       callee_(std::move(callee)),
       argument_(std::move(argument)) {
     
   }
 };
 
-class MemberExpressionLikeNode : public Node, public MemberExpressionLikeDecoration {
+class MemberExpressionLikeNode : public ASTNode, public MemberExpressionLikeDecoration {
 public:
-  explicit MemberExpressionLikeNode(NodeKind kind) : Node(kind) {
+  explicit MemberExpressionLikeNode(NodeKind kind) : ASTNode(kind) {
     
   }
   
@@ -346,27 +346,27 @@ public:
   
 };
 
-class ClassPropertyNode : public Node {
+class ClassPropertyNode : public ASTNode {
 
 };
 
-class SpreadElementNode : public Node {
+class SpreadElementNode : public ASTNode {
 public:
   NodePtr argument_;
   explicit SpreadElementNode(NodePtr argument)
-      : Node(NodeKind::SpreadElement),
+      : ASTNode(NodeKind::SpreadElement),
       argument_(std::move(argument)) {
     
   }
 };
 
-class IdentifierNode : public Node {
+class IdentifierNode : public ASTNode {
 public:
   NodeLabel name_;
   NodePtr typeAnnotation_;
   NodeBoolean optional_;
   explicit IdentifierNode(NodeLabel name, NodePtr typeAnnotation, NodeBoolean optional)
-      : Node(NodeKind::Identifier),
+      : ASTNode(NodeKind::Identifier),
       name_(std::move(name)),
       typeAnnotation_(std::move(typeAnnotation)) ,
       optional_(std::move(optional)) {
@@ -374,13 +374,13 @@ public:
   }
 };
 
-class UnaryExpressionNode : public Node {
+class UnaryExpressionNode : public ASTNode {
 public:
   NodeLabel operator_;
   NodePtr argument_;
   NodeBoolean prefix_;
   explicit UnaryExpressionNode(NodeLabel _operator, NodePtr argument, NodeBoolean prefix)
-      : Node(NodeKind::UnaryExpression),
+      : ASTNode(NodeKind::UnaryExpression),
       operator_(std::move(_operator)),
       argument_(std::move(argument)) ,
       prefix_(std::move(prefix)) {
@@ -389,13 +389,13 @@ public:
   
 };
 
-class PostfixUnaryExpressionNode : public Node {
+class PostfixUnaryExpressionNode : public ASTNode {
 public:
   NodeLabel operator_;
   NodePtr argument_;
   NodeBoolean prefix_;
   explicit PostfixUnaryExpressionNode(NodeLabel _operator, NodePtr argument, NodeBoolean prefix)
-      : Node(NodeKind::PostfixUnaryExpression),
+      : ASTNode(NodeKind::PostfixUnaryExpression),
       operator_(std::move(_operator)),
       argument_(std::move(argument)) ,
       prefix_(std::move(prefix)) {
@@ -404,13 +404,13 @@ public:
   
 };
 
-class BinaryExpressionNode : public Node {
+class BinaryExpressionNode : public ASTNode {
 public:
   NodePtr left_;
   NodePtr right_;
   NodeLabel operator_;
   explicit BinaryExpressionNode(NodePtr left, NodePtr right, NodeLabel _operator)
-      : Node(NodeKind::BinaryExpression),
+      : ASTNode(NodeKind::BinaryExpression),
       left_(std::move(left)) ,
       right_(std::move(right)) ,
       operator_(std::move(_operator)) {

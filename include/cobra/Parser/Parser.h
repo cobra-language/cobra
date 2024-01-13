@@ -27,7 +27,7 @@ public:
     return context_;
   }
   
-  std::optional<Node *> parse();
+  std::optional<ASTNode *> parse();
   
 private:
   Lexer lexer_;
@@ -46,7 +46,7 @@ private:
   static SMLoc getStartLoc(const Token *tok) {
     return tok->getStartLoc();
   }
-  static SMLoc getStartLoc(const Node *from) {
+  static SMLoc getStartLoc(const ASTNode *from) {
     return from->getStartLoc();
   }
   static SMLoc getStartLoc(SMLoc loc) {
@@ -59,7 +59,7 @@ private:
   static SMLoc getEndLoc(const Token *tok) {
     return tok->getEndLoc();
   }
-  static SMLoc getEndLoc(const Node *from) {
+  static SMLoc getEndLoc(const ASTNode *from) {
     return from->getEndLoc();
   }
   static SMLoc getEndLoc(SMLoc loc) {
@@ -108,21 +108,21 @@ private:
   
   std::optional<ProgramNode *> parseProgram();
   
-  std::optional<Node *> parseTypeAnnotation(std::optional<SMLoc> wrappedStart = std::nullopt);
+  std::optional<ASTNode *> parseTypeAnnotation(std::optional<SMLoc> wrappedStart = std::nullopt);
     
-  std::optional<Node *> parseUnionType();
+  std::optional<ASTNode *> parseUnionType();
   
-  std::optional<Node *> parseIntersectionType();
+  std::optional<ASTNode *> parseIntersectionType();
   
-  std::optional<Node *> parsePostfixType();
+  std::optional<ASTNode *> parsePostfixType();
   
-  std::optional<Node *> parsePrimaryType();
+  std::optional<ASTNode *> parsePrimaryType();
   
   std::optional<bool> parseStatementList(TokenKind until, NodeList &stmtList);
   
   bool parseStatementListItem(NodeList &stmtList);
   
-  std::optional<Node *> parseStatement();
+  std::optional<ASTNode *> parseStatement();
   
   std::optional<FunctionDeclarationNode *> parseFunctionDeclaration();
   
@@ -142,39 +142,39 @@ private:
   
   std::optional<VariableDeclaratorNode *> parseVariableDeclaration();
     
-  std::optional<Node *> parseIdentifierOrPattern();
+  std::optional<ASTNode *> parseIdentifierOrPattern();
   
   std::optional<IdentifierNode *> parseBindingIdentifier();
     
   bool validateBindingIdentifier(SMRange range, std::string id, TokenKind kind);
   
-  std::optional<Node *> parseExpressionOrLabelledStatement();
+  std::optional<ASTNode *> parseExpressionOrLabelledStatement();
   
   std::optional<IfStatementNode *> parseIfStatement();
   
-  std::optional<Node *> parseReturnStatement();
+  std::optional<ASTNode *> parseReturnStatement();
   
-  std::optional<Node *> parseAssignmentExpression();
+  std::optional<ASTNode *> parseAssignmentExpression();
   
-  std::optional<Node *> parseConditionalExpression();
+  std::optional<ASTNode *> parseConditionalExpression();
   
-  std::optional<Node *> parseBinaryExpression();
+  std::optional<ASTNode *> parseBinaryExpression();
   
-  std::optional<Node *> parseUnaryExpression();
+  std::optional<ASTNode *> parseUnaryExpression();
   
-  std::optional<Node *> parsePostfixExpression();
+  std::optional<ASTNode *> parsePostfixExpression();
   
-  std::optional<Node *> parseCallExpression(SMLoc startLoc, NodePtr expr);
+  std::optional<ASTNode *> parseCallExpression(SMLoc startLoc, NodePtr expr);
   
-  std::optional<Node *> parseLeftHandSideExpression();
+  std::optional<ASTNode *> parseLeftHandSideExpression();
   
-  std::optional<Node *> parseMemberExpression();
+  std::optional<ASTNode *> parseMemberExpression();
   
-  std::optional<Node *> parseMemberExpressionContinuation(SMLoc startLoc, Node *expr);
+  std::optional<ASTNode *> parseMemberExpressionContinuation(SMLoc startLoc, ASTNode *expr);
   
-  std::optional<Node *> parsePrimaryExpression();
+  std::optional<ASTNode *> parsePrimaryExpression();
   
-  std::optional<Node *> parseExpression();
+  std::optional<ASTNode *> parseExpression();
   
   bool parseArguments(NodeList &argList, SMLoc &endLoc);
   

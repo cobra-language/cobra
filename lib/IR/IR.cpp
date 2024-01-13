@@ -67,7 +67,7 @@ void Value::replaceAllUsesWith(Value *Other) {
     }
 }
 
-Parameter::Parameter(Function *parent, std::string name)
+Parameter::Parameter(Function *parent, Identifier name)
     : Value(ValueKind::ParameterKind), Parent(parent), Name(std::move(name)) {
   Parent->addParameter(this);
 }

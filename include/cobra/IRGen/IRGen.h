@@ -16,13 +16,17 @@
 #include "cobra/IR/IR.h"
 #include "cobra/IR/IRBuilder.h"
 #include "cobra/AST/Tree.h"
-#include "cobra/Support/Identifier.h"
+#include "cobra/Support/StringTable.h"
 
 namespace cobra {
 namespace Lowering {
 
-using NameTableTy = std::map<std::string, Value *>;
-using NameTableScopeTy = std::map<std::string, Value *>;
+using NameTableTy = std::map<Identifier, Value *>;
+using NameTableScopeTy = std::map<Identifier, Value *>;
+
+inline Identifier getNameFieldFromID(ASTNode *ID) {
+  return Identifier::getFromPointer(dynamic_cast<IdentifierNode *>(ID)->name);
+}
 
 class TreeIRGen : public ASTVisitor {
   TreeIRGen(const TreeIRGen &) = delete;

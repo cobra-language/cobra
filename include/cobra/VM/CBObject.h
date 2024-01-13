@@ -9,7 +9,7 @@
 #define CBObject_hpp
 
 #include "cobra/VM/CBValue.h"
-#include "cobra/VM/CGCCell.h"
+#include "cobra/VM/GCCell.h"
 
 namespace cobra {
 namespace vm {

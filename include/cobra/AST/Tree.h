@@ -13,7 +13,8 @@
 #include "cobra/Support/SMLoc.h"
 #include <string>
 #include "cobra/VM/Context.h"
-#include "cobra/Support/Identifier.h"
+#include "cobra/Support/StringRef.h"
+#include "cobra/Support/StringTable.h"
 
 namespace cobra {
 
@@ -21,11 +22,10 @@ class ASTVisitor;
 class ASTNode;
 class ParamDecl;
 class BlockStmt;
-class Identifier;
 
-using NodeLabel = std::string;
+using NodeLabel = UniqueString *;
 
-using NodeString = std::string;
+using NodeString = UniqueString *;
 using NodePtr = ASTNode *;
 using NodeBoolean = bool;
 using NodeNumber = double;

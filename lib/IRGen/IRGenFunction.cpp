@@ -14,8 +14,9 @@ using namespace cobra;
 using namespace Lowering;
 
 void TreeIRGen::emitFunction(FuncDecl *fd) {
-  auto id = dynamic_cast<IdentifierNode *>(fd->id);
-  Function *newFunction = Builder.createFunction(id->name);
+  Identifier functionName = getNameFieldFromID(fd->id);
+  std::cout << functionName.c_str() << std::endl;
+  Function *newFunction = Builder.createFunction(functionName);
   this->curFunction = newFunction;
   
   emitFunctionPreamble(Builder.createBasicBlock(newFunction));
@@ -43,11 +44,11 @@ void TreeIRGen::emitParameters(AbstractFunctionDecl *funcNode) {
     ++paramIndex;
     
     auto paramNameDecl = dynamic_cast<ParamDecl *>(elem)->id;
-    auto paramName = dynamic_cast<IdentifierNode *>(paramNameDecl)->name;
+    auto b = getNameFieldFromID(paramNameDecl);
     
-    std::cout << paramName << std::endl;
+    std::cout << b.c_str() << std::endl;
     
-    auto *Param = Builder.createParameter(this->curFunction , paramName);
+    auto *Param = Builder.createParameter(this->curFunction, b);
     
     
   }

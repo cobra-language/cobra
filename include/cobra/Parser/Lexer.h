@@ -13,6 +13,8 @@
 #include "cobra/Support/SMLoc.h"
 #include "cobra/VM/CBValue.h"
 #include "cobra/Support/Allocator.h"
+#include "cobra/Support/StringRef.h"
+#include "cobra/Support/StringTable.h"
 
 namespace cobra {
 namespace parser {
@@ -137,14 +139,16 @@ inline constexpr int ord(TokenKind kind) {
   return static_cast<int>(kind);
 }
 
-std::string tokenKindStr(TokenKind kind);
+const unsigned NUM_JS_TOKENS = ord(TokenKind::_last_token) + 1;
+const char *tokenKindStr(TokenKind kind);
 
 class Token {
   TokenKind kind_{TokenKind::none};
   SMRange range_{};
   double numeric_{};
-  std::string ident_;
-  std::string stringLiteral_;
+  UniqueString *ident_{nullptr};
+  UniqueString *stringLiteral_{nullptr};
+  UniqueString *rawString_{nullptr};
   
 public:
   Token() = default;
@@ -169,16 +173,16 @@ public:
     return numeric_;
   }
   
-  std::string getIdentifier() const {
+  UniqueString *getIdentifier() const {
     assert(getKind() == TokenKind::identifier);
     return ident_;
   }
   
-  std::string getResWordOrIdentifier() const {
+  UniqueString *getResWordOrIdentifier() const {
     return ident_;
   }
   
-  std::string getStringLiteral() const {
+  UniqueString *getStringLiteral() const {
     assert(getKind() == TokenKind::string_literal);
     return stringLiteral_;
   }
@@ -214,12 +218,12 @@ private:
     numeric_ = literal;
   }
   
-  void setIdentifier(std::string ident) {
+  void setIdentifier(UniqueString *ident) {
     kind_ = TokenKind::identifier;
     ident_ = ident;
   }
   
-  void setResWord(TokenKind kind, std::string ident) {
+  void setResWord(TokenKind kind, UniqueString *ident) {
     assert(kind > TokenKind::_first_resword && kind < TokenKind::_last_resword);
     kind_ = kind;
     ident_ = ident;
@@ -259,15 +263,26 @@ private:
   
   bool newLineBeforeCurrentToken_ = false;
   
-  std::string *getIdentifier(std::string name) {
-    
-    return &name;
+  std::unique_ptr<StringTable> ownStrTab_;
+  StringTable &strTab_;
+  
+  UniqueString *resWordIdent_
+      [ord(TokenKind::_last_resword) - ord(TokenKind::_first_resword) + 1];
+
+  UniqueString *&resWordIdent(TokenKind kind) {
+    assert(
+        kind >= TokenKind::_first_resword && kind <= TokenKind::_last_resword);
+    return resWordIdent_[ord(kind) - ord(TokenKind::_first_resword)];
   }
   
   bool isDigit(char c) const;
   bool isAlpha(char c) const;
   
   char peakChar();
+  
+  UniqueString *getIdentifier(StringRef name) {
+    return strTab_.getString(name);
+  }
   
   void scanLineComment(const char *start);
   

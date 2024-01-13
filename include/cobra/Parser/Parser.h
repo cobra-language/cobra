@@ -73,8 +73,10 @@ private:
     return lexer_.getPrevTokenEndLoc();
   }
   
-  std::string getTokenIdent(TokenKind kind) const {
-    return tokenKindStr(kind);
+  UniqueString *tokenIdent_[NUM_JS_TOKENS];
+  
+  UniqueString *getTokenIdent(TokenKind kind) const {
+    return tokenIdent_[(unsigned)kind];
   }
   
   SMRange advance() {
@@ -146,7 +148,7 @@ private:
   
   std::optional<IdentifierNode *> parseBindingIdentifier();
     
-  bool validateBindingIdentifier(SMRange range, std::string id, TokenKind kind);
+  bool validateBindingIdentifier(SMRange range, UniqueString *id, TokenKind kind);
   
   std::optional<ASTNode *> parseExpressionOrLabelledStatement();
   

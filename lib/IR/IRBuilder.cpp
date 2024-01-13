@@ -13,11 +13,11 @@ BasicBlock *IRBuilder::createBasicBlock(Function *Parent) {
   return new BasicBlock(Parent);
 }
 
-Function *IRBuilder::createFunction(std::string Name) {
-  return new Function(M, Name);
+Function *IRBuilder::createFunction(Identifier OriginalName) {
+  return new Function(M, OriginalName);
 }
 
-Parameter *IRBuilder::createParameter(Function *Parent, std::string Name) {
+Parameter *IRBuilder::createParameter(Function *Parent, Identifier Name) {
   return new Parameter(Parent, Name);
 }
 

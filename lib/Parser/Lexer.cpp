@@ -10,12 +10,12 @@
 namespace cobra {
 namespace parser {
 
-std::string g_tokenStr[] = {
+const char *g_tokenStr[] = {
 #define TOK(name, str) str,
 #include "cobra/Parser/TokenKinds.def"
 };
 
-std::string tokenKindStr(TokenKind kind) {
+const char *tokenKindStr(TokenKind kind) {
   assert(kind <= TokenKind::_last_token);
   return g_tokenStr[static_cast<unsigned>(kind)];
 }
@@ -31,7 +31,12 @@ const std::map<TokenKind, std::string> resWordIdentMap = {
 };
 
 Lexer::Lexer(const char* buffer, std::size_t bufferSize, Allocator& allocator)
-    : bufferStart_(buffer), bufferEnd_(buffer+bufferSize), curCharPtr_(buffer), allocator_(allocator) {
+    : allocator_(allocator),
+      bufferStart_(buffer),
+      bufferEnd_(buffer + bufferSize),
+      curCharPtr_(buffer),
+      ownStrTab_(new StringTable(allocator_)),
+      strTab_(*ownStrTab_) {
 }
 
 bool Lexer::isDigit(const char c) const {
@@ -369,10 +374,6 @@ void Lexer::lexNumber() {
   token_.setNumericLiteral(val);
 }
 
-std::string resWordIdent(TokenKind kind) {
-  return resWordIdentMap.at(kind);
-}
-
 static TokenKind matchReservedWord(const char *str, unsigned len) {
   auto name = std::string(str, len);
   auto it = TokenMap.find(name);
@@ -398,7 +399,7 @@ void Lexer::lexIdentifier() {
   if (rw != TokenKind::identifier) {
     token_.setResWord(rw, resWordIdent(rw));
   } else {
-    token_.setIdentifier(std::string(start, (unsigned)length));
+    token_.setIdentifier(getIdentifier(StringRef(start, length)));
   }
   
 //  std::string substr(start, curCharPtr_);

@@ -10,6 +10,7 @@
 
 #include <list>
 #include <string>
+#include "cobra/Support/StringTable.h"
 
 namespace cobra {
 
@@ -118,10 +119,10 @@ class Parameter : public Value {
 
   Function *Parent;
 
-  std::string Name;
+  Identifier Name;
 
  public:
-  explicit Parameter(Function *parent, std::string name);
+  explicit Parameter(Function *parent, Identifier name);
 
   void removeFromParent();
 
@@ -132,8 +133,6 @@ class Parameter : public Value {
   void setParent(Function *parent) {
     Parent = parent;
   }
-
-  std::string getName() const;
 
   static bool classof(const Value *V) {
     return V->getKind() == ValueKind::ParameterKind;
@@ -249,13 +248,13 @@ public:
 private:
   Module *Parent;
   
-  std::string Name;
+  Identifier Name;
   
   BasicBlockListType BasicBlockList{};
   ParameterListType Parameters;
   
 public:
-  explicit Function(Module *parent, std::string name) : Value(ValueKind::FunctionKind), Parent(parent), Name(name) {};
+  explicit Function(Module *parent, Identifier name) : Value(ValueKind::FunctionKind), Parent(parent), Name(name) {};
   
   ~Function();
   

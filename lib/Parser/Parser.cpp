@@ -99,25 +99,25 @@ std::optional<ASTNode *> Parser::parsePrimaryType() {
   SMLoc start = tok_->getStartLoc();
   switch (tok_->getKind()) {
     case TokenKind::identifier:
-      if (tok_->getResWordOrIdentifier() == "any") {
+      if (tok_->getResWordOrIdentifier()->str().str() == "any") {
         return setLocation(
             start,
             advance().End,
             new (context_) AnyKeywordNode());
       }
-      if (tok_->getResWordOrIdentifier() == "boolean") {
+      if (tok_->getResWordOrIdentifier()->str().str()  == "boolean") {
         return setLocation(
             start,
             advance().End,
             new (context_) BooleanKeywordNode());
       }
-      if (tok_->getResWordOrIdentifier() == "number") {
+      if (tok_->getResWordOrIdentifier()->str().str()  == "number") {
         return setLocation(
             start,
             advance().End,
             new (context_) NumberKeywordNode());
       }
-      if (tok_->getResWordOrIdentifier() == "string") {
+      if (tok_->getResWordOrIdentifier()->str().str()  == "string") {
         return setLocation(
             start,
             advance().End,
@@ -392,7 +392,7 @@ std::optional<ASTNode *> Parser::parseIdentifierOrPattern() {
 std::optional<IdentifierNode *> Parser::parseBindingIdentifier() {
   SMRange identRng = tok_->getSourceRange();
   
-  std::string id = tok_->getResWordOrIdentifier();
+  UniqueString *id = tok_->getResWordOrIdentifier();
   TokenKind kind = tok_->getKind();
   
   if (!validateBindingIdentifier(tok_->getSourceRange(), id, kind)) {
@@ -423,7 +423,7 @@ std::optional<IdentifierNode *> Parser::parseBindingIdentifier() {
       new (context_) IdentifierNode(id, type, optional));
 }
 
-bool Parser::validateBindingIdentifier(SMRange range, std::string id, TokenKind kind) {
+bool Parser::validateBindingIdentifier(SMRange range, UniqueString *id, TokenKind kind) {
   return kind == TokenKind::identifier;
 }
 
@@ -604,7 +604,7 @@ std::optional<ASTNode *> Parser::parseBinaryExpression() {
   
   while (unsigned precedence = getPrecedence(tok_->getKind())) {
     while (!stack.empty() && precedence <= getPrecedence(stack.back().opKind)) {
-      std::string opIdent = getTokenIdent(stack.back().opKind);
+      UniqueString *opIdent = getTokenIdent(stack.back().opKind);
       topExpr = setLocation(
             stack.back().exprStartLoc,
             topExprEndLoc,
@@ -627,7 +627,7 @@ std::optional<ASTNode *> Parser::parseBinaryExpression() {
   }
   
   while (!stack.empty()) {
-    std::string opIdent = getTokenIdent(stack.back().opKind);
+    UniqueString *opIdent = getTokenIdent(stack.back().opKind);
     topExpr = setLocation(
           stack.back().exprStartLoc,
           topExprEndLoc,
@@ -654,7 +654,7 @@ std::optional<ASTNode *> Parser::parseUnaryExpression() {
       
     case TokenKind::plusplus:
     case TokenKind::minusminus: {
-      std::string op = getTokenIdent(tok_->getKind());
+      UniqueString *op = getTokenIdent(tok_->getKind());
       advance();
       auto expr = parseUnaryExpression();
       if (!expr)

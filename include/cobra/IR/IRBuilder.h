@@ -32,6 +32,8 @@ public:
   
   Function *createFunction(std::string Name);
   
+  Parameter *createParameter(Function *Parent, std::string Name);
+  
   void setInsertionBlock(BasicBlock *BB);
   
   BasicBlock *getInsertionBlock();

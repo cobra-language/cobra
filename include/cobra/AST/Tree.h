@@ -13,6 +13,7 @@
 #include "cobra/Support/SMLoc.h"
 #include <string>
 #include "cobra/VM/Context.h"
+#include "cobra/Support/Identifier.h"
 
 namespace cobra {
 
@@ -361,12 +362,12 @@ public:
   }
 };
 
-class Identifier : public ASTNode {
+class IdentifierNode : public ASTNode {
 public:
   NodeLabel name;
   NodePtr typeAnnotation;
   NodeBoolean optional;
-  explicit Identifier(NodeLabel name, NodePtr typeAnnotation, NodeBoolean optional)
+  explicit IdentifierNode(NodeLabel name, NodePtr typeAnnotation, NodeBoolean optional)
       : ASTNode(NodeKind::Identifier),
       name(std::move(name)),
       typeAnnotation(std::move(typeAnnotation)) ,

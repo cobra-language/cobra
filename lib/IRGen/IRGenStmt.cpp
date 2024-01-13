@@ -23,3 +23,11 @@ void TreeIRGen::emitfunctionBody(ASTNode *stmt) {
 void TreeIRGen::emitStatement(ASTNode *stmt, bool isLoopBody) {
   
 }
+
+Instruction *TreeIRGen::emitLoad(Value *from) {
+  
+}
+
+Instruction *TreeIRGen::emitStore(Value *storedValue, Value *ptr, bool declInit) {
+  
+}

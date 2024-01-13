@@ -6,22 +6,23 @@
  */
 
 #include "cobra/IRGen/IRGen.h"
+#include <iostream>
+#include <string>
+#include <fstream>
 
 using namespace cobra;
 using namespace Lowering;
 
-void TreeIRGen::emitFunction(FunctionDeclarationNode *fd) {
-  auto *body = getBlockStatement(fd);
-  
-  auto id = dynamic_cast<IdentifierNode *>(fd->id_);
-  Function *newFunction = Builder.createFunction(id->name_);
+void TreeIRGen::emitFunction(FuncDecl *fd) {
+  auto id = dynamic_cast<IdentifierNode *>(fd->id);
+  Function *newFunction = Builder.createFunction(id->name);
   this->curFunction = newFunction;
   
   emitFunctionPreamble(Builder.createBasicBlock(newFunction));
   
   emitParameters(fd);
   
-  emitfunctionBody(body);
+  emitfunctionBody(fd->body);
 }
 
 void TreeIRGen::emitFunctionPreamble(BasicBlock *entry) {
@@ -35,6 +36,19 @@ void TreeIRGen::emitFunctionPreamble(BasicBlock *entry) {
   Builder.setInsertionBlock(entry);
 }
 
-void TreeIRGen::emitParameters(FunctionLikeNode *funcNode) {
-  
+void TreeIRGen::emitParameters(AbstractFunctionDecl *funcNode) {
+  uint32_t paramIndex = uint32_t{0} - 1;
+  for (auto elem : funcNode->params) {
+    ASTNode *init = nullptr;
+    ++paramIndex;
+    
+    auto paramNameDecl = dynamic_cast<ParamDecl *>(elem)->id;
+    auto paramName = dynamic_cast<IdentifierNode *>(paramNameDecl)->name;
+    
+    std::cout << paramName << std::endl;
+    
+    auto *Param = Builder.createParameter(this->curFunction , paramName);
+    
+    
+  }
 }

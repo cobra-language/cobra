@@ -133,6 +133,17 @@ void Instruction::replaceFirstOperandWith(Value *OldValue, Value *NewValue) {
   }
 }
 
+std::string Instruction::getName() {
+  switch (getKind()) {
+    default:
+      break;
+#define DEF_VALUE(XX, PARENT) \
+  case ValueKind::XX##Kind:   \
+    return #XX;
+#include "cobra/IR/Instrs.def"
+  }
+}
+
 BasicBlock::BasicBlock(Function *parent) : Value(ValueKind::BasicBlockKind), Parent(parent) {
   assert(Parent && "Invalid parent function");
   Parent->addBlock(this);

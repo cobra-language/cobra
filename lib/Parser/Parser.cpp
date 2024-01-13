@@ -389,7 +389,7 @@ std::optional<ASTNode *> Parser::parseIdentifierOrPattern() {
   return parseBindingIdentifier();
 }
 
-std::optional<Identifier *> Parser::parseBindingIdentifier() {
+std::optional<IdentifierNode *> Parser::parseBindingIdentifier() {
   SMRange identRng = tok_->getSourceRange();
   
   std::string id = tok_->getResWordOrIdentifier();
@@ -420,7 +420,7 @@ std::optional<Identifier *> Parser::parseBindingIdentifier() {
   return setLocation(
       identRng,
       getPrevTokenEndLoc(),
-      new (context_) Identifier(id, type, optional));
+      new (context_) IdentifierNode(id, type, optional));
 }
 
 bool Parser::validateBindingIdentifier(SMRange range, std::string id, TokenKind kind) {
@@ -745,7 +745,7 @@ std::optional<ASTNode *> Parser::parseMemberExpressionContinuation(SMLoc startLo
           id = setLocation(
               tok_,
               tok_,
-              new (context_) Identifier(
+              new (context_) IdentifierNode(
                   tok_->getResWordOrIdentifier(), nullptr, false));
           advance();
         }
@@ -767,7 +767,7 @@ std::optional<ASTNode *> Parser::parsePrimaryExpression() {
       auto *res = setLocation(
           tok_,
           tok_,
-          new (context_) Identifier(tok_->getIdentifier(), nullptr, false));
+          new (context_) IdentifierNode(tok_->getIdentifier(), nullptr, false));
       advance();
       return res;
     }

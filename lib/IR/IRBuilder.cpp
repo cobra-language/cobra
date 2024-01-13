@@ -17,6 +17,10 @@ Function *IRBuilder::createFunction(std::string Name) {
   return new Function(M, Name);
 }
 
+Parameter *IRBuilder::createParameter(Function *Parent, std::string Name) {
+  return new Parameter(Parent, Name);
+}
+
 void IRBuilder::setInsertionBlock(BasicBlock *BB) {
   if (BB) {
     InsertionPoint = BB->end();

@@ -9,14 +9,20 @@
 #define IRGen_hpp
 
 #include <stdio.h>
+#include <map>
+#include <unordered_map>
 
 #include "cobra/AST/ASTVisitor.h"
 #include "cobra/IR/IR.h"
 #include "cobra/IR/IRBuilder.h"
 #include "cobra/AST/Tree.h"
+#include "cobra/Support/Identifier.h"
 
 namespace cobra {
 namespace Lowering {
+
+using NameTableTy = std::map<std::string, Value *>;
+using NameTableScopeTy = std::map<std::string, Value *>;
 
 class TreeIRGen : public ASTVisitor {
   TreeIRGen(const TreeIRGen &) = delete;
@@ -26,6 +32,8 @@ class TreeIRGen : public ASTVisitor {
   IRBuilder Builder;
   ASTNode *Root;
   Function *curFunction{};
+  
+  NameTableTy nameTable_{};
   
 public:
   explicit TreeIRGen(ASTNode *root, Module *M);
@@ -44,9 +52,13 @@ public:
   void emitfunctionBody(ASTNode *stmt);
   
   void emitStatement(ASTNode *stmt, bool isLoopBody);
-    
-  BlockStmt *getBlockStatement(AbstractFunctionDecl *node);
   
+  Instruction *emitLoad(Value *from);
+  
+  Instruction *emitStore(Value *storedValue, Value *ptr, bool declInit);
+  
+  
+      
 };
 
 }

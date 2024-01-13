@@ -144,7 +144,7 @@ private:
     
   std::optional<ASTNode *> parseIdentifierOrPattern();
   
-  std::optional<Identifier *> parseBindingIdentifier();
+  std::optional<IdentifierNode *> parseBindingIdentifier();
     
   bool validateBindingIdentifier(SMRange range, std::string id, TokenKind kind);
   

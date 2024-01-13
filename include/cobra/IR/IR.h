@@ -163,6 +163,8 @@ public:
   
   void replaceFirstOperandWith(Value *OldValue, Value *NewValue);
   
+  std::string getName();
+  
   BasicBlock *getParent() const {
     return Parent;
   }

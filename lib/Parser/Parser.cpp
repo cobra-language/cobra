@@ -172,14 +172,14 @@ bool Parser::parseStatementListItem(NodeList &stmtList) {
   return true;
 }
 
-std::optional<FunctionDeclarationNode *> Parser::parseFunctionDeclaration() {
+std::optional<FuncDecl *> Parser::parseFunctionDeclaration() {
   SMLoc startLoc = advance().Start;
   
   auto optId = parseBindingIdentifier();
   if (!optId)
     return std::nullopt;
   
-  NodeList paramList;
+  ParameterList paramList;
   if (!parseParameters(paramList)) {
     return std::nullopt;
   }
@@ -197,17 +197,17 @@ std::optional<FunctionDeclarationNode *> Parser::parseFunctionDeclaration() {
   if (!body)
     return std::nullopt;
   
-  auto *decl = new (context_) FunctionDeclarationNode(
+  auto *decl = new (context_) FuncDecl(
       optId ? *optId : nullptr,
       std::move(paramList),
       body.value(),
       returnType.value());
   
   auto node = setLocation(startLoc, body.value(), decl);
-  return dynamic_cast<FunctionDeclarationNode *>(node);
+  return dynamic_cast<FuncDecl *>(node);
 }
 
-bool Parser::parseParameters(NodeList &paramList) {
+bool Parser::parseParameters(ParameterList &paramList) {
   assert(match(TokenKind::l_paren));
   
   advance();
@@ -230,7 +230,7 @@ bool Parser::parseParameters(NodeList &paramList) {
   return true;
 }
 
-std::optional<ParameterDeclarationNode *> Parser::parseParameter() {
+std::optional<ParamDecl *> Parser::parseParameter() {
   ASTNode *target;
   SMLoc startLoc = tok_->getStartLoc();
   
@@ -245,7 +245,7 @@ std::optional<ParameterDeclarationNode *> Parser::parseParameter() {
     return setLocation(
         startLoc,
         getPrevTokenEndLoc(),
-        new (context_) ParameterDeclarationNode(nullptr, target));
+        new (context_) ParamDecl(nullptr, target));
   };
   
   advance();
@@ -258,14 +258,14 @@ std::optional<ParameterDeclarationNode *> Parser::parseParameter() {
   return setLocation(
       startLoc,
       getPrevTokenEndLoc(),
-      new (context_) ParameterDeclarationNode(*expr, target));
+      new (context_) ParamDecl(*expr, target));
 }
 
-std::optional<BlockStatementNode *> Parser::parseFunctionBody() {
+std::optional<BlockStmt *> Parser::parseFunctionBody() {
   return parseBlock();
 }
 
-std::optional<BlockStatementNode *> Parser::parseBlock() {
+std::optional<BlockStmt *> Parser::parseBlock() {
   assert(match(TokenKind::l_brace));
   SMLoc startLoc = advance().Start;
   
@@ -278,7 +278,7 @@ std::optional<BlockStatementNode *> Parser::parseBlock() {
   auto *body = setLocation(
       startLoc,
       tok_,
-      new (context_) BlockStatementNode(std::move(stmtList)));
+      new (context_) BlockStmt(std::move(stmtList)));
   
   if (!eat(TokenKind::r_brace))
     return std::nullopt;
@@ -389,7 +389,7 @@ std::optional<ASTNode *> Parser::parseIdentifierOrPattern() {
   return parseBindingIdentifier();
 }
 
-std::optional<IdentifierNode *> Parser::parseBindingIdentifier() {
+std::optional<Identifier *> Parser::parseBindingIdentifier() {
   SMRange identRng = tok_->getSourceRange();
   
   std::string id = tok_->getResWordOrIdentifier();
@@ -420,7 +420,7 @@ std::optional<IdentifierNode *> Parser::parseBindingIdentifier() {
   return setLocation(
       identRng,
       getPrevTokenEndLoc(),
-      new (context_) IdentifierNode(id, type, optional));
+      new (context_) Identifier(id, type, optional));
 }
 
 bool Parser::validateBindingIdentifier(SMRange range, std::string id, TokenKind kind) {
@@ -745,7 +745,7 @@ std::optional<ASTNode *> Parser::parseMemberExpressionContinuation(SMLoc startLo
           id = setLocation(
               tok_,
               tok_,
-              new (context_) IdentifierNode(
+              new (context_) Identifier(
                   tok_->getResWordOrIdentifier(), nullptr, false));
           advance();
         }
@@ -767,7 +767,7 @@ std::optional<ASTNode *> Parser::parsePrimaryExpression() {
       auto *res = setLocation(
           tok_,
           tok_,
-          new (context_) IdentifierNode(tok_->getIdentifier(), nullptr, false));
+          new (context_) Identifier(tok_->getIdentifier(), nullptr, false));
       advance();
       return res;
     }

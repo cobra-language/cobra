@@ -11,8 +11,8 @@ using namespace cobra;
 using namespace Lowering;
 
 void TreeIRGen::emitfunctionBody(ASTNode *stmt) {
-  if (auto *BS = dynamic_cast<BlockStatementNode *>(stmt)) {
-    for (auto Node : BS->body_) {
+  if (auto *BS = dynamic_cast<BlockStmt *>(stmt)) {
+    for (auto Node : BS->body) {
       emitStatement(Node, false);
     }
 

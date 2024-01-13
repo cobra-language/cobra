@@ -31,23 +31,21 @@ public:
   explicit TreeIRGen(ASTNode *root, Module *M);
   
   void visit();
-  void visit(FunctionDeclarationNode *fd);
+  void visit(FuncDecl *fd);
   void visit(VariableDeclaratorNode *vd);
   
   
-  void emitFunction(FunctionDeclarationNode *fd);
+  void emitFunction(FuncDecl *fd);
   
   void emitFunctionPreamble(BasicBlock *entry);
   
-  void emitParameters(FunctionLikeNode *funcNode);
+  void emitParameters(AbstractFunctionDecl *funcNode);
   
   void emitfunctionBody(ASTNode *stmt);
   
   void emitStatement(ASTNode *stmt, bool isLoopBody);
-  
-  NodeList getParams(FunctionLikeNode *node);
-  
-  BlockStatementNode *getBlockStatement(FunctionLikeNode *node);
+    
+  BlockStmt *getBlockStatement(AbstractFunctionDecl *node);
   
 };
 

@@ -124,15 +124,15 @@ private:
   
   std::optional<ASTNode *> parseStatement();
   
-  std::optional<FunctionDeclarationNode *> parseFunctionDeclaration();
+  std::optional<FuncDecl *> parseFunctionDeclaration();
   
-  bool parseParameters(NodeList &paramList);
+  bool parseParameters(ParameterList &paramList);
   
-  std::optional<ParameterDeclarationNode *> parseParameter();
+  std::optional<ParamDecl *> parseParameter();
   
-  std::optional<BlockStatementNode *> parseBlock();
+  std::optional<BlockStmt *> parseBlock();
     
-  std::optional<BlockStatementNode *> parseFunctionBody();
+  std::optional<BlockStmt *> parseFunctionBody();
   
   bool eatSemi();
   
@@ -144,7 +144,7 @@ private:
     
   std::optional<ASTNode *> parseIdentifierOrPattern();
   
-  std::optional<IdentifierNode *> parseBindingIdentifier();
+  std::optional<Identifier *> parseBindingIdentifier();
     
   bool validateBindingIdentifier(SMRange range, std::string id, TokenKind kind);
   

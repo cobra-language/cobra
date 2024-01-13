@@ -17,7 +17,7 @@ public:
   ASTVisitor() = default;
   virtual ~ASTVisitor() = default;
   
-  virtual void visit(FunctionDeclarationNode *fd) = 0;
+  virtual void visit(FuncDecl *fd) = 0;
   virtual void visit(VariableDeclaratorNode *vd) = 0;
   
   

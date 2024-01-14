@@ -44,10 +44,277 @@ class Type {
     LAST_NUM_TYPE
   };
   
-public:
+  StringRef getKindStr(TypeKind idx) const {
+    // The strings below match the values in TypeKind.
+    static const char *const names[] = {
+        "empty",
+        "undefined",
+        "null",
+        "boolean",
+        "string",
+        "number",
+        "bigint",
+        "object",
+        "closure",
+        "regexp"};
+    return names[idx];
+  }
+  
+#define BIT_TO_VAL(XX) (1 << TypeKind::XX)
+#define IS_VAL(XX) (bitmask_ == (1 << TypeKind::XX))
+
+#define NUM_BIT_TO_VAL(XX) (1 << NumTypeKind::XX)
+#define NUM_IS_VAL(XX) (numBitmask_ == (1 << NumTypeKind::XX))
+
+  // The 'Any' type means all possible types.
+  static constexpr uint16_t TYPE_ANY_MASK = (1u << TypeKind::LAST_TYPE) - 1;
+
+  static constexpr uint16_t PRIMITIVE_BITS = BIT_TO_VAL(Number) |
+      BIT_TO_VAL(String) | BIT_TO_VAL(BigInt) | BIT_TO_VAL(Null) |
+      BIT_TO_VAL(Undefined) | BIT_TO_VAL(Boolean);
+
+  static constexpr uint16_t OBJECT_BITS =
+      BIT_TO_VAL(Object) | BIT_TO_VAL(Closure) | BIT_TO_VAL(RegExp);
+
+  static constexpr uint16_t NONPTR_BITS = BIT_TO_VAL(Number) |
+      BIT_TO_VAL(Boolean) | BIT_TO_VAL(Null) | BIT_TO_VAL(Undefined);
+
+  static constexpr uint16_t ANY_NUM_BITS =
+      NUM_BIT_TO_VAL(Double) | NUM_BIT_TO_VAL(Int32) | NUM_BIT_TO_VAL(Uint32);
+
+  static constexpr uint16_t INTEGER_BITS =
+      NUM_BIT_TO_VAL(Int32) | NUM_BIT_TO_VAL(Uint32);
+
+  /// Each bit represent the possibility of the type being the type that's
+  /// represented in the enum entry.
+  uint16_t bitmask_{TYPE_ANY_MASK};
+  /// Each bit represent the possibility of the type being the subtype of number
+  /// that's represented in the number type enum entry. If the number bit is not
+  /// set, this bitmask is meaningless.
+  uint16_t numBitmask_{ANY_NUM_BITS};
+
+  /// The constructor is only accessible by static builder methods.
+  constexpr explicit Type(uint16_t mask, uint16_t numMask = ANY_NUM_BITS)
+      : bitmask_(mask), numBitmask_(numMask) {}
+
+ public:
   constexpr Type() = default;
-  
-  
+
+  static constexpr Type unionTy(Type A, Type B) {
+    return Type(A.bitmask_ | B.bitmask_, A.numBitmask_ | B.numBitmask_);
+  }
+
+  static constexpr Type intersectTy(Type A, Type B) {
+    // This is sound but not complete, but this is only used for disjointness
+    // check.
+    return Type(A.bitmask_ & B.bitmask_);
+  }
+
+  static constexpr Type subtractTy(Type A, Type B) {
+    return Type(A.bitmask_ & ~B.bitmask_, A.numBitmask_ & ~B.numBitmask_);
+  }
+
+  constexpr bool isNoType() const {
+    return bitmask_ == 0;
+  }
+
+  static constexpr Type createNoType() {
+    return Type(0);
+  }
+  static constexpr Type createAnyType() {
+    return Type(TYPE_ANY_MASK);
+  }
+  /// Create an uninitialized TDZ type.
+  static constexpr Type createEmpty() {
+    return Type(BIT_TO_VAL(Empty));
+  }
+  static constexpr Type createUndefined() {
+    return Type(BIT_TO_VAL(Undefined));
+  }
+  static constexpr Type createNull() {
+    return Type(BIT_TO_VAL(Null));
+  }
+  static constexpr Type createBoolean() {
+    return Type(BIT_TO_VAL(Boolean));
+  }
+  static constexpr Type createString() {
+    return Type(BIT_TO_VAL(String));
+  }
+  static constexpr Type createObject() {
+    return Type(BIT_TO_VAL(Object));
+  }
+  static constexpr Type createNumber() {
+    return Type(BIT_TO_VAL(Number));
+  }
+  static constexpr Type createBigInt() {
+    return Type(BIT_TO_VAL(BigInt));
+  }
+  static constexpr Type createNumeric() {
+    return unionTy(createNumber(), createBigInt());
+  }
+  static constexpr Type createClosure() {
+    return Type(BIT_TO_VAL(Closure));
+  }
+  static constexpr Type createRegExp() {
+    return Type(BIT_TO_VAL(RegExp));
+  }
+  static constexpr Type createInt32() {
+    return Type(BIT_TO_VAL(Number), NUM_BIT_TO_VAL(Int32));
+  }
+  static constexpr Type createUint32() {
+    return Type(BIT_TO_VAL(Number), NUM_BIT_TO_VAL(Uint32));
+  }
+
+  constexpr bool isAnyType() const {
+    return bitmask_ == TYPE_ANY_MASK;
+  }
+
+  constexpr bool isUndefinedType() const {
+    return IS_VAL(Undefined);
+  }
+  constexpr bool isNullType() const {
+    return IS_VAL(Null);
+  }
+  constexpr bool isBooleanType() const {
+    return IS_VAL(Boolean);
+  }
+  constexpr bool isStringType() const {
+    return IS_VAL(String);
+  }
+
+  bool isObjectType() const {
+    // One or more of OBJECT_BITS must be set, and no other bit must be set.
+    return bitmask_ && !(bitmask_ & ~OBJECT_BITS);
+  }
+
+  constexpr bool isNumberType() const {
+    return IS_VAL(Number);
+  }
+  constexpr bool isBigIntType() const {
+    return IS_VAL(BigInt);
+  }
+  constexpr bool isClosureType() const {
+    return IS_VAL(Closure);
+  }
+  constexpr bool isRegExpType() const {
+    return IS_VAL(RegExp);
+  }
+  constexpr bool isInt32Type() const {
+    return IS_VAL(Number) && NUM_IS_VAL(Int32);
+  }
+  constexpr bool isUint32Type() const {
+    return IS_VAL(Number) && NUM_IS_VAL(Uint32);
+  }
+  constexpr bool isIntegerType() const {
+    return IS_VAL(Number) && (numBitmask_ && !(numBitmask_ & ~INTEGER_BITS));
+  }
+
+  constexpr bool isPrimitive() const {
+    // Check if any bit except the primitive bits is on.
+    return bitmask_ && !(bitmask_ & ~PRIMITIVE_BITS);
+  }
+
+  /// \return true if the type is not referenced by a pointer in javascript.
+  constexpr bool isNonPtr() const {
+    // One or more of NONPTR_BITS must be set, and no other bit must be set.
+    return bitmask_ && !(bitmask_ & ~NONPTR_BITS);
+  }
+#undef BIT_TO_VAL
+#undef IS_VAL
+#undef NUM_BIT_TO_VAL
+#undef NUM_IS_VAL
+
+  /// \returns true if this type is a subset of \p t.
+  constexpr bool isSubsetOf(Type t) const {
+    return !(bitmask_ & ~t.bitmask_);
+  }
+
+  /// \returns true if the type \p t can be any of the types that this type
+  /// represents. For example, if this type is "string|number" and \p t is
+  /// a string the result is true because this type can represent strings.
+  constexpr bool canBeType(Type t) const {
+    return t.isSubsetOf(*this);
+  }
+
+  /// \returns true if this type can represent a string value.
+  constexpr bool canBeString() const {
+    return canBeType(Type::createString());
+  }
+
+  /// \returns true if this type can represent a bigint value.
+  constexpr bool canBeBigInt() const {
+    return canBeType(Type::createBigInt());
+  }
+
+  /// \returns true if this type can represent a number value.
+  constexpr bool canBeNumber() const {
+    return canBeType(Type::createNumber());
+  }
+
+  /// \returns true if this type can represent an object.
+  constexpr bool canBeObject() const {
+    return canBeType(Type::createObject());
+  }
+
+  /// \returns true if this type can represent a subtype of object.
+  constexpr bool canBeObjectSubtype() const {
+    return bitmask_ & OBJECT_BITS;
+  }
+
+  /// \returns true if this type can represent a boolean value.
+  constexpr bool canBeBoolean() const {
+    return canBeType(Type::createBoolean());
+  }
+
+  /// \returns true if this type can represent an "empty" value.
+  constexpr bool canBeEmpty() const {
+    return canBeType(Type::createEmpty());
+  }
+
+  /// \returns true if this type can represent an undefined value.
+  constexpr bool canBeUndefined() const {
+    return canBeType(Type::createUndefined());
+  }
+
+  /// \returns true if this type can represent a null value.
+  constexpr bool canBeNull() const {
+    return canBeType(Type::createNull());
+  }
+
+  /// \returns true if this type can represent a closure value.
+  constexpr bool canBeClosure() const {
+    return canBeType(Type::createClosure());
+  }
+
+  /// \returns true if this type can represent a regex value.
+  constexpr bool canBeRegex() const {
+    return canBeType(Type::createRegExp());
+  }
+
+  /// Return true if this type is a proper subset of \p t. A "proper subset"
+  /// means that it is a subset bit is not equal.
+  constexpr bool isProperSubsetOf(Type t) const {
+    return bitmask_ != t.bitmask_ && !(bitmask_ & ~t.bitmask_);
+  }
+
+  constexpr bool operator==(Type RHS) const {
+    return bitmask_ == RHS.bitmask_;
+  }
+  constexpr bool operator!=(Type RHS) const {
+    return !(*this == RHS);
+  }
+};
+
+enum class SideEffectKind {
+  /// Does not read, write to memory.
+  None,
+  /// Instruction may read memory.
+  MayRead,
+  /// Instruction may read or write memory.
+  MayWrite,
+  /// The side effects of the instruction are unknown and we can't make any
+  /// assumptions.
+  Unknown,
 };
 
 enum class ValueKind : uint8_t {
@@ -89,14 +356,14 @@ private:
   
 protected:
   explicit Value(ValueKind k) {
-   Kind = k;
+    Kind = k;
   }
   
 public:
   Value(const Value &) = delete;
   void operator=(const Value &) = delete;
   
-  ~Value() = default;
+  virtual ~Value() = default;
   
   static void destroy(Value *V);
   
@@ -111,6 +378,58 @@ public:
   ValueKind getKind() const {
       return Kind;
   }
+  
+  /// \returns the string representation of the Value kind.
+  StringRef getKindStr() const;
+
+  /// Sets a new type \p type to the value.
+  void setType(Type type) {
+    valueType = type;
+  }
+
+  /// \returns the JavaScript type of the value.
+  Type getType() const {
+    return valueType;
+  }
+
+  static bool classof(const Value *) {
+    return true;
+  }
+};
+
+class Variable : public Value {
+public:
+  enum class DeclKind : unsigned char { Const, Let, Var };
+  
+private:
+  Variable(const Variable &) = delete;
+  void operator=(const Variable &) = delete;
+  
+  DeclKind declKind;
+  
+  Identifier text;
+  
+protected:
+ explicit Variable(
+     ValueKind k,
+     DeclKind declKind,
+     Identifier txt);
+  
+public:
+  
+ explicit Variable(DeclKind declKind, Identifier txt)
+     : Variable(ValueKind::VariableKind, declKind, txt) {};
+
+ ~Variable();
+
+ DeclKind getDeclKind() const {
+   return declKind;
+ }
+
+ Identifier getName() const {
+   return text;
+ }
+  
 };
 
 class Parameter : public Value {
@@ -136,6 +455,32 @@ class Parameter : public Value {
 
   static bool classof(const Value *V) {
     return V->getKind() == ValueKind::ParameterKind;
+  }
+};
+
+class Label : public Value {
+  Label(const Label &) = delete;
+  void operator=(const Label &) = delete;
+
+  // Label is "special" it is never created separately - it is only embedded
+  // in existing instructions. To prevent accidents we list them here as
+  // friends.
+
+  void *operator new(size_t) {
+  }
+
+  /// The formal name of the parameter
+  Identifier text;
+
+ public:
+  explicit Label(Identifier txt) : Value(ValueKind::LabelKind), text(txt) {}
+
+  Identifier get() const {
+    return text;
+  }
+
+  static bool classof(const Value *V) {
+    return V->getKind() == ValueKind::LabelKind;
   }
 };
 

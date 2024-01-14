@@ -35,6 +35,8 @@ public:
   
   Parameter *createParameter(Function *Parent, Identifier OriginalName);
   
+  Variable *createVariable(Variable::DeclKind declKind, Identifier Name);
+  
   void setInsertionBlock(BasicBlock *BB);
   
   BasicBlock *getInsertionBlock();

@@ -67,6 +67,27 @@ void Value::replaceAllUsesWith(Value *Other) {
     }
 }
 
+StringRef Value::getKindStr() const {
+  switch (Kind) {
+    default:
+#define DEF_VALUE(XX, PARENT) \
+  case ValueKind::XX##Kind:   \
+    return StringRef(#XX);
+#include "cobra/IR/ValueKinds.def"
+  }
+}
+
+Variable::Variable(
+    ValueKind k,
+    DeclKind declKind,
+    Identifier txt)
+    : Value(k),
+      declKind(declKind),
+      text(txt) {
+}
+
+Variable::~Variable() {}
+
 Parameter::Parameter(Function *parent, Identifier name)
     : Value(ValueKind::ParameterKind), Parent(parent), Name(std::move(name)) {
   Parent->addParameter(this);

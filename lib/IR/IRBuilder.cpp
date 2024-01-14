@@ -21,6 +21,10 @@ Parameter *IRBuilder::createParameter(Function *Parent, Identifier Name) {
   return new Parameter(Parent, Name);
 }
 
+Variable *IRBuilder::createVariable(Variable::DeclKind declKind, Identifier Name) {
+  return new Variable(declKind, Name);
+}
+
 void IRBuilder::setInsertionBlock(BasicBlock *BB) {
   if (BB) {
     InsertionPoint = BB->end();

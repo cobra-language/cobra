@@ -8,7 +8,7 @@
 #ifndef GCCell_hpp
 #define GCCell_hpp
 
-#include "cobra/VM/CCBValue.h"
+#include "cobra/VM/CBValue.h"
 
 namespace cobra {
 namespace vm {

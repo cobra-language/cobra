@@ -9,14 +9,24 @@
 #define IRGen_hpp
 
 #include <stdio.h>
+#include <map>
+#include <unordered_map>
 
 #include "cobra/AST/ASTVisitor.h"
 #include "cobra/IR/IR.h"
 #include "cobra/IR/IRBuilder.h"
 #include "cobra/AST/Tree.h"
+#include "cobra/Support/StringTable.h"
 
 namespace cobra {
 namespace Lowering {
+
+using NameTableTy = std::map<Identifier, Value *>;
+using NameTableScopeTy = std::map<Identifier, Value *>;
+
+inline Identifier getNameFieldFromID(ASTNode *ID) {
+  return Identifier::getFromPointer(dynamic_cast<IdentifierNode *>(ID)->name);
+}
 
 class TreeIRGen : public ASTVisitor {
   TreeIRGen(const TreeIRGen &) = delete;
@@ -24,29 +34,35 @@ class TreeIRGen : public ASTVisitor {
   
   Module *Mod;
   IRBuilder Builder;
-  Node *Root;
+  ASTNode *Root;
   Function *curFunction{};
   
+  NameTableTy nameTable_{};
+  
 public:
-  explicit TreeIRGen(Node *root, Module *M);
+  explicit TreeIRGen(ASTNode *root, Module *M);
   
   void visit();
-  void visit(FunctionDeclarationNode *fd);
+  void visit(FuncDecl *fd);
   void visit(VariableDeclaratorNode *vd);
   
   
-  void emitFunction(FunctionDeclarationNode *fd);
+  void emitFunction(FuncDecl *fd);
   
   void emitFunctionPreamble(BasicBlock *entry);
   
-  void emitParameters(FunctionLikeNode *funcNode);
+  void emitParameters(AbstractFunctionDecl *funcNode);
   
-  void emitfunctionBody(Node *stmt);
+  void emitfunctionBody(ASTNode *stmt);
   
-  void emitStatement(Node *stmt, bool isLoopBody);
+  void emitStatement(ASTNode *stmt, bool isLoopBody);
   
-  BlockStatementNode *getBlockStatement(FunctionLikeNode *node);
+  Instruction *emitLoad(Value *from);
   
+  Instruction *emitStore(Value *storedValue, Value *ptr, bool declInit);
+  
+  
+      
 };
 
 }

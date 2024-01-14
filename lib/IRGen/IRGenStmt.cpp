@@ -10,9 +10,9 @@
 using namespace cobra;
 using namespace Lowering;
 
-void TreeIRGen::emitfunctionBody(Node *stmt) {
-  if (auto *BS = dynamic_cast<BlockStatementNode *>(stmt)) {
-    for (auto Node : BS->body_) {
+void TreeIRGen::emitfunctionBody(ASTNode *stmt) {
+  if (auto *BS = dynamic_cast<BlockStmt *>(stmt)) {
+    for (auto Node : BS->body) {
       emitStatement(Node, false);
     }
 
@@ -20,6 +20,14 @@ void TreeIRGen::emitfunctionBody(Node *stmt) {
   }
 }
 
-void TreeIRGen::emitStatement(Node *stmt, bool isLoopBody) {
+void TreeIRGen::emitStatement(ASTNode *stmt, bool isLoopBody) {
+  
+}
+
+Instruction *TreeIRGen::emitLoad(Value *from) {
+  
+}
+
+Instruction *TreeIRGen::emitStore(Value *storedValue, Value *ptr, bool declInit) {
   
 }

@@ -67,7 +67,7 @@ void Value::replaceAllUsesWith(Value *Other) {
     }
 }
 
-Parameter::Parameter(Function *parent, std::string name)
+Parameter::Parameter(Function *parent, Identifier name)
     : Value(ValueKind::ParameterKind), Parent(parent), Name(std::move(name)) {
   Parent->addParameter(this);
 }
@@ -130,6 +130,17 @@ void Instruction::replaceFirstOperandWith(Value *OldValue, Value *NewValue) {
       setOperand(NewValue, i);
       return;
     }
+  }
+}
+
+std::string Instruction::getName() {
+  switch (getKind()) {
+    default:
+      break;
+#define DEF_VALUE(XX, PARENT) \
+  case ValueKind::XX##Kind:   \
+    return #XX;
+#include "cobra/IR/Instrs.def"
   }
 }
 

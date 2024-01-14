@@ -8,7 +8,7 @@
 #ifndef PrimitiveBox_hpp
 #define PrimitiveBox_hpp
 
-#include "cobra/VM/CCBObject.h"
+#include "cobra/VM/CBObject.h"
 #include <string>
 
 namespace cobra {

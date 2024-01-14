@@ -14,6 +14,17 @@
 namespace cobra {
 
 class SingleOperandInst : public Instruction {
+  SingleOperandInst(const SingleOperandInst &) = delete;
+  void operator=(const SingleOperandInst &) = delete;
+  
+};
+
+class TerminatorInst : public Instruction {
+  TerminatorInst(const TerminatorInst &) = delete;
+  void operator=(const TerminatorInst &) = delete;
+  
+protected:
+ explicit TerminatorInst(ValueKind K) : Instruction(K) {}
   
 };
 

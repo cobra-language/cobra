@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include "cobra/IR/IR.h"
+#include "cobra/Support/StringTable.h"
 
 namespace cobra {
 
@@ -30,7 +31,9 @@ public:
   
   BasicBlock *createBasicBlock(Function *Parent);
   
-  Function *createFunction(std::string Name);
+  Function *createFunction(Identifier OriginalName);
+  
+  Parameter *createParameter(Function *Parent, Identifier OriginalName);
   
   void setInsertionBlock(BasicBlock *BB);
   

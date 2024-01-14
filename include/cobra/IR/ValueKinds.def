@@ -21,6 +21,12 @@
 MARK_FIRST(Value)
 MARK_VALUE(Value)
 
+MARK_FIRST(Instruction)
+DEF_VALUE(Instruction, Value)
+#define INCLUDED_FROM_VALUEKINDS
+#include "cobra/IR/Instrs.def"
+#undef INCLUDED_FROM_VALUEKINDS
+MARK_LAST(Instruction)
 
 MARK_FIRST(Literal)
 DEF_VALUE(Literal, Value)

@@ -19,6 +19,56 @@ class SingleOperandInst : public Instruction {
   
 };
 
+class TerminatorInst : public Instruction {
+  TerminatorInst(const TerminatorInst &) = delete;
+  void operator=(const TerminatorInst &) = delete;
+  
+protected:
+ explicit TerminatorInst(ValueKind K) : Instruction(K) {}
+  
+public:
+ explicit TerminatorInst(const TerminatorInst *src, std::vector<Value *> operands)
+     : Instruction(src, operands) {}
+  
+  unsigned getNumSuccessors();
+  BasicBlock *getSuccessor(unsigned idx);
+  void setSuccessor(unsigned idx, BasicBlock *B);
+  
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::TerminatorInstKind);
+  }
+};
+
+class ReturnInst : public TerminatorInst {
+  ReturnInst(const ReturnInst &) = delete;
+  void operator=(const ReturnInst &) = delete;
+
+ public:
+  enum { ReturnValueIdx };
+
+  Value *getValue() const {
+    return getOperand(ReturnValueIdx);
+  }
+
+  explicit ReturnInst(Value *val) : TerminatorInst(ValueKind::ReturnInstKind) {
+    pushOperand(val);
+  }
+  explicit ReturnInst(const ReturnInst *src, std::vector<Value *> operands)
+      : TerminatorInst(src, operands) {}
+
+  SideEffectKind getSideEffect() {
+    return SideEffectKind::None;
+  }
+
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::ReturnInstKind);
+  }
+
+  unsigned getNumSuccessors() {
+    return 0;
+  }
+};
+
 class AllocStackInst : public Instruction {
   AllocStackInst(const AllocStackInst &) = delete;
   void operator=(const AllocStackInst &) = delete;
@@ -81,15 +131,6 @@ class StoreStackInst : public Instruction {
   static bool classof(const Value *V) {
     return kindIsA(V->getKind(), ValueKind::StoreStackInstKind);
   }
-};
-
-class TerminatorInst : public Instruction {
-  TerminatorInst(const TerminatorInst &) = delete;
-  void operator=(const TerminatorInst &) = delete;
-  
-protected:
- explicit TerminatorInst(ValueKind K) : Instruction(K) {}
-  
 };
 
 }

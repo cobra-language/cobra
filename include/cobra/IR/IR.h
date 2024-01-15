@@ -9,8 +9,8 @@
 #define IR_hpp
 
 #include <list>
-#include <string>
 #include "cobra/Support/StringTable.h"
+#include "cobra/Support/SMLoc.h"
 
 namespace cobra {
 
@@ -492,8 +492,12 @@ class Instruction : public Value {
   BasicBlock *Parent;
   std::vector<Use> Operands;
   
+  SMLoc location_{};
+  
 protected:
   explicit Instruction(ValueKind kind) : Value(kind), Parent(nullptr) {}
+  
+  explicit Instruction(const Instruction *src, std::vector<Value *> operands);
   
   void pushOperand(Value *Val);
   
@@ -502,6 +506,16 @@ public:
   Value *getOperand(unsigned Index) const;
   unsigned getNumOperands() const;
   void removeOperand(unsigned index);
+  
+  void setLocation(SMLoc loc) {
+    location_ = loc;
+  }
+  SMLoc getLocation() const {
+    return location_;
+  }
+  bool hasLocation() const {
+    return location_.isValid();
+  }
   
   void eraseFromParent();
   
@@ -533,6 +547,8 @@ private:
   
 public:
   explicit BasicBlock(Function *parent);
+  
+  void insert(iterator InsertPt, Instruction *I);
   
   void push_back(Instruction *I);
   void eraseFromParent();

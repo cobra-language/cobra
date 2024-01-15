@@ -93,6 +93,18 @@ Parameter::Parameter(Function *parent, Identifier name)
   Parent->addParameter(this);
 }
 
+Instruction::Instruction(const Instruction *src, std::vector<Value *> operands)
+    : Instruction(src->getKind()) {
+  assert(src->getNumOperands() == operands.size() && "invalid number of operands");
+
+  setType(src->getType());
+
+  location_ = src->location_;
+
+  for (auto val : operands)
+    pushOperand(val);
+}
+
 void Instruction::pushOperand(Value *Val) {
   Operands.push_back({nullptr, 0});
   setOperand(Val, getNumOperands() - 1);
@@ -168,6 +180,10 @@ std::string Instruction::getName() {
 BasicBlock::BasicBlock(Function *parent) : Value(ValueKind::BasicBlockKind), Parent(parent) {
   assert(Parent && "Invalid parent function");
   Parent->addBlock(this);
+}
+
+void BasicBlock::insert(iterator InsertPt, Instruction *I) {
+  InstList.insert(InsertPt, I);
 }
 
 void BasicBlock::push_back(Instruction *I) {

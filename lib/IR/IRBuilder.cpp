@@ -25,6 +25,13 @@ Variable *IRBuilder::createVariable(Variable::DeclKind declKind, Identifier Name
   return new Variable(declKind, Name);
 }
 
+void IRBuilder::insert(Instruction *Inst) {
+  assert(!Inst->getParent() && "Instr that's already inserted elsewhere");
+  Inst->setLocation(Location);
+  Inst->setParent(Block);
+  Block->insert(InsertionPoint, Inst);
+}
+
 void IRBuilder::setInsertionBlock(BasicBlock *BB) {
   if (BB) {
     InsertionPoint = BB->end();
@@ -42,4 +49,10 @@ BasicBlock *IRBuilder::getInsertionBlock() {
 void IRBuilder::setInsertionPoint(Instruction *IP) {
   InsertionPoint = IP->getParent()->getIterator(IP);
   Block = IP->getParent();
+}
+
+AllocStackInst *IRBuilder::createAllocStackInst(Identifier varName) {
+  auto *AHI = new AllocStackInst(varName);
+  insert(AHI);
+  return AHI;
 }

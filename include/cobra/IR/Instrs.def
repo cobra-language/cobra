@@ -29,9 +29,16 @@ DEF_VALUE(LoadStackInst, SingleOperandInst)
 
 MARK_LAST(SingleOperandInst)
 
+MARK_FIRST(TerminatorInst)
+DEF_VALUE(TerminatorInst, Instruction)
+TERMINATOR(ReturnInst, TerminatorInst)
+MARK_LAST(TerminatorInst)
 
 DEF_VALUE(StoreStackInst, Instruction)
 DEF_VALUE(AllocStackInst, Instruction)
+
+
+
 
 
 

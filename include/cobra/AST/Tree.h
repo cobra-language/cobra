@@ -23,9 +23,9 @@ class ASTNode;
 class ParamDecl;
 class BlockStmt;
 
-using NodeLabel = UniqueString *;
+using NodeLabel = StringRef *;
 
-using NodeString = UniqueString *;
+using NodeString = StringRef *;
 using NodePtr = ASTNode *;
 using NodeBoolean = bool;
 using NodeNumber = double;

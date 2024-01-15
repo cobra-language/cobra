@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include "cobra/IR/IR.h"
 #include "cobra/Support/StringTable.h"
+#include "cobra/IR/Instrs.h"
 
 namespace cobra {
 
@@ -21,6 +22,7 @@ class IRBuilder {
   Module *M;
   BasicBlock::iterator InsertionPoint{};
   BasicBlock *Block{};
+  SMLoc Location{};
   
 public:
   explicit IRBuilder(Module *Mod) : M(Mod) {}
@@ -35,11 +37,22 @@ public:
   
   Parameter *createParameter(Function *Parent, Identifier OriginalName);
   
+  Variable *createVariable(Variable::DeclKind declKind, Identifier Name);
+  
+private:
+  void insert(Instruction *Inst);
+  
+public:
+  
   void setInsertionBlock(BasicBlock *BB);
   
   BasicBlock *getInsertionBlock();
   
   void setInsertionPoint(Instruction *IP);
+  
+  ReturnInst *createReturnInst(Value *Val);
+  
+  AllocStackInst *createAllocStackInst(Identifier varName);
   
 };
 

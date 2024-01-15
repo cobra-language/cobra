@@ -67,9 +67,42 @@ void Value::replaceAllUsesWith(Value *Other) {
     }
 }
 
+StringRef Value::getKindStr() const {
+  switch (Kind) {
+    default:
+#define DEF_VALUE(XX, PARENT) \
+  case ValueKind::XX##Kind:   \
+    return StringRef(#XX);
+#include "cobra/IR/ValueKinds.def"
+  }
+}
+
+Variable::Variable(
+    ValueKind k,
+    DeclKind declKind,
+    Identifier txt)
+    : Value(k),
+      declKind(declKind),
+      text(txt) {
+}
+
+Variable::~Variable() {}
+
 Parameter::Parameter(Function *parent, Identifier name)
     : Value(ValueKind::ParameterKind), Parent(parent), Name(std::move(name)) {
   Parent->addParameter(this);
+}
+
+Instruction::Instruction(const Instruction *src, std::vector<Value *> operands)
+    : Instruction(src->getKind()) {
+  assert(src->getNumOperands() == operands.size() && "invalid number of operands");
+
+  setType(src->getType());
+
+  location_ = src->location_;
+
+  for (auto val : operands)
+    pushOperand(val);
 }
 
 void Instruction::pushOperand(Value *Val) {
@@ -147,6 +180,10 @@ std::string Instruction::getName() {
 BasicBlock::BasicBlock(Function *parent) : Value(ValueKind::BasicBlockKind), Parent(parent) {
   assert(Parent && "Invalid parent function");
   Parent->addBlock(this);
+}
+
+void BasicBlock::insert(iterator InsertPt, Instruction *I) {
+  InstList.insert(InsertPt, I);
 }
 
 void BasicBlock::push_back(Instruction *I) {

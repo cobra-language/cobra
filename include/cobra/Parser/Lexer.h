@@ -146,9 +146,9 @@ class Token {
   TokenKind kind_{TokenKind::none};
   SMRange range_{};
   double numeric_{};
-  UniqueString *ident_{nullptr};
-  UniqueString *stringLiteral_{nullptr};
-  UniqueString *rawString_{nullptr};
+  StringRef *ident_{nullptr};
+  StringRef *stringLiteral_{nullptr};
+  StringRef *rawString_{nullptr};
   
 public:
   Token() = default;
@@ -173,16 +173,16 @@ public:
     return numeric_;
   }
   
-  UniqueString *getIdentifier() const {
+  StringRef *getIdentifier() const {
     assert(getKind() == TokenKind::identifier);
     return ident_;
   }
   
-  UniqueString *getResWordOrIdentifier() const {
+  StringRef *getResWordOrIdentifier() const {
     return ident_;
   }
   
-  UniqueString *getStringLiteral() const {
+  StringRef *getStringLiteral() const {
     assert(getKind() == TokenKind::string_literal);
     return stringLiteral_;
   }
@@ -218,12 +218,12 @@ private:
     numeric_ = literal;
   }
   
-  void setIdentifier(UniqueString *ident) {
+  void setIdentifier(StringRef *ident) {
     kind_ = TokenKind::identifier;
     ident_ = ident;
   }
   
-  void setResWord(TokenKind kind, UniqueString *ident) {
+  void setResWord(TokenKind kind, StringRef *ident) {
     assert(kind > TokenKind::_first_resword && kind < TokenKind::_last_resword);
     kind_ = kind;
     ident_ = ident;
@@ -266,10 +266,10 @@ private:
   std::unique_ptr<StringTable> ownStrTab_;
   StringTable &strTab_;
   
-  UniqueString *resWordIdent_
+  StringRef *resWordIdent_
       [ord(TokenKind::_last_resword) - ord(TokenKind::_first_resword) + 1];
 
-  UniqueString *&resWordIdent(TokenKind kind) {
+  StringRef *&resWordIdent(TokenKind kind) {
     assert(
         kind >= TokenKind::_first_resword && kind <= TokenKind::_last_resword);
     return resWordIdent_[ord(kind) - ord(TokenKind::_first_resword)];
@@ -280,7 +280,7 @@ private:
   
   char peakChar();
   
-  UniqueString *getIdentifier(StringRef name) {
+  StringRef *getIdentifier(StringRef name) {
     return strTab_.getString(name);
   }
   

@@ -39,16 +39,15 @@ void TreeIRGen::emitFunctionPreamble(BasicBlock *entry) {
 
 void TreeIRGen::emitParameters(AbstractFunctionDecl *funcNode) {
   uint32_t paramIndex = uint32_t{0} - 1;
-  for (auto elem : funcNode->params) {
+  for (auto paramDecl : funcNode->params) {
     ASTNode *init = nullptr;
     ++paramIndex;
     
-    auto paramNameDecl = dynamic_cast<ParamDecl *>(elem)->id;
-    auto b = getNameFieldFromID(paramNameDecl);
+    auto formalParamName = getNameFieldFromID(paramDecl->id);
     
-    std::cout << b.c_str() << std::endl;
+    std::cout << formalParamName.c_str() << std::endl;
     
-    auto *Param = Builder.createParameter(this->curFunction, b);
+    auto *Param = Builder.createParameter(this->curFunction, formalParamName);
     
     
   }

@@ -15,6 +15,7 @@
 #include "cobra/AST/ASTVisitor.h"
 #include "cobra/IR/IR.h"
 #include "cobra/IR/IRBuilder.h"
+#include "cobra/IR/Scope.h"
 #include "cobra/AST/Tree.h"
 #include "cobra/Support/StringTable.h"
 
@@ -36,6 +37,8 @@ class TreeIRGen : public ASTVisitor {
   IRBuilder Builder;
   ASTNode *Root;
   Function *curFunction{};
+  
+  Scope *currentIRScope{};
   
   NameTableTy nameTable_{};
   

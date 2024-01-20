@@ -9,10 +9,15 @@
 #define Context_hpp
 
 #include "cobra/Support/Allocator.h"
+#include "cobra/Support/StringTable.h"
 
 namespace cobra {
 
 class Context {
+private:
+  Allocator allocator_{};
+  Allocator identifierAllocator_{};
+  StringTable stringTable_{identifierAllocator_};
   
 public:
   explicit Context() = default;
@@ -20,6 +25,10 @@ public:
     
   Allocator &getAllocator() {
     return allocator_;
+  }
+  
+  Identifier getIdentifier(StringRef str) {
+    return stringTable_.getIdentifier(str);
   }
   
   template <typename T>
@@ -30,9 +39,6 @@ public:
   void *allocateNode(size_t size, size_t alignment) {
     return allocator_.Allocate(size, alignment);
   }
-  
-private:
-  Allocator allocator_{};
   
 };
 

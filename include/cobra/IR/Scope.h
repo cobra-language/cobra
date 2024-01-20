@@ -25,14 +25,43 @@ class Scope {
   ~Scope();
   
 public:
+  using ScopeListTy = std::vector<Scope *>;
+  
+  Scope *createInnerScope() {
+    auto *S = new Scope(this);
+    innerScopes.emplace_back(S);
+    return S;
+  }
   
   Scope *getParent() const {
     return parent;
   }
   
+  ScopeListTy &getMutableInnerScopes() {
+    return innerScopes;
+  }
+
+  const ScopeListTy &getInnerScopes() const {
+    return innerScopes;
+  }
+  
+  VariableListType &getMutableVariables() {
+    return variables;
+  }
+
+  const VariableListType &getVariables() const {
+    return variables;
+  }
+  
+  void addVariable(Variable *V) {
+    variables.emplace_back(V);
+  }
   
 private:
   Scope *parent{};
+  ScopeListTy innerScopes;
+  
+  VariableListType variables;
   
 };
 

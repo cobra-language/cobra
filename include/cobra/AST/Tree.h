@@ -12,7 +12,7 @@
 #include <vector>
 #include "cobra/Support/SMLoc.h"
 #include <string>
-#include "cobra/VM/Context.h"
+#include "cobra/AST/Context.h"
 #include "cobra/Support/StringRef.h"
 #include "cobra/Support/StringTable.h"
 

@@ -11,6 +11,7 @@
 #include <list>
 #include "cobra/Support/StringTable.h"
 #include "cobra/Support/SMLoc.h"
+#include "cobra/AST/Context.h"
 
 namespace cobra {
 
@@ -466,8 +467,7 @@ class Label : public Value {
   // in existing instructions. To prevent accidents we list them here as
   // friends.
 
-  void *operator new(size_t) {
-  }
+  void *operator new(size_t) {}
 
   /// The formal name of the parameter
   Identifier text;
@@ -481,6 +481,191 @@ class Label : public Value {
 
   static bool classof(const Value *V) {
     return V->getKind() == ValueKind::LabelKind;
+  }
+};
+
+class Literal : public Value {
+  Literal(const Literal &) = delete;
+  void operator=(const Literal &) = delete;
+
+ public:
+  explicit Literal(ValueKind k) : Value(k) {}
+
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::LiteralKind);
+  }
+};
+
+class LiteralEmpty : public Literal {
+  LiteralEmpty(const LiteralEmpty &) = delete;
+  void operator=(const LiteralEmpty &) = delete;
+
+ public:
+  explicit LiteralEmpty() : Literal(ValueKind::LiteralEmptyKind) {
+    setType(Type::createEmpty());
+  }
+
+  static bool classof(const Value *V) {
+    return V->getKind() == ValueKind::LiteralEmptyKind;
+  }
+};
+
+class LiteralNull : public Literal {
+  LiteralNull(const LiteralNull &) = delete;
+  void operator=(const LiteralNull &) = delete;
+
+ public:
+  explicit LiteralNull() : Literal(ValueKind::LiteralNullKind) {
+    setType(Type::createNull());
+  }
+
+  static bool classof(const Value *V) {
+    return V->getKind() == ValueKind::LiteralNullKind;
+  }
+};
+
+class LiteralUndefined : public Literal {
+  LiteralUndefined(const LiteralUndefined &) = delete;
+  void operator=(const LiteralUndefined &) = delete;
+
+ public:
+  explicit LiteralUndefined() : Literal(ValueKind::LiteralUndefinedKind) {
+    setType(Type::createUndefined());
+  }
+
+  static bool classof(const Value *V) {
+    return V->getKind() == ValueKind::LiteralUndefinedKind;
+  }
+};
+
+class LiteralNumber : public Literal {
+  LiteralNumber(const LiteralNumber &) = delete;
+  void operator=(const LiteralNumber &) = delete;
+  double value;
+  
+public:
+  double getValue() const {
+    return value;
+  }
+  
+  template <typename T>
+  std::optional<T> isIntTypeRepresentible() const {
+    // Check the value is within the bounds of T.
+    // Converting double to int when it's out of bound is undefined behavior.
+    // Although it is harmless in this scenario, we should still avoid it.
+    if (value > std::numeric_limits<T>::max() ||
+        value < std::numeric_limits<T>::min()) {
+      return std::nullopt;
+    }
+    if (std::isnan(value)) {
+      return std::nullopt;
+    }
+    // Check the value is integer and is not -0.
+    T valAsInt = static_cast<T>(value);
+    if (valAsInt == value && (valAsInt || !std::signbit(value))) {
+      return valAsInt;
+    }
+    return std::nullopt;
+  }
+  
+  explicit LiteralNumber(double val)
+      : Literal(ValueKind::LiteralNumberKind), value(val) {
+    if (isInt32Representible()) {
+      setType(Type::createInt32());
+    } else {
+      setType(Type::createNumber());
+    }
+  }
+  
+  bool isPositiveZero() const {
+    return value == 0.0 && !std::signbit(value);
+  }
+
+  /// Check whether the number can be represented in unsigned 8-bit integer
+  /// without losing any precision or information.
+  bool isUInt8Representible() const {
+    return isIntTypeRepresentible<uint8_t>().has_value();
+  }
+
+  /// Check whether the number can be represented in 32-bit integer
+  /// without losing any precision or information.
+  bool isInt32Representible() const {
+    return isIntTypeRepresentible<int32_t>().has_value();
+  }
+
+  /// Check whether the number can be represented in unsigned 32-bit integer
+  /// without losing any precision or information.
+  bool isUInt32Representible() const {
+    return isIntTypeRepresentible<uint32_t>().has_value();
+  }
+
+  /// Convert the number to uint8_t without losing precision. If not doable,
+  /// assertion will fail.
+  uint32_t asUInt8() const {
+    auto tmp = isIntTypeRepresentible<uint8_t>();
+    assert(tmp && "Cannot convert to uint8_t");
+    return tmp.value();
+  }
+
+  /// Convert the number to int32_t without losing precision. If not doable,
+  /// assertion will fail.
+  int32_t asInt32() const {
+    auto tmp = isIntTypeRepresentible<int32_t>();
+    assert(tmp && "Cannot convert to int32_t");
+    return tmp.value();
+  }
+
+  /// Convert the number to uint32_t without losing precision. If not doable,
+  /// assertion will fail.
+  uint32_t asUInt32() const {
+    auto tmp = isIntTypeRepresentible<uint32_t>();
+    assert(tmp && "Cannot convert to uint32_t");
+    return tmp.value();
+  }
+  
+  static bool classof(const Value *V) {
+    return V->getKind() == ValueKind::LiteralNumberKind;
+  }
+  
+};
+
+class LiteralString : public Literal {
+  LiteralString(const LiteralString &) = delete;
+  void operator=(const LiteralString &) = delete;
+  Identifier value;
+
+ public:
+  Identifier getValue() const {
+    return value;
+  }
+
+  explicit LiteralString(Identifier val)
+      : Literal(ValueKind::LiteralStringKind), value(val) {
+    setType(Type::createString());
+  }
+
+  static bool classof(const Value *V) {
+    return V->getKind() == ValueKind::LiteralStringKind;
+  }
+};
+
+class LiteralBool : public Literal {
+  LiteralBool(const LiteralBool &) = delete;
+  void operator=(const LiteralBool &) = delete;
+  bool value;
+
+ public:
+  bool getValue() const {
+    return value;
+  }
+
+  explicit LiteralBool(bool val)
+      : Literal(ValueKind::LiteralBoolKind), value(val) {
+    setType(Type::createBoolean());
+  }
+
+  static bool classof(const Value *V) {
+    return V->getKind() == ValueKind::LiteralBoolKind;
   }
 };
 

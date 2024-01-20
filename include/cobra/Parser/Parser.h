@@ -12,7 +12,7 @@
 #include "cobra/Parser/Lexer.h"
 #include "cobra/AST/Tree.h"
 #include <optional>
-#include "cobra/VM/Context.h"
+#include "cobra/AST/Context.h"
 
 namespace cobra {
 namespace parser {

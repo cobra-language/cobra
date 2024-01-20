@@ -16,6 +16,10 @@ TreeIRGen::TreeIRGen(ASTNode *root, Module *M) : Mod(M), Builder(Mod), Root(root
   
 }
 
+TreeIRGen::~TreeIRGen() {
+  
+}
+
 void TreeIRGen::visit() {
   ProgramNode *Program = dynamic_cast<ProgramNode *>(Root);
   

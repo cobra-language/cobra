@@ -12,6 +12,7 @@
 #include "cobra/IR/IR.h"
 #include "cobra/Support/StringTable.h"
 #include "cobra/IR/Instrs.h"
+#include "cobra/AST/Context.h"
 
 namespace cobra {
 
@@ -38,6 +39,20 @@ public:
   Parameter *createParameter(Function *Parent, Identifier OriginalName);
   
   Variable *createVariable(Variable::DeclKind declKind, Identifier Name);
+  
+  LiteralNumber *getLiteralNumber(double value);
+  
+  LiteralString *getLiteralString(StringRef value);
+  
+  LiteralBool *getLiteralBool(bool value);
+  
+  LiteralEmpty *getLiteralEmpty();
+  
+  LiteralUndefined *getLiteralUndefined();
+  
+  LiteralNull *getLiteralNull();
+  
+  Identifier createIdentifier(StringRef str);
   
 private:
   void insert(Instruction *Inst);

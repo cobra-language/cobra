@@ -25,6 +25,21 @@ Variable *IRBuilder::createVariable(Variable::DeclKind declKind, Identifier Name
   return new Variable(declKind, Name);
 }
 
+LiteralNumber *IRBuilder::getLiteralNumber(double value) {
+  auto New = new LiteralNumber(value);
+  return New;
+}
+
+LiteralString *IRBuilder::getLiteralString(StringRef value) {
+  Identifier Iden = createIdentifier(value);
+  auto New = new LiteralString(Iden);
+  return New;
+}
+
+Identifier IRBuilder::createIdentifier(StringRef str) {
+  return M->getContext().getIdentifier(str);
+}
+
 void IRBuilder::insert(Instruction *Inst) {
   assert(!Inst->getParent() && "Instr that's already inserted elsewhere");
   Inst->setLocation(Location);

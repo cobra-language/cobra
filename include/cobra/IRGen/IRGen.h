@@ -38,12 +38,15 @@ class TreeIRGen : public ASTVisitor {
   ASTNode *Root;
   Function *curFunction{};
   
-  Scope *currentIRScope{};
+  Scope *currentScope{};
+  std::vector<Scope *> ScopeStack;
   
   NameTableTy nameTable_{};
   
 public:
   explicit TreeIRGen(ASTNode *root, Module *M);
+  
+  ~TreeIRGen();
   
   void visit();
   void visit(FuncDecl *fd);

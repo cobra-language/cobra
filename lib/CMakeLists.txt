@@ -8,6 +8,7 @@ add_cobra_library(cobraFrontend
   IR/IR.cpp
   IR/IRBuilder.cpp
   IR/Instrs.cpp
+  Utils/IRPrinter.cpp
   IRGen/IRGenStmt.cpp
   IRGen/IRGenExpr.cpp
   IRGen/IRGenFunction.cpp

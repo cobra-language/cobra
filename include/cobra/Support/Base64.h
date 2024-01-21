@@ -5,4 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/Support/Base64.h"
+#ifndef Base64_hpp
+#define Base64_hpp
+
+#include <stdio.h>
+
+#endif /* Base64_hpp */

@@ -5,5 +5,6 @@
 
 add_cobra_library(cobraSupport
   Base64.cpp
+  StringRef.cpp
   LINK_LIBS ${link_libs}
 )

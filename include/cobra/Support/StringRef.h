@@ -91,6 +91,23 @@ public:
     return Length < RHS.Length ? -1 : 1;
   }
   
+  size_t count(char C) const {
+    size_t Count = 0;
+    for (size_t i = 0, e = Length; i != e; ++i)
+      if (Data[i] == C)
+        ++Count;
+    return Count;
+  }
+
+  /// Return the number of non-overlapped occurrences of \p Str in
+  /// the string.
+  size_t count(StringRef Str) const;
+  
+  StringRef substr(size_t Start, size_t N = npos) const {
+    Start = std::min(Start, Length);
+    return StringRef(Data + Start, std::min(N, Length - Start));
+  }
+  
 };
 
 inline bool operator==(StringRef LHS, StringRef RHS) {

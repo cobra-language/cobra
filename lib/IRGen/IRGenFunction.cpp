@@ -38,17 +38,39 @@ void TreeIRGen::emitFunctionPreamble(BasicBlock *entry) {
 }
 
 void TreeIRGen::emitParameters(AbstractFunctionDecl *funcNode) {
-  uint32_t paramIndex = uint32_t{0} - 1;
   for (auto paramDecl : funcNode->params) {
-    ASTNode *init = nullptr;
-    ++paramIndex;
+    auto paramName = getNameFieldFromID(paramDecl->id);
+    std::cout << paramName.c_str() << std::endl;
     
-    auto formalParamName = getNameFieldFromID(paramDecl->id);
+    auto *param = Builder.createParameter(this->curFunction, paramName);
     
-    std::cout << formalParamName.c_str() << std::endl;
-    
-    auto *Param = Builder.createParameter(this->curFunction, formalParamName);
-    
-    
+    if (paramDecl->init) {
+      auto *currentBlock = Builder.getInsertionBlock();
+      auto *getDefaultBlock = Builder.createBasicBlock(Builder.getFunction());
+      auto *storeBlock = Builder.createBasicBlock(Builder.getFunction());
+      
+      Builder.createCondBranchInst(
+          Builder.createBinaryOperatorInst(
+              param,
+              Builder.getLiteralUndefined(),
+              BinaryOperatorInst::OpKind::StrictlyNotEqualKind),
+          storeBlock,
+          getDefaultBlock);
+      
+      Builder.setInsertionBlock(getDefaultBlock);
+      auto *defaultValue = genExpression(paramDecl->init, paramName);
+      auto *defaultResultBlock = Builder.getInsertionBlock();
+      Builder.createBranchInst(storeBlock);
+
+      // storeBlock:
+      Builder.setInsertionBlock(storeBlock);
+      auto *phi = Builder.createPhiInst(
+          {param, defaultValue}, {currentBlock, defaultResultBlock});
+      
+    } else {
+      
+      auto *stackVar = Builder.createAllocStackInst(paramName);
+      Builder.createStoreStackInst(param, stackVar);
+    }
   }
 }

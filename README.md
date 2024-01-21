@@ -1,6 +1,8 @@
 # Cobra
 
-Cobra is a programming language for Mobile App cross-platform dynamic scenarios. Its syntax is very similar to Typescript, it can be run in two ways, one is to interpret and execute bytecode, and the other is to compile it into machine code through LLVM. Its goal is to be faster JS/TS.
+Cobra is a high-level statically typed programming language, it's mainly used for Mobile App cross-platform dynamic scenarios. It's syntax is very similar to Typescript, it can be run in two ways, one is to interprete and execute bytecode, and the other is to compile it into machine code through LLVM. Its goal is to be faster than JS/TS.
+
+
 
 ## Hello World!
 

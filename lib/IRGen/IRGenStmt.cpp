@@ -31,3 +31,23 @@ Instruction *TreeIRGen::emitLoad(Value *from) {
 Instruction *TreeIRGen::emitStore(Value *storedValue, Value *ptr, bool declInit) {
   
 }
+
+Value *TreeIRGen::genExpression(ASTNode *expr, Identifier name) {
+  if (auto *Iden = dynamic_cast<IdentifierNode *>(expr)) {
+    
+  }
+  
+  if (auto *Lit = dynamic_cast<StringLiteralNode *>(expr)) {
+    return Builder.getLiteralString(*Lit->value);
+  }
+  
+  if (auto *Lit = dynamic_cast<BooleanLiteralNode *>(expr)) {
+    return Builder.getLiteralBool(Lit->value);
+  }
+  
+  if (auto *Lit = dynamic_cast<NumericLiteralNode *>(expr)) {
+    return Builder.getLiteralNumber(Lit->value);
+  }
+  
+  return Builder.getLiteralUndefined();
+}

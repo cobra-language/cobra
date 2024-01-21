@@ -67,6 +67,8 @@ public:
   
   Instruction *emitStore(Value *storedValue, Value *ptr, bool declInit);
   
+  Value *genExpression(ASTNode *expr, Identifier name = Identifier{});
+  
   
       
 };

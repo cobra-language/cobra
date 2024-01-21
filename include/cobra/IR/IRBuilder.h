@@ -25,6 +25,12 @@ class IRBuilder {
   BasicBlock *Block{};
   SMLoc Location{};
   
+  LiteralEmpty literalEmpty{};
+  LiteralUndefined literalUndefined{};
+  LiteralNull literalNull{};
+  LiteralBool literalFalse{false};
+  LiteralBool literalTrue{true};
+  
 public:
   explicit IRBuilder(Module *Mod) : M(Mod) {}
   
@@ -63,11 +69,32 @@ public:
   
   BasicBlock *getInsertionBlock();
   
+  Function *getFunction() {
+    assert(Block && "Builder has no current function");
+    return Block->getParent();
+  }
+  
   void setInsertionPoint(Instruction *IP);
+  
+  BranchInst *createBranchInst(BasicBlock *Destination);
+  
+  CondBranchInst *
+  createCondBranchInst(Value *Cond, BasicBlock *T, BasicBlock *F);
   
   ReturnInst *createReturnInst(Value *Val);
   
   AllocStackInst *createAllocStackInst(Identifier varName);
+  
+  StoreStackInst *createStoreStackInst(Value *storedValue, AllocStackInst *ptr);
+  
+  BinaryOperatorInst *createBinaryOperatorInst(
+      Value *left,
+      Value *right,
+      BinaryOperatorInst::OpKind opKind);
+  
+  PhiInst *createPhiInst(
+      const PhiInst::ValueListType &values,
+      const PhiInst::BasicBlockListType &blocks);
   
 };
 

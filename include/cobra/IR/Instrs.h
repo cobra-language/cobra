@@ -13,6 +13,8 @@
 
 namespace cobra {
 
+bool isSideEffectFree(Type T);
+
 class SingleOperandInst : public Instruction {
   SingleOperandInst(const SingleOperandInst &) = delete;
   void operator=(const SingleOperandInst &) = delete;
@@ -36,6 +38,100 @@ public:
   
   static bool classof(const Value *V) {
     return kindIsA(V->getKind(), ValueKind::TerminatorInstKind);
+  }
+};
+
+class BranchInst : public TerminatorInst {
+  BranchInst(const BranchInst &) = delete;
+  void operator=(const BranchInst &) = delete;
+
+ public:
+  enum { BranchDestIdx };
+
+  BasicBlock *getBranchDest() const {
+    return dynamic_cast<BasicBlock *>(getOperand(BranchDestIdx));
+  }
+
+  explicit BranchInst(BasicBlock *parent, BasicBlock *dest)
+      : TerminatorInst(ValueKind::BranchInstKind) {
+    pushOperand(dest);
+  }
+  explicit BranchInst(const BranchInst *src, std::vector<Value *> operands)
+      : TerminatorInst(src, operands) {}
+
+  SideEffectKind getSideEffect() {
+    return SideEffectKind::None;
+  }
+
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::BranchInstKind);
+  }
+
+  unsigned getNumSuccessors() const {
+    return 1;
+  }
+  BasicBlock *getSuccessor(unsigned idx) const {
+    assert(idx == 0 && "BranchInst only have 1 successor!");
+    return getBranchDest();
+  }
+  void setSuccessor(unsigned idx, BasicBlock *B) {
+    assert(idx == 0 && "BranchInst only have 1 successor!");
+    setOperand(B, idx);
+  }
+};
+
+class CondBranchInst : public TerminatorInst {
+  CondBranchInst(const CondBranchInst &) = delete;
+  void operator=(const CondBranchInst &) = delete;
+
+ public:
+  enum { ConditionIdx, TrueBlockIdx, FalseBlockIdx };
+
+  Value *getCondition() const {
+    return getOperand(ConditionIdx);
+  }
+  BasicBlock *getTrueDest() const {
+    return dynamic_cast<BasicBlock *>(getOperand(TrueBlockIdx));
+  }
+  BasicBlock *getFalseDest() const {
+    return dynamic_cast<BasicBlock *>(getOperand(FalseBlockIdx));
+  }
+
+  explicit CondBranchInst(
+      BasicBlock *parent,
+      Value *cond,
+      BasicBlock *trueBlock,
+      BasicBlock *falseBlock)
+      : TerminatorInst(ValueKind::CondBranchInstKind) {
+    pushOperand(cond);
+    pushOperand(trueBlock);
+    pushOperand(falseBlock);
+  }
+  explicit CondBranchInst(
+      const CondBranchInst *src,
+      std::vector<Value *> operands)
+      : TerminatorInst(src, operands) {}
+
+  SideEffectKind getSideEffect() {
+    return SideEffectKind::None;
+  }
+
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::CondBranchInstKind);
+  }
+
+  unsigned getNumSuccessors() const {
+    return 2;
+  }
+  BasicBlock *getSuccessor(unsigned idx) const {
+    if (idx == 0)
+      return getTrueDest();
+    if (idx == 1)
+      return getFalseDest();
+  }
+  void setSuccessor(unsigned idx, BasicBlock *B) {
+    assert(idx <= 1 && "CondBranchInst only have 2 successors!");
+    setOperand(B, idx + TrueBlockIdx);
   }
 };
 
@@ -130,6 +226,135 @@ class StoreStackInst : public Instruction {
 
   static bool classof(const Value *V) {
     return kindIsA(V->getKind(), ValueKind::StoreStackInstKind);
+  }
+};
+
+class BinaryOperatorInst : public Instruction {
+ public:
+  /// JavaScript Binary operators as defined in the ECMA spec.
+  /// http://ecma-international.org/ecma-262/5.1/#sec-11
+  enum class OpKind {
+    IdentityKind, // nop (assignment operator, no arithmetic op)
+    EqualKind, // ==
+    NotEqualKind, // !=
+    StrictlyEqualKind, // ===
+    StrictlyNotEqualKind, // !==
+    LessThanKind, // <
+    LessThanOrEqualKind, // <=
+    GreaterThanKind, // >
+    GreaterThanOrEqualKind, // >=
+    LeftShiftKind, // <<  (<<=)
+    RightShiftKind, // >>  (>>=)
+    UnsignedRightShiftKind, // >>> (>>>=)
+    AddKind, // +   (+=)
+    SubtractKind, // -   (-=)
+    MultiplyKind, // *   (*=)
+    DivideKind, // /   (/=)
+    ModuloKind, // %   (%=)
+    OrKind, // |   (|=)
+    XorKind, // ^   (^=)
+    AndKind, // &   (^=)
+    ExponentiationKind, // ** (**=)
+    AssignShortCircuitOrKind, // ||= (only for assignment)
+    AssignShortCircuitAndKind, // &&= (only for assignment)
+    AssignNullishCoalesceKind, // ??= (only for assignment)
+    InKind, // "in"
+    InstanceOfKind, // instanceof
+    LAST_OPCODE
+  };
+
+  static const char *opStringRepr[(int)OpKind::LAST_OPCODE];
+
+  static const char *assignmentOpStringRepr[(int)OpKind::LAST_OPCODE];
+
+ private:
+  BinaryOperatorInst(const BinaryOperatorInst &) = delete;
+  void operator=(const BinaryOperatorInst &) = delete;
+
+  OpKind op_;
+
+ public:
+  enum { LeftHandSideIdx, RightHandSideIdx };
+
+  OpKind getOperatorKind() const {
+    return op_;
+  }
+
+  Value *getLeftHandSide() const {
+    return getOperand(LeftHandSideIdx);
+  }
+  Value *getRightHandSide() const {
+    return getOperand(RightHandSideIdx);
+  }
+
+  static OpKind parseOperator(StringRef op);
+
+  static OpKind parseAssignmentOperator(StringRef op);
+
+  static std::optional<OpKind> tryGetReverseOperator(OpKind op);
+
+  StringRef getOperatorStr() {
+    return opStringRepr[static_cast<int>(op_)];
+  }
+
+  explicit BinaryOperatorInst(Value *left, Value *right, OpKind opKind)
+      : Instruction(ValueKind::BinaryOperatorInstKind), op_(opKind) {
+    pushOperand(left);
+    pushOperand(right);
+  }
+  explicit BinaryOperatorInst(
+      const BinaryOperatorInst *src,
+      std::vector<Value *> operands)
+      : Instruction(src, operands), op_(src->op_) {}
+
+  SideEffectKind getSideEffect() {
+    return getBinarySideEffect(
+        getLeftHandSide()->getType(),
+        getRightHandSide()->getType(),
+        getOperatorKind());
+  }
+
+
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::BinaryOperatorInstKind);
+  }
+
+  static SideEffectKind
+  getBinarySideEffect(Type leftTy, Type rightTy, OpKind op);
+};
+
+class PhiInst : public Instruction {
+  PhiInst(const PhiInst &) = delete;
+  void operator=(const PhiInst &) = delete;
+
+ public:
+  using ValueListType = std::vector<Value *>;
+  using BasicBlockListType = std::vector<BasicBlock *>;
+
+  unsigned getNumEntries() const;
+
+  std::pair<Value *, BasicBlock *> getEntry(unsigned i) const;
+
+  void updateEntry(unsigned i, Value *val, BasicBlock *BB);
+
+  void addEntry(Value *val, BasicBlock *BB);
+
+  void removeEntry(unsigned index);
+
+  void removeEntry(BasicBlock *BB);
+
+  explicit PhiInst(
+      const ValueListType &values,
+      const BasicBlockListType &blocks);
+  explicit PhiInst(const PhiInst *src, std::vector<Value *> operands)
+      : Instruction(src, operands) {}
+
+  SideEffectKind getSideEffect() {
+    return SideEffectKind::None;
+  }
+
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::PhiInstKind);
   }
 };
 

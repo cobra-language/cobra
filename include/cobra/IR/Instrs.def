@@ -29,16 +29,18 @@ DEF_VALUE(LoadStackInst, SingleOperandInst)
 
 MARK_LAST(SingleOperandInst)
 
-MARK_FIRST(TerminatorInst)
-DEF_VALUE(TerminatorInst, Instruction)
-TERMINATOR(ReturnInst, TerminatorInst)
-MARK_LAST(TerminatorInst)
+DEF_VALUE(PhiInst, Instruction)
+DEF_VALUE(BinaryOperatorInst, Instruction)
 
 DEF_VALUE(StoreStackInst, Instruction)
 DEF_VALUE(AllocStackInst, Instruction)
 
-
-
+MARK_FIRST(TerminatorInst)
+DEF_VALUE(TerminatorInst, Instruction)
+TERMINATOR(BranchInst, TerminatorInst)
+TERMINATOR(ReturnInst, TerminatorInst)
+TERMINATOR(CondBranchInst, TerminatorInst)
+MARK_LAST(TerminatorInst)
 
 
 

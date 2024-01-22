@@ -138,11 +138,11 @@ private:
   
   bool eatSemi();
   
-  std::optional<VariableDeclarationNode *> parseVariableStatement();
+  std::optional<VariableStmt *> parseVariableStatement();
     
   bool parseVariableDeclarationList(NodeList &declList);
   
-  std::optional<VariableDeclaratorNode *> parseVariableDeclaration();
+  std::optional<VariableDecl *> parseVariableDeclaration();
     
   std::optional<ASTNode *> parseIdentifierOrPattern();
   
@@ -152,7 +152,7 @@ private:
   
   std::optional<ASTNode *> parseExpressionOrLabelledStatement();
   
-  std::optional<IfStatementNode *> parseIfStatement();
+  std::optional<IfStmt *> parseIfStatement();
   
   std::optional<ASTNode *> parseReturnStatement();
   

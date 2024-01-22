@@ -24,6 +24,8 @@ void TreeIRGen::emitFunction(FuncDecl *fd) {
   emitParameters(fd);
   
   emitfunctionBody(fd->body);
+  
+  emitFunctionEpilogue(Builder.getLiteralUndefined());
 }
 
 void TreeIRGen::emitFunctionPreamble(BasicBlock *entry) {
@@ -73,4 +75,8 @@ void TreeIRGen::emitParameters(AbstractFunctionDecl *funcNode) {
       Builder.createStoreStackInst(param, stackVar);
     }
   }
+}
+
+void TreeIRGen::emitFunctionEpilogue(Value *returnValue) {
+  Builder.createReturnInst(returnValue);
 }

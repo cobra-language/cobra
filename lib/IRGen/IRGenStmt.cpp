@@ -37,15 +37,15 @@ Value *TreeIRGen::genExpression(ASTNode *expr, Identifier name) {
     
   }
   
-  if (auto *Lit = dynamic_cast<StringLiteralNode *>(expr)) {
+  if (auto *Lit = dynamic_cast<StringLiteralExpr *>(expr)) {
     return Builder.getLiteralString(*Lit->value);
   }
   
-  if (auto *Lit = dynamic_cast<BooleanLiteralNode *>(expr)) {
+  if (auto *Lit = dynamic_cast<BooleanLiteralExpr *>(expr)) {
     return Builder.getLiteralBool(Lit->value);
   }
   
-  if (auto *Lit = dynamic_cast<NumericLiteralNode *>(expr)) {
+  if (auto *Lit = dynamic_cast<NumericLiteralExpr *>(expr)) {
     return Builder.getLiteralNumber(Lit->value);
   }
   

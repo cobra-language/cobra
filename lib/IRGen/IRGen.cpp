@@ -35,6 +35,6 @@ void TreeIRGen::visit() {
 
 void TreeIRGen::visit(FuncDecl *fd) { emitFunction(fd); }
 
-void TreeIRGen::visit(VariableDeclaratorNode *vd) {
+void TreeIRGen::visit(VariableDecl *vd) {
   
 }

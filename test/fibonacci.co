@@ -1,6 +1,4 @@
-function fibonacci(n: number): number {
-  if (n <= 1) {
-    return n;
-  }
-  return fibonacci(n - 1) + fibonacci(n - 2);
+function printParity(x: number) : number {
+  var x = 100;
+  return x + 1;
 }

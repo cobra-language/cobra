@@ -50,14 +50,15 @@ public:
   
   void visit();
   void visit(FuncDecl *fd);
-  void visit(VariableDeclaratorNode *vd);
-  
+  void visit(VariableDecl *vd) ;
   
   void emitFunction(FuncDecl *fd);
   
   void emitFunctionPreamble(BasicBlock *entry);
   
   void emitParameters(AbstractFunctionDecl *funcNode);
+  
+  void emitFunctionEpilogue(Value *returnValue);
   
   void emitfunctionBody(ASTNode *stmt);
   

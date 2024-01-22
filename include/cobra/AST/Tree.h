@@ -23,14 +23,24 @@ class ASTNode;
 class ParamDecl;
 class BlockStmt;
 
-using NodeLabel = StringRef *;
+//#define ACCEPT_VISITOR void accept (ASTVisitor *v) override { v->visit(this); }
+//#define ACCEPT_VISITOR_VIRTUAL void accept (ASTVisitor *v) override = 0;
 
+using NodeLabel = StringRef *;
 using NodeString = StringRef *;
 using NodePtr = ASTNode *;
 using NodeBoolean = bool;
 using NodeNumber = double;
 using NodeList = std::vector<ASTNode *>;
 using ParameterList = std::vector<ParamDecl *>;
+
+enum class StmtKind {
+#define STMT(ID, PARENT) ID,
+#define LAST_STMT(ID) Last_Stmt = ID,
+#define STMT_RANGE(Id, FirstId, LastId) \
+  First_##Id##Stmt = FirstId, Last_##Id##Stmt = LastId,
+#include "cobra/AST/StmtNodes.def"
+};
 
 enum class NodeKind : uint32_t {
   Empty,
@@ -77,6 +87,9 @@ public:
   ASTNode(NodeKind kind) : kind_(kind) {}
   
   virtual ~ASTNode() = default;
+  
+//  virtual void accept(ASTVisitor *v) = 0;
+//  virtual void accept(ASTVisitor &vis) = 0;
   
   void setSourceRange(SMRange rng) {
     sourceRange_ = rng;
@@ -155,48 +168,21 @@ public:
   }
 };
 
-class BooleanLiteralNode : public ASTNode {
-public:
-  NodeBoolean value;
-  explicit BooleanLiteralNode(NodeBoolean value)
-      : ASTNode(NodeKind::BooleanLiteral), value(std::move(value)) {
-    
-  }
-};
-
-class StringLiteralNode : public ASTNode {
-public:
-  NodeString value;
-  explicit StringLiteralNode(NodeString value)
-      : ASTNode(NodeKind::StringLiteral), value(std::move(value)) {
-    
-  }
-};
-
-class NumericLiteralNode : public ASTNode {
-public:
-  NodeNumber value;
-  explicit NumericLiteralNode(NodeNumber value)
-      : ASTNode(NodeKind::NumericLiteral), value(std::move(value)) {
-    
-  }
-};
-
-class VariableDeclaratorNode : public ASTNode {
+class VariableDecl : public ASTNode {
 public:
   NodePtr init;
   NodePtr id;
-  explicit VariableDeclaratorNode(NodePtr init, NodePtr id)
+  explicit VariableDecl(NodePtr init, NodePtr id)
       : ASTNode(NodeKind::VariableDeclarator), init(std::move(init)), id(std::move(id)) {
     
   }
 };
 
-class VariableDeclarationNode : public ASTNode {
+class VariableStmt : public ASTNode {
 public:
   NodeLabel label;
   NodeList declarations;
-  explicit VariableDeclarationNode(NodeLabel label, NodeList declarations)
+  explicit VariableStmt(NodeLabel label, NodeList declarations)
       : ASTNode(NodeKind::VariableDeclarator), label(std::move(label)), declarations(std::move(declarations)) {
     
   }
@@ -239,6 +225,7 @@ class FuncDecl : public AbstractFunctionDecl {
 public:
   NodePtr id;
   NodePtr returnType;
+//  virtual void accept(ASTVisitor *v) { v->visit(this); }
   explicit FuncDecl(NodePtr id, ParameterList params, BlockStmt *body, NodePtr returnType)
       : AbstractFunctionDecl(NodeKind::FuncDecl, params, body),
       id(id),
@@ -248,7 +235,7 @@ public:
   
 };
 
-class ClassDeclarationNode : public ASTNode {
+class ClassDecl : public ASTNode {
 
 };
 
@@ -281,24 +268,25 @@ public:
   }
 };
 
-class IfStatementNode : public ASTNode {
+class IfStmt : public ASTNode {
 public:
   NodePtr test;
   NodePtr consequent;
   NodePtr alternate;
-  explicit IfStatementNode(NodePtr test, NodePtr consequent, NodePtr alternate)
+  StmtKind kind;
+  explicit IfStmt(NodePtr test, NodePtr consequent, NodePtr alternate)
       : ASTNode(NodeKind::IfStatement),
       test(std::move(test)),
       consequent(std::move(consequent)) ,
       alternate(std::move(alternate)) {
-    
+        kind = StmtKind::If;
   }
 };
 
-class ReturnStatementNode : public ASTNode {
+class ReturnStmt : public ASTNode {
 public:
   NodePtr argument;
-  explicit ReturnStatementNode(NodePtr argument)
+  explicit ReturnStmt(NodePtr argument)
       : ASTNode(NodeKind::ReturnStatement),
       argument(std::move(argument)) {
     
@@ -309,15 +297,42 @@ class ExpressionNode : public ASTNode {
 
 };
 
-class ClassExpressionNode : public ASTNode {
+class BooleanLiteralExpr : public ASTNode {
+public:
+  NodeBoolean value;
+  explicit BooleanLiteralExpr(NodeBoolean value)
+      : ASTNode(NodeKind::BooleanLiteral), value(std::move(value)) {
+    
+  }
+};
+
+class StringLiteralExpr : public ASTNode {
+public:
+  NodeString value;
+  explicit StringLiteralExpr(NodeString value)
+      : ASTNode(NodeKind::StringLiteral), value(std::move(value)) {
+    
+  }
+};
+
+class NumericLiteralExpr : public ASTNode {
+public:
+  NodeNumber value;
+  explicit NumericLiteralExpr(NodeNumber value)
+      : ASTNode(NodeKind::NumericLiteral), value(std::move(value)) {
+    
+  }
+};
+
+class ClassExpr : public ASTNode {
 
 };
 
-class CallExpressionNode : public ASTNode {
+class CallExpr : public ASTNode {
 public:
   NodePtr callee;
   NodeList argument;
-  explicit CallExpressionNode(NodePtr callee, NodeList argument)
+  explicit CallExpr(NodePtr callee, NodeList argument)
       : ASTNode(NodeKind::CallExpression),
     callee(std::move(callee)),
     argument(std::move(argument)) {
@@ -333,12 +348,12 @@ public:
   
 };
 
-class MemberExpressionNode : public MemberExpressionLikeNode {
+class MemberExpr : public MemberExpressionLikeNode {
 public:
   NodePtr object;
   NodePtr property;
   NodeBoolean computed;
-  explicit MemberExpressionNode(NodePtr object, NodePtr property, NodeBoolean computed)
+  explicit MemberExpr(NodePtr object, NodePtr property, NodeBoolean computed)
       : MemberExpressionLikeNode(NodeKind::MemberExpression),
       object(std::move(object)),
       property(std::move(property)),
@@ -376,12 +391,12 @@ public:
   }
 };
 
-class UnaryExpressionNode : public ASTNode {
+class UnaryExpr : public ASTNode {
 public:
   NodeLabel Operator;
   NodePtr argument;
   NodeBoolean prefix;
-  explicit UnaryExpressionNode(NodeLabel Operator, NodePtr argument, NodeBoolean prefix)
+  explicit UnaryExpr(NodeLabel Operator, NodePtr argument, NodeBoolean prefix)
       : ASTNode(NodeKind::UnaryExpression),
     Operator(std::move(Operator)),
     argument(std::move(argument)) ,
@@ -391,12 +406,12 @@ public:
   
 };
 
-class PostfixUnaryExpressionNode : public ASTNode {
+class PostfixUnaryExpr : public ASTNode {
 public:
   NodeLabel Operator;
   NodePtr argument;
   NodeBoolean prefix;
-  explicit PostfixUnaryExpressionNode(NodeLabel Operator, NodePtr argument, NodeBoolean prefix)
+  explicit PostfixUnaryExpr(NodeLabel Operator, NodePtr argument, NodeBoolean prefix)
       : ASTNode(NodeKind::PostfixUnaryExpression),
     Operator(std::move(Operator)),
     argument(std::move(argument)) ,
@@ -406,12 +421,12 @@ public:
   
 };
 
-class BinaryExpressionNode : public ASTNode {
+class BinaryExpr : public ASTNode {
 public:
   NodePtr left;
   NodePtr right;
   NodeLabel Operator;
-  explicit BinaryExpressionNode(NodePtr left, NodePtr right, NodeLabel Operator)
+  explicit BinaryExpr(NodePtr left, NodePtr right, NodeLabel Operator)
       : ASTNode(NodeKind::BinaryExpression),
       left(std::move(left)) ,
       right(std::move(right)) ,
@@ -428,11 +443,6 @@ public:
 
 class BindingPattern : public Pattern {
 public:
-  
-};
-
-namespace Tree {
-
   
 };
 

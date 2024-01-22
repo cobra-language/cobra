@@ -310,7 +310,7 @@ std::optional<ASTNode *> Parser::parseStatement() {
   return std::nullopt;
 }
 
-std::optional<VariableDeclarationNode *> Parser::parseVariableStatement() {
+std::optional<VariableStmt *> Parser::parseVariableStatement() {
   assert(match(TokenKind::rw_var));
   
   auto kindIdent = tok_->getResWordOrIdentifier();
@@ -327,7 +327,7 @@ std::optional<VariableDeclarationNode *> Parser::parseVariableStatement() {
   auto *res = setLocation(
       startLoc,
       getPrevTokenEndLoc(),
-      new (context_) VariableDeclarationNode(kindIdent, std::move(declList)));
+      new (context_) VariableStmt(kindIdent, std::move(declList)));
  
   return res;
 }
@@ -349,7 +349,7 @@ bool Parser::parseVariableDeclarationList(NodeList &declList) {
   return true;
 }
 
-std::optional<VariableDeclaratorNode *> Parser::parseVariableDeclaration() {
+std::optional<VariableDecl *> Parser::parseVariableDeclaration() {
   ASTNode *target;
   SMLoc startLoc = tok_->getStartLoc();
   
@@ -363,7 +363,7 @@ std::optional<VariableDeclaratorNode *> Parser::parseVariableDeclaration() {
     return setLocation(
         startLoc,
         getPrevTokenEndLoc(),
-        new (context_) VariableDeclaratorNode(nullptr, target));
+        new (context_) VariableDecl(nullptr, target));
   };
   
   advance();
@@ -376,7 +376,7 @@ std::optional<VariableDeclaratorNode *> Parser::parseVariableDeclaration() {
   return setLocation(
       startLoc,
       getPrevTokenEndLoc(),
-      new (context_) VariableDeclaratorNode(*expr, target));
+      new (context_) VariableDecl(*expr, target));
 }
 
 std::optional<ASTNode *> Parser::parseIdentifierOrPattern() {
@@ -445,7 +445,7 @@ std::optional<ASTNode *> Parser::parseExpressionOrLabelledStatement() {
           ExpressionStatementNode(optExpr.value(), nullptr));
 }
 
-std::optional<IfStatementNode *> Parser::parseIfStatement() {
+std::optional<IfStmt *> Parser::parseIfStatement() {
   assert(match(TokenKind::rw_if));
   SMLoc startLoc = advance().Start;
 
@@ -471,7 +471,7 @@ std::optional<IfStatementNode *> Parser::parseIfStatement() {
     return setLocation(
         startLoc,
         optAlternate.value(),
-        new (context_) IfStatementNode(
+        new (context_) IfStmt(
             optTest.value(),
             optConsequent.value(),
             optAlternate.value()));
@@ -479,7 +479,7 @@ std::optional<IfStatementNode *> Parser::parseIfStatement() {
     return setLocation(
         startLoc,
         optConsequent.value(),
-        new (context_) IfStatementNode(
+        new (context_) IfStmt(
             optTest.value(), optConsequent.value(), nullptr));
   }
 }
@@ -492,7 +492,7 @@ std::optional<ASTNode *> Parser::parseReturnStatement() {
     return setLocation(
         startLoc,
         getPrevTokenEndLoc(),
-        new (context_) ReturnStatementNode(nullptr));
+        new (context_) ReturnStmt(nullptr));
   
   auto optArg = parseExpression();
   if (!optArg)
@@ -504,7 +504,7 @@ std::optional<ASTNode *> Parser::parseReturnStatement() {
   return setLocation(
       startLoc,
       getPrevTokenEndLoc(),
-      new (context_) ReturnStatementNode(optArg.value()));
+      new (context_) ReturnStmt(optArg.value()));
 }
 
 std::optional<ASTNode *> Parser::parseAssignmentExpression() {
@@ -608,7 +608,7 @@ std::optional<ASTNode *> Parser::parseBinaryExpression() {
       topExpr = setLocation(
             stack.back().exprStartLoc,
             topExprEndLoc,
-            new (context_) BinaryExpressionNode(stack.back().expr, topExpr, opIdent));
+            new (context_) BinaryExpr(stack.back().expr, topExpr, opIdent));
       topExprStartLoc = topExpr->getStartLoc();
       stack.pop_back();
     }
@@ -631,7 +631,7 @@ std::optional<ASTNode *> Parser::parseBinaryExpression() {
     topExpr = setLocation(
           stack.back().exprStartLoc,
           topExprEndLoc,
-          new (context_) BinaryExpressionNode(stack.back().expr, topExpr, opIdent));
+          new (context_) BinaryExpr(stack.back().expr, topExpr, opIdent));
     stack.pop_back();
   }
   
@@ -664,7 +664,7 @@ std::optional<ASTNode *> Parser::parseUnaryExpression() {
           startLoc,
           getPrevTokenEndLoc(),
           new (context_)
-              PostfixUnaryExpressionNode(op, expr.value(), true));
+              PostfixUnaryExpr(op, expr.value(), true));
     }
       
     case TokenKind::less:
@@ -697,7 +697,7 @@ std::optional<ASTNode *> Parser::parseCallExpression(SMLoc startLoc, NodePtr exp
     expr = setLocation(
         startLoc,
         endLoc,
-        new (context_) CallExpressionNode(expr, std::move(argList)));
+        new (context_) CallExpr(expr, std::move(argList)));
   }
   
   return expr;
@@ -753,7 +753,7 @@ std::optional<ASTNode *> Parser::parseMemberExpressionContinuation(SMLoc startLo
         return setLocation(
             startLoc,
             id,
-            new (context_) MemberExpressionNode(expr, id, false));
+            new (context_) MemberExpr(expr, id, false));
       }
     }
   }
@@ -777,7 +777,7 @@ std::optional<ASTNode *> Parser::parsePrimaryExpression() {
       auto *res = setLocation(
           tok_,
           tok_,
-          new (context_) BooleanLiteralNode(
+          new (context_) BooleanLiteralExpr(
               tok_->getKind() == TokenKind::rw_true));
       advance();
       return res;
@@ -787,7 +787,7 @@ std::optional<ASTNode *> Parser::parsePrimaryExpression() {
       auto *res = setLocation(
           tok_,
           tok_,
-          new (context_) NumericLiteralNode(tok_->getNumericLiteral()));
+          new (context_) NumericLiteralExpr(tok_->getNumericLiteral()));
       advance();
       return res;
     }
@@ -796,7 +796,7 @@ std::optional<ASTNode *> Parser::parsePrimaryExpression() {
       auto *res = setLocation(
           tok_,
           tok_,
-          new (context_) StringLiteralNode(tok_->getStringLiteral()));
+          new (context_) StringLiteralExpr(tok_->getStringLiteral()));
       advance();
       return res;
     }

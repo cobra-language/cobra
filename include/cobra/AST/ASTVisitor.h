@@ -12,14 +12,44 @@
 
 namespace cobra {
 
+template<typename ImplClass>
 class ASTVisitor {
 public:
-  ASTVisitor() = default;
-  virtual ~ASTVisitor() = default;
   
-  virtual void visit(FuncDecl *fd) = 0;
-  virtual void visit(VariableDecl *vd) = 0;
+  void visitDecl(Decl *E) {
+    switch (E->getKind()) {
+      
+#define DECL(CLASS, PARENT) \
+    case DeclKind::CLASS: \
+      return static_cast<ImplClass*>(this) \
+        ->visit##CLASS##Decl(static_cast<CLASS##Decl*>(E));
+#include "cobra/AST/DeclNodes.def"
+
+    }
+  }
   
+  void visitExpr(Expr *E) {
+    switch (E->getKind()) {
+
+#define EXPR(CLASS, PARENT) \
+    case ExprKind::CLASS: \
+      return static_cast<ImplClass*>(this) \
+        ->visit##CLASS##Expr(static_cast<CLASS##Expr*>(E));
+#include "cobra/AST/ExprNodes.def"
+
+    }
+  }
+  
+  void visitStmt(Stmt *S) {
+    switch (S->getKind()) {
+
+#define STMT(CLASS, PARENT) \
+    case StmtKind::CLASS: \
+      return static_cast<ImplClass*>(this) \
+        ->visit##CLASS##Stmt(static_cast<CLASS##Stmt*>(S));
+#include "cobra/AST/StmtNodes.def"
+    }
+  }
   
 };
 

@@ -22,8 +22,8 @@ void TreeIRGen::emitFunction(FuncDecl *fd) {
   emitFunctionPreamble(Builder.createBasicBlock(newFunction));
   
   emitParameters(fd);
-  
-  emitfunctionBody(fd->body);
+    
+  emitStatement(fd->body);
   
   emitFunctionEpilogue(Builder.getLiteralUndefined());
 }

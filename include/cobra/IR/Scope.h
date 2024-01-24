@@ -9,23 +9,23 @@
 #define Scope_hpp
 
 #include <stdio.h>
-#include <vector>
+#include <map>
 #include "cobra/IR/IR.h"
 
 namespace cobra {
 
 class Scope {
-  using VariableListType = std::vector<Variable *>;
+  using VariableListType = std::map<Identifier *, Variable *>;
   
   Scope(const Scope &) = delete;
   Scope &operator=(const Scope &) = delete;
   
-  explicit Scope(Scope *p) : parent(p) {}
-
-  ~Scope();
-  
 public:
   using ScopeListTy = std::vector<Scope *>;
+  
+  explicit Scope(Scope *p) : parent(p) {}
+  
+  ~Scope();
   
   Scope *createInnerScope() {
     auto *S = new Scope(this);
@@ -53,8 +53,13 @@ public:
     return variables;
   }
   
-  void addVariable(Variable *V) {
-    variables.emplace_back(V);
+  void insert(Identifier *K, Variable *V) {
+    variables.insert({K, V});
+  }
+  
+  Variable *lookup(Identifier *K) {
+    auto it = variables.find(K);
+    return it == variables.end() ? nullptr : it->second;
   }
   
 private:

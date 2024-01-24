@@ -108,7 +108,7 @@ private:
     return match(h) || matchN(tail...);
   }
   
-  std::optional<ProgramNode *> parseProgram();
+  std::optional<Program *> parseProgram();
   
   std::optional<ASTNode *> parseTypeAnnotation(std::optional<SMLoc> wrappedStart = std::nullopt);
     
@@ -140,13 +140,13 @@ private:
   
   std::optional<VariableStmt *> parseVariableStatement();
     
-  bool parseVariableDeclarationList(NodeList &declList);
+  bool parseVariableDeclarationList(VariableDeclList &declList);
   
   std::optional<VariableDecl *> parseVariableDeclaration();
     
   std::optional<ASTNode *> parseIdentifierOrPattern();
   
-  std::optional<IdentifierNode *> parseBindingIdentifier();
+  std::optional<IdentifierExpr *> parseBindingIdentifier();
     
   bool validateBindingIdentifier(SMRange range, StringRef *id, TokenKind kind);
   

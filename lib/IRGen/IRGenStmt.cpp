@@ -10,17 +10,31 @@
 using namespace cobra;
 using namespace Lowering;
 
-void TreeIRGen::emitfunctionBody(ASTNode *stmt) {
-  if (auto *BS = dynamic_cast<BlockStmt *>(stmt)) {
-    for (auto Node : BS->body) {
-      emitStatement(Node, false);
-    }
+void TreeIRGen::emitStatement(Stmt *stmt) {
+  visitStmt(stmt);
+}
 
-    return;
+void TreeIRGen::visitBlockStmt(BlockStmt *bs) {
+  for (auto node : bs->body) {
+    visit(node);
   }
 }
 
-void TreeIRGen::emitStatement(ASTNode *stmt, bool isLoopBody) {
+void TreeIRGen::visitReturnStmt(ReturnStmt *rs) {
+  
+}
+
+void TreeIRGen::visitIfStmt(IfStmt *is) {
+  
+}
+
+void TreeIRGen::visitVariableStmt(VariableStmt *vs) {
+  for (auto decl : vs->declarations) {
+    visitDecl(decl);
+  }
+}
+
+void TreeIRGen::visitExpressionStmt(ExpressionStmt *es) {
   
 }
 
@@ -33,7 +47,7 @@ Instruction *TreeIRGen::emitStore(Value *storedValue, Value *ptr, bool declInit)
 }
 
 Value *TreeIRGen::genExpression(ASTNode *expr, Identifier name) {
-  if (auto *Iden = dynamic_cast<IdentifierNode *>(expr)) {
+  if (auto *Iden = dynamic_cast<IdentifierExpr *>(expr)) {
     
   }
   

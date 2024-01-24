@@ -13,7 +13,7 @@ using namespace cobra;
 using namespace Lowering;
 
 TreeIRGen::TreeIRGen(ASTNode *root, Module *M) : Mod(M), Builder(Mod), Root(root) {
-  
+  currentScope = new Scope(nullptr);
 }
 
 TreeIRGen::~TreeIRGen() {
@@ -21,20 +21,42 @@ TreeIRGen::~TreeIRGen() {
 }
 
 void TreeIRGen::visit() {
-  ProgramNode *Program = dynamic_cast<ProgramNode *>(Root);
-  
+  Program *Program = dynamic_cast<class Program *>(Root);
   for (auto Node : Program->body) {
-    switch (Node->getKind()) {
-      case NodeKind::FuncDecl:
-        auto fd = dynamic_cast<FuncDecl *>(Node);
-        visit(fd);
-        break;
-    }
+    visit(Node);
   }
 }
 
-void TreeIRGen::visit(FuncDecl *fd) { emitFunction(fd); }
+void TreeIRGen::visit(ASTNode *n) {
+  if (auto *D = dynamic_cast<Decl *>(n)) {
+    visitDecl(D);
+  } else if (auto *S = dynamic_cast<Stmt *>(n)) {
+    visitStmt(S);
+  } else if (auto *E = dynamic_cast<Expr *>(n)) {
+    visitExpr(E);
+  }
+}
 
-void TreeIRGen::visit(VariableDecl *vd) {
+void TreeIRGen::visitFuncDecl(FuncDecl *fd) { emitFunction(fd); }
+
+void TreeIRGen::visitParamDecl(ParamDecl *pd) {
+  
+}
+
+void TreeIRGen::visitVariableDecl(VariableDecl *vd) {  
+  if (vd->init) {
+    Identifier name{};
+    if (dynamic_cast<IdentifierExpr *>(vd->id))
+      name = getNameFieldFromID(vd->id);
+    std::cout << "VariableDecl: " << name.c_str() << std::endl;
+    Variable *V = Builder.createVariable(Variable::DeclKind::Var, name);
+    currentScope->insert(&name, V);
+    
+    auto *stackVar = Builder.createAllocStackInst(name);
+    Builder.createStoreStackInst(V, stackVar);
+    
+  } else {
+    
+  }
   
 }

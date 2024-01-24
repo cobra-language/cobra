@@ -26,10 +26,10 @@ using NameTableTy = std::map<Identifier, Value *>;
 using NameTableScopeTy = std::map<Identifier, Value *>;
 
 inline Identifier getNameFieldFromID(ASTNode *ID) {
-  return Identifier::getFromPointer(dynamic_cast<IdentifierNode *>(ID)->name);
+  return Identifier::getFromPointer(dynamic_cast<IdentifierExpr *>(ID)->name);
 }
 
-class TreeIRGen : public ASTVisitor {
+class TreeIRGen : public ASTVisitor<TreeIRGen> {
   TreeIRGen(const TreeIRGen &) = delete;
   void operator=(const TreeIRGen &) = delete;
   
@@ -49,8 +49,46 @@ public:
   ~TreeIRGen();
   
   void visit();
-  void visit(FuncDecl *fd);
-  void visit(VariableDecl *vd) ;
+  void visitProgram(Program *fd) {};
+  
+  void visit(ASTNode *n);
+  
+  void visitFuncDecl(FuncDecl *fd);
+  
+  void visitParamDecl(ParamDecl *pd);
+  
+  void visitVariableDecl(VariableDecl *vd);
+  
+  void visitBlockStmt(BlockStmt *bs);
+  
+  void visitReturnStmt(ReturnStmt *rs);
+  
+  void visitIfStmt(IfStmt *is);
+  
+  void visitVariableStmt(VariableStmt *vs);
+  
+  void visitExpressionStmt(ExpressionStmt *es);
+  
+  void visitBooleanLiteralExpr(BooleanLiteralExpr *be);
+  
+  void visitNumericLiteralExpr(NumericLiteralExpr *ne);
+  
+  void visitStringLiteralExpr(StringLiteralExpr *se);
+  
+  void visitCallExpr(CallExpr *ce);
+  
+  void visitMemberExpr(MemberExpr *me);
+  
+  void visitIdentifierExpr(IdentifierExpr *ie);
+  
+  void visitUnaryExpr(UnaryExpr *ue);
+  
+  void visitPostfixUnaryExpr(PostfixUnaryExpr *pe);
+  
+  void visitBinaryExpr(BinaryExpr *be);
+  
+  void visitSpreadElementExpr(SpreadElementExpr *se);
+  
   
   void emitFunction(FuncDecl *fd);
   
@@ -59,10 +97,8 @@ public:
   void emitParameters(AbstractFunctionDecl *funcNode);
   
   void emitFunctionEpilogue(Value *returnValue);
-  
-  void emitfunctionBody(ASTNode *stmt);
-  
-  void emitStatement(ASTNode *stmt, bool isLoopBody);
+    
+  void emitStatement(Stmt *stmt);
   
   Instruction *emitLoad(Value *from);
   

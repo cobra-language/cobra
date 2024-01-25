@@ -15,7 +15,7 @@
 namespace cobra {
 
 class Scope {
-  using VariableListType = std::map<Identifier *, Variable *>;
+  using ValueListType = std::map<Identifier *, Value *>;
   
   Scope(const Scope &) = delete;
   Scope &operator=(const Scope &) = delete;
@@ -45,28 +45,28 @@ public:
     return innerScopes;
   }
   
-  VariableListType &getMutableVariables() {
-    return variables;
+  ValueListType &getMutableVariables() {
+    return values;
   }
 
-  const VariableListType &getVariables() const {
-    return variables;
+  const ValueListType &getVariables() const {
+    return values;
   }
   
-  void insert(Identifier *K, Variable *V) {
-    variables.insert({K, V});
+  void insert(Identifier *K, Value *V) {
+    values.insert({K, V});
   }
   
-  Variable *lookup(Identifier *K) {
-    auto it = variables.find(K);
-    return it == variables.end() ? nullptr : it->second;
+  Value *lookup(Identifier *K) {
+    auto it = values.find(K);
+    return it == values.end() ? nullptr : it->second;
   }
   
 private:
   Scope *parent{};
   ScopeListTy innerScopes;
   
-  VariableListType variables;
+  ValueListType values;
   
 };
 

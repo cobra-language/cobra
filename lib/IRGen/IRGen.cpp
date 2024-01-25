@@ -20,20 +20,10 @@ TreeIRGen::~TreeIRGen() {
   
 }
 
-void TreeIRGen::visit() {
+void TreeIRGen::visitChildren() {
   Program *Program = dynamic_cast<class Program *>(Root);
   for (auto Node : Program->body) {
     visit(Node);
-  }
-}
-
-void TreeIRGen::visit(ASTNode *n) {
-  if (auto *D = dynamic_cast<Decl *>(n)) {
-    visitDecl(D);
-  } else if (auto *S = dynamic_cast<Stmt *>(n)) {
-    visitStmt(S);
-  } else if (auto *E = dynamic_cast<Expr *>(n)) {
-    visitExpr(E);
   }
 }
 
@@ -43,20 +33,17 @@ void TreeIRGen::visitParamDecl(ParamDecl *pd) {
   
 }
 
-void TreeIRGen::visitVariableDecl(VariableDecl *vd) {  
+void TreeIRGen::visitVariableDecl(VariableDecl *vd) {
+  Identifier name{};
+  if (dynamic_cast<IdentifierExpr *>(vd->id))
+    name = getNameFieldFromID(vd->id);
+  std::cout << "VariableDecl: " << name.c_str() << std::endl;
+//    Variable *V = Builder.createVariable(Variable::DeclKind::Var, name);
+//    currentScope->insert(&name, V);
+  auto *stackVar = Builder.createAllocStackInst(name);
+  currentScope->insert(&name, stackVar);
   if (vd->init) {
-    Identifier name{};
-    if (dynamic_cast<IdentifierExpr *>(vd->id))
-      name = getNameFieldFromID(vd->id);
-    std::cout << "VariableDecl: " << name.c_str() << std::endl;
-    Variable *V = Builder.createVariable(Variable::DeclKind::Var, name);
-    currentScope->insert(&name, V);
-    
-    auto *stackVar = Builder.createAllocStackInst(name);
-    Builder.createStoreStackInst(V, stackVar);
-    
-  } else {
-    
+    auto *storedValue = genExpression(vd->init, name);
+    Builder.createStoreStackInst(storedValue, stackVar);
   }
-  
 }

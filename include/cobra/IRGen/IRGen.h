@@ -48,10 +48,8 @@ public:
   
   ~TreeIRGen();
   
-  void visit();
+  void visitChildren();
   void visitProgram(Program *fd) {};
-  
-  void visit(ASTNode *n);
   
   void visitFuncDecl(FuncDecl *fd);
   

@@ -35,7 +35,7 @@ int main(int argc, const char * argv[]) {
   NodePtr ast = parsedCb.value();
     
   TreeIRGen irGen(ast, &M);
-  irGen.visit();
+  irGen.visitChildren();
   
 //  auto to = cbLexer.advance();
 //

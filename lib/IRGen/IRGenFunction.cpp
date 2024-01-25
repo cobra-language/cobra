@@ -70,7 +70,6 @@ void TreeIRGen::emitParameters(AbstractFunctionDecl *funcNode) {
           {param, defaultValue}, {currentBlock, defaultResultBlock});
       
     } else {
-      
       auto *stackVar = Builder.createAllocStackInst(paramName);
       Builder.createStoreStackInst(param, stackVar);
     }

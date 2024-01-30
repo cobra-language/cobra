@@ -60,7 +60,7 @@ void TreeIRGen::emitParameters(AbstractFunctionDecl *funcNode) {
           getDefaultBlock);
       
       Builder.setInsertionBlock(getDefaultBlock);
-      auto *defaultValue = genExpression(paramDecl->init, paramName);
+      auto *defaultValue = visitExpr(paramDecl->init);
       auto *defaultResultBlock = Builder.getInsertionBlock();
       Builder.createBranchInst(storeBlock);
 

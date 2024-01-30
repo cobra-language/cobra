@@ -156,27 +156,27 @@ private:
   
   std::optional<ASTNode *> parseReturnStatement();
   
-  std::optional<ASTNode *> parseAssignmentExpression();
+  std::optional<Expr *> parseAssignmentExpression();
   
-  std::optional<ASTNode *> parseConditionalExpression();
+  std::optional<Expr *> parseConditionalExpression();
   
-  std::optional<ASTNode *> parseBinaryExpression();
+  std::optional<Expr *> parseBinaryExpression();
   
-  std::optional<ASTNode *> parseUnaryExpression();
+  std::optional<Expr *> parseUnaryExpression();
   
-  std::optional<ASTNode *> parsePostfixExpression();
+  std::optional<Expr *> parsePostfixExpression();
   
-  std::optional<ASTNode *> parseCallExpression(SMLoc startLoc, NodePtr expr);
+  std::optional<Expr *> parseCallExpression(SMLoc startLoc, Expr *expr);
   
-  std::optional<ASTNode *> parseLeftHandSideExpression();
+  std::optional<Expr *> parseLeftHandSideExpression();
   
-  std::optional<ASTNode *> parseMemberExpression();
+  std::optional<Expr *> parseMemberExpression();
   
-  std::optional<ASTNode *> parseMemberExpressionContinuation(SMLoc startLoc, ASTNode *expr);
+  std::optional<Expr *> parseMemberExpressionContinuation(SMLoc startLoc, Expr *expr);
   
-  std::optional<ASTNode *> parsePrimaryExpression();
+  std::optional<Expr *> parsePrimaryExpression();
   
-  std::optional<ASTNode *> parseExpression();
+  std::optional<Expr *> parseExpression();
   
   bool parseArguments(NodeList &argList, SMLoc &endLoc);
   

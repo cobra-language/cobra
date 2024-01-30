@@ -1,4 +1,5 @@
 function printParity(x: number) : number {
   var y = 100;
-  return x + y;
+  var z = x + y;
+  return z;
 }

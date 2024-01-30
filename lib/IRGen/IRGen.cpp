@@ -27,13 +27,13 @@ void TreeIRGen::visitChildren() {
   }
 }
 
-void TreeIRGen::visitFuncDecl(FuncDecl *fd) { emitFunction(fd); }
+Value *TreeIRGen::visitFuncDecl(FuncDecl *fd) { emitFunction(fd); }
 
-void TreeIRGen::visitParamDecl(ParamDecl *pd) {
+Value *TreeIRGen::visitParamDecl(ParamDecl *pd) {
   
 }
 
-void TreeIRGen::visitVariableDecl(VariableDecl *vd) {
+Value *TreeIRGen::visitVariableDecl(VariableDecl *vd) {
   Identifier name{};
   if (dynamic_cast<IdentifierExpr *>(vd->id))
     name = getNameFieldFromID(vd->id);
@@ -43,7 +43,7 @@ void TreeIRGen::visitVariableDecl(VariableDecl *vd) {
   auto *stackVar = Builder.createAllocStackInst(name);
   currentScope->insert(&name, stackVar);
   if (vd->init) {
-    auto *storedValue = genExpression(vd->init, name);
+    auto *storedValue = visitExpr(vd->init);
     Builder.createStoreStackInst(storedValue, stackVar);
   }
 }

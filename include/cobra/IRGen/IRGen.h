@@ -29,7 +29,7 @@ inline Identifier getNameFieldFromID(ASTNode *ID) {
   return Identifier::getFromPointer(dynamic_cast<IdentifierExpr *>(ID)->name);
 }
 
-class TreeIRGen : public ASTVisitor<TreeIRGen> {
+class TreeIRGen : public ASTVisitor<TreeIRGen, Value *, Value *, Value *> {
   TreeIRGen(const TreeIRGen &) = delete;
   void operator=(const TreeIRGen &) = delete;
   
@@ -51,41 +51,41 @@ public:
   void visitChildren();
   void visitProgram(Program *fd) {};
   
-  void visitFuncDecl(FuncDecl *fd);
+  Value *visitFuncDecl(FuncDecl *fd);
   
-  void visitParamDecl(ParamDecl *pd);
+  Value *visitParamDecl(ParamDecl *pd);
   
-  void visitVariableDecl(VariableDecl *vd);
+  Value *visitVariableDecl(VariableDecl *vd);
   
-  void visitBlockStmt(BlockStmt *bs);
+  Value *visitBlockStmt(BlockStmt *bs);
   
-  void visitReturnStmt(ReturnStmt *rs);
+  Value *visitReturnStmt(ReturnStmt *rs);
   
-  void visitIfStmt(IfStmt *is);
+  Value *visitIfStmt(IfStmt *is);
   
-  void visitVariableStmt(VariableStmt *vs);
+  Value *visitVariableStmt(VariableStmt *vs);
   
-  void visitExpressionStmt(ExpressionStmt *es);
+  Value *visitExpressionStmt(ExpressionStmt *es);
   
-  void visitBooleanLiteralExpr(BooleanLiteralExpr *be);
+  Value *visitBooleanLiteralExpr(BooleanLiteralExpr *be);
   
-  void visitNumericLiteralExpr(NumericLiteralExpr *ne);
+  Value *visitNumericLiteralExpr(NumericLiteralExpr *ne);
   
-  void visitStringLiteralExpr(StringLiteralExpr *se);
+  Value *visitStringLiteralExpr(StringLiteralExpr *se);
   
-  void visitCallExpr(CallExpr *ce);
+  Value *visitCallExpr(CallExpr *ce);
   
-  void visitMemberExpr(MemberExpr *me);
+  Value *visitMemberExpr(MemberExpr *me);
   
-  void visitIdentifierExpr(IdentifierExpr *ie);
+  Value *visitIdentifierExpr(IdentifierExpr *ie);
   
-  void visitUnaryExpr(UnaryExpr *ue);
+  Value *visitUnaryExpr(UnaryExpr *ue);
   
-  void visitPostfixUnaryExpr(PostfixUnaryExpr *pe);
+  Value *visitPostfixUnaryExpr(PostfixUnaryExpr *pe);
   
-  void visitBinaryExpr(BinaryExpr *be);
+  Value *visitBinaryExpr(BinaryExpr *be);
   
-  void visitSpreadElementExpr(SpreadElementExpr *se);
+  Value *visitSpreadElementExpr(SpreadElementExpr *se);
   
   
   void emitFunction(FuncDecl *fd);
@@ -101,8 +101,8 @@ public:
   Instruction *emitLoad(Value *from);
   
   Instruction *emitStore(Value *storedValue, Value *ptr, bool declInit);
-  
-  Value *genExpression(ASTNode *expr, Identifier name = Identifier{});
+    
+  Value *genBinaryExpression(BinaryExpr *bin);
   
   
       

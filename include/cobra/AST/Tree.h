@@ -150,9 +150,9 @@ public:
 
 class VariableDecl : public Decl {
 public:
-  NodePtr init;
+  Expr *init;
   NodePtr id;
-  explicit VariableDecl(NodePtr init, NodePtr id)
+  explicit VariableDecl(Expr *init, NodePtr id)
       : Decl(DeclKind::Variable), init(std::move(init)), id(std::move(id)) {
     
   }
@@ -160,9 +160,9 @@ public:
 
 class ParamDecl : public Decl {
 public:
-  NodePtr init;
+  Expr *init;
   NodePtr id;
-  explicit ParamDecl(NodePtr init, NodePtr id)
+  explicit ParamDecl(Expr *init, NodePtr id)
       : Decl(DeclKind::Param), init(std::move(init)), id(std::move(id)) {
     
   }

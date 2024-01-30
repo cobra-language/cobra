@@ -13,6 +13,9 @@
 namespace cobra {
 
 template<typename ImplClass,
+         typename ExprRetTy = void,
+         typename StmtRetTy = void,
+         typename DeclRetTy = void,
          typename... Args>
 class ASTVisitor {
 public:
@@ -27,7 +30,7 @@ public:
     }
   }
   
-  void visitDecl(Decl *D, Args... AA) {
+  DeclRetTy visitDecl(Decl *D, Args... AA) {
     switch (D->getKind()) {
       
 #define DECL(CLASS, PARENT) \
@@ -40,7 +43,7 @@ public:
     }
   }
   
-  void visitExpr(Expr *E, Args... AA) {
+  ExprRetTy visitExpr(Expr *E, Args... AA) {
     switch (E->getKind()) {
 
 #define EXPR(CLASS, PARENT) \
@@ -53,7 +56,7 @@ public:
     }
   }
   
-  void visitStmt(Stmt *S, Args... AA) {
+  StmtRetTy visitStmt(Stmt *S, Args... AA) {
     switch (S->getKind()) {
 
 #define STMT(CLASS, PARENT) \

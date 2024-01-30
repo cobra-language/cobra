@@ -507,7 +507,7 @@ std::optional<ASTNode *> Parser::parseReturnStatement() {
       new (context_) ReturnStmt(optArg.value()));
 }
 
-std::optional<ASTNode *> Parser::parseAssignmentExpression() {
+std::optional<Expr *> Parser::parseAssignmentExpression() {
   struct State {
     SMLoc leftStartLoc = {};
     std::optional<ASTNode *> optLeftExpr = std::nullopt;
@@ -539,7 +539,7 @@ std::optional<ASTNode *> Parser::parseAssignmentExpression() {
   return optRes;
 }
 
-std::optional<ASTNode *> Parser::parseConditionalExpression() {
+std::optional<Expr *> Parser::parseConditionalExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   auto optExpr = parseBinaryExpression();
   
@@ -575,7 +575,7 @@ inline unsigned getPrecedence(TokenKind kind) {
 
 }
 
-std::optional<ASTNode *> Parser::parseBinaryExpression() {
+std::optional<Expr *> Parser::parseBinaryExpression() {
   struct PrecedenceStackEntry {
     /// Left hand side expression.
     NodePtr expr;
@@ -594,7 +594,7 @@ std::optional<ASTNode *> Parser::parseBinaryExpression() {
   std::vector<PrecedenceStackEntry> stack{};
   
   SMLoc topExprStartLoc = tok_->getStartLoc();
-  ASTNode *topExpr = nullptr;
+  Expr *topExpr = nullptr;
   auto optExpr = parseUnaryExpression();
   if (!optExpr)
     return std::nullopt;
@@ -638,7 +638,7 @@ std::optional<ASTNode *> Parser::parseBinaryExpression() {
   return topExpr;
 }
 
-std::optional<ASTNode *> Parser::parseUnaryExpression() {
+std::optional<Expr *> Parser::parseUnaryExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   
   switch (tok_->getKind()) {
@@ -679,13 +679,13 @@ std::optional<ASTNode *> Parser::parseUnaryExpression() {
   
 }
 
-std::optional<ASTNode *> Parser::parsePostfixExpression() {
+std::optional<Expr *> Parser::parsePostfixExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   auto optLHandExpr = parseLeftHandSideExpression();
   return optLHandExpr;
 }
 
-std::optional<ASTNode *> Parser::parseCallExpression(SMLoc startLoc, NodePtr expr) {
+std::optional<Expr *> Parser::parseCallExpression(SMLoc startLoc, Expr *expr) {
   assert(match(TokenKind::l_paren));
   
   while (match(TokenKind::l_paren)) {
@@ -703,7 +703,7 @@ std::optional<ASTNode *> Parser::parseCallExpression(SMLoc startLoc, NodePtr exp
   return expr;
 }
 
-std::optional<ASTNode *> Parser::parseLeftHandSideExpression() {
+std::optional<Expr *> Parser::parseLeftHandSideExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   
   auto optExpr = parseMemberExpression();
@@ -721,7 +721,7 @@ std::optional<ASTNode *> Parser::parseLeftHandSideExpression() {
   return expr;
 }
 
-std::optional<ASTNode *> Parser::parseMemberExpression() {
+std::optional<Expr *> Parser::parseMemberExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   
   auto primExpr = parsePrimaryExpression();
@@ -732,7 +732,7 @@ std::optional<ASTNode *> Parser::parseMemberExpression() {
   return parseMemberExpressionContinuation(startLoc, primExpr.value());
 }
 
-std::optional<ASTNode *> Parser::parseMemberExpressionContinuation(SMLoc startLoc, ASTNode *expr) {
+std::optional<Expr *> Parser::parseMemberExpressionContinuation(SMLoc startLoc, Expr *expr) {
   while (matchN(TokenKind::l_square, TokenKind::period)) {
     if (matchAndEat(TokenKind::l_square)) {
       
@@ -761,7 +761,7 @@ std::optional<ASTNode *> Parser::parseMemberExpressionContinuation(SMLoc startLo
   return expr;
 }
 
-std::optional<ASTNode *> Parser::parsePrimaryExpression() {
+std::optional<Expr *> Parser::parsePrimaryExpression() {
   switch (tok_->getKind()) {
     case TokenKind::identifier: {
       auto *res = setLocation(
@@ -817,7 +817,7 @@ std::optional<ASTNode *> Parser::parsePrimaryExpression() {
   }
 }
 
-std::optional<ASTNode *> Parser::parseExpression() {
+std::optional<Expr *> Parser::parseExpression() {
   SMLoc startLoc = tok_->getStartLoc();
   auto optExpr = parseAssignmentExpression();
   

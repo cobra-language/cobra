@@ -10,42 +10,48 @@
 using namespace cobra;
 using namespace Lowering;
 
-void TreeIRGen::visitBooleanLiteralExpr(BooleanLiteralExpr *be) {
+Value *TreeIRGen::visitBooleanLiteralExpr(BooleanLiteralExpr *be) {
+  return Builder.getLiteralBool(be->value);
+}
+
+Value *TreeIRGen::visitNumericLiteralExpr(NumericLiteralExpr *ne) {
+  return Builder.getLiteralNumber(ne->value);
+}
+
+Value *TreeIRGen::visitStringLiteralExpr(StringLiteralExpr *se) {
+  return Builder.getLiteralString(*se->value);
+}
+
+Value *TreeIRGen::visitCallExpr(CallExpr *ce) {
   
 }
 
-void TreeIRGen::visitNumericLiteralExpr(NumericLiteralExpr *ne) {
+Value *TreeIRGen::visitMemberExpr(MemberExpr *me) {
   
 }
 
-void TreeIRGen::visitStringLiteralExpr(StringLiteralExpr *se) {
+Value *TreeIRGen::visitIdentifierExpr(IdentifierExpr *ie) {
   
 }
 
-void TreeIRGen::visitCallExpr(CallExpr *ce) {
+Value *TreeIRGen::visitUnaryExpr(UnaryExpr *ue) {
   
 }
 
-void TreeIRGen::visitMemberExpr(MemberExpr *me) {
+Value *TreeIRGen::visitPostfixUnaryExpr(PostfixUnaryExpr *pe) {
   
 }
 
-void TreeIRGen::visitIdentifierExpr(IdentifierExpr *ie) {
+Value *TreeIRGen::visitBinaryExpr(BinaryExpr *be) {
+  printf("visitBinaryExpr");
+}
+
+Value *TreeIRGen::visitSpreadElementExpr(SpreadElementExpr *se) {
   
 }
 
-void TreeIRGen::visitUnaryExpr(UnaryExpr *ue) {
-  
-}
 
-void TreeIRGen::visitPostfixUnaryExpr(PostfixUnaryExpr *pe) {
+Value *TreeIRGen::genBinaryExpression(BinaryExpr *bin) {
   
-}
-
-void TreeIRGen::visitBinaryExpr(BinaryExpr *be) {
-  
-}
-
-void TreeIRGen::visitSpreadElementExpr(SpreadElementExpr *se) {
   
 }

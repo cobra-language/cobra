@@ -24,7 +24,7 @@
 #endif
 
 MARK_FIRST(SingleOperandInst)
-
+DEF_VALUE(SingleOperandInst, Instruction)
 DEF_VALUE(LoadStackInst, SingleOperandInst)
 
 MARK_LAST(SingleOperandInst)

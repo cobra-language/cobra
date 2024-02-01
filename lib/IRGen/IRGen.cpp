@@ -41,9 +41,18 @@ Value *TreeIRGen::visitVariableDecl(VariableDecl *vd) {
 //    Variable *V = Builder.createVariable(Variable::DeclKind::Var, name);
 //    currentScope->insert(&name, V);
   auto *stackVar = Builder.createAllocStackInst(name);
-  currentScope->insert(&name, stackVar);
+  currentScope->insert(name, stackVar);
   if (vd->init) {
     auto *storedValue = visitExpr(vd->init);
     Builder.createStoreStackInst(storedValue, stackVar);
   }
+}
+
+Value *TreeIRGen::ensureVariableExists(IdentifierExpr *id) {
+  Identifier name = getNameFieldFromID(id);
+  
+  if (auto *var = currentScope->lookup(name))
+    return var;
+  
+  return nullptr;
 }

@@ -73,6 +73,8 @@ private:
     return lexer_.getPrevTokenEndLoc();
   }
   
+  void initializeIdentifiers();
+  
   StringRef *tokenIdent_[NUM_JS_TOKENS];
   
   StringRef *getTokenIdent(TokenKind kind) const {

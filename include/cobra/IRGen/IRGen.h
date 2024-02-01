@@ -41,7 +41,7 @@ class TreeIRGen : public ASTVisitor<TreeIRGen, Value *, Value *, Value *> {
   Scope *currentScope{};
   std::vector<Scope *> ScopeStack;
   
-  NameTableTy nameTable_{};
+  NameTableTy nameTable{};
   
 public:
   explicit TreeIRGen(ASTNode *root, Module *M);
@@ -103,6 +103,8 @@ public:
   Instruction *emitStore(Value *storedValue, Value *ptr, bool declInit);
     
   Value *genBinaryExpression(BinaryExpr *bin);
+  
+  Value *ensureVariableExists(IdentifierExpr *id);
   
   
       

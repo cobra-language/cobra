@@ -85,6 +85,8 @@ public:
   
   AllocStackInst *createAllocStackInst(Identifier varName);
   
+  LoadStackInst *createLoadStackInst(AllocStackInst *ptr);
+  
   StoreStackInst *createStoreStackInst(Value *storedValue, AllocStackInst *ptr);
   
   BinaryOperatorInst *createBinaryOperatorInst(

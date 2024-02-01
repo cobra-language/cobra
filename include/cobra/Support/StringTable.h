@@ -79,6 +79,10 @@ class Identifier {
   static Identifier getFromPointer(StringRef *ptr) {
     return Identifier(ptr);
   }
+  
+  bool operator<(Identifier RHS) const {
+    return ptr_ < RHS.ptr_;
+  }
 
   bool operator==(Identifier RHS) const {
     return ptr_ == RHS.ptr_;
@@ -87,8 +91,12 @@ class Identifier {
     return !(*this == RHS);
   }
   
-  std::string str() const {
+  std::string string() const {
     return ptr_->str();
+  }
+  
+  const StringRef *str() const {
+    return ptr_;
   }
 
   const char *c_str() const {

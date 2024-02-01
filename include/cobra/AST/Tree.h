@@ -351,17 +351,15 @@ public:
 
 class BinaryExpr : public Expr {
 public:
-  NodePtr left;
-  NodePtr right;
+  Expr *left;
+  Expr *right;
   NodeLabel Operator;
-  explicit BinaryExpr(NodePtr left, NodePtr right, NodeLabel Operator)
+  explicit BinaryExpr(Expr *left, Expr *right, NodeLabel Operator)
       : Expr(ExprKind::Binary),
       left(std::move(left)) ,
       right(std::move(right)) ,
       Operator(std::move(Operator)) {
-    
   }
-  
 };
 
 class SpreadElementExpr : public Expr {

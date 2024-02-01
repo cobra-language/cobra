@@ -45,3 +45,4 @@ Instruction *TreeIRGen::emitLoad(Value *from) {
 Instruction *TreeIRGen::emitStore(Value *storedValue, Value *ptr, bool declInit) {
   
 }
+

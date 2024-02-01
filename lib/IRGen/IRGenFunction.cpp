@@ -71,6 +71,7 @@ void TreeIRGen::emitParameters(AbstractFunctionDecl *funcNode) {
       
     } else {
       auto *stackVar = Builder.createAllocStackInst(paramName);
+      currentScope->insert(paramName, stackVar);
       Builder.createStoreStackInst(param, stackVar);
     }
   }

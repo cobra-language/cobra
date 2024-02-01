@@ -103,11 +103,16 @@ ReturnInst *IRBuilder::createReturnInst(Value *Val) {
   return RI;
 }
 
-
 AllocStackInst *IRBuilder::createAllocStackInst(Identifier varName) {
   auto *AHI = new AllocStackInst(varName);
   insert(AHI);
   return AHI;
+}
+
+LoadStackInst *IRBuilder::createLoadStackInst(AllocStackInst *ptr) {
+  auto LI = new LoadStackInst(ptr);
+  insert(LI);
+  return LI;
 }
 
 StoreStackInst *IRBuilder::createStoreStackInst(Value *storedValue, AllocStackInst *ptr) {

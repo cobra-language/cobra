@@ -233,23 +233,6 @@ private:
 };
 
 class Lexer {
-public:
-  explicit Lexer(const char* buffer, std::size_t bufferSize, Allocator& allocator);
-  
-  const Token *getCurToken() const {
-    return &token_;
-  }
-  
-  SMLoc getCurLoc() const {
-    return SMLoc::getFromPointer(curCharPtr_);
-  }
-  
-  SMLoc getPrevTokenEndLoc() const {
-    return prevTokenEndLoc_;
-  }
-  
-  const Token *advance();
-  
 private:
   Allocator &allocator_;
   
@@ -268,6 +251,23 @@ private:
   
   StringRef *resWordIdent_
       [ord(TokenKind::_last_resword) - ord(TokenKind::_first_resword) + 1];
+  
+public:
+  explicit Lexer(const char* buffer, std::size_t bufferSize, Allocator& allocator);
+  
+  const Token *getCurToken() const {
+    return &token_;
+  }
+  
+  SMLoc getCurLoc() const {
+    return SMLoc::getFromPointer(curCharPtr_);
+  }
+  
+  SMLoc getPrevTokenEndLoc() const {
+    return prevTokenEndLoc_;
+  }
+  
+  const Token *advance();
 
   StringRef *&resWordIdent(TokenKind kind) {
     assert(

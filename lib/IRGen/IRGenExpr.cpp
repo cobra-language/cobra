@@ -31,7 +31,10 @@ Value *TreeIRGen::visitMemberExpr(MemberExpr *me) {
 }
 
 Value *TreeIRGen::visitIdentifierExpr(IdentifierExpr *ie) {
+  auto StrName = getNameFieldFromID(ie);
+  auto *Var = dynamic_cast<AllocStackInst *>(ensureVariableExists(ie));
   
+  return Builder.createLoadStackInst(Var);
 }
 
 Value *TreeIRGen::visitUnaryExpr(UnaryExpr *ue) {
@@ -43,6 +46,12 @@ Value *TreeIRGen::visitPostfixUnaryExpr(PostfixUnaryExpr *pe) {
 }
 
 Value *TreeIRGen::visitBinaryExpr(BinaryExpr *be) {
+  auto Kind = BinaryOperatorInst::parseOperator(be->Operator->str());
+  auto lhs = visitExpr(be->left);
+  auto rhs = visitExpr(be->right);
+  
+  BinaryOperatorInst *result = Builder.createBinaryOperatorInst(lhs, rhs, Kind);
+  return result;
   printf("visitBinaryExpr");
 }
 

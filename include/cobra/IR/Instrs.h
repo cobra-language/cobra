@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include "cobra/IR/IR.h"
+#include "cobra/Support/Common.h"
 
 namespace cobra {
 
@@ -18,7 +19,36 @@ bool isSideEffectFree(Type T);
 class SingleOperandInst : public Instruction {
   SingleOperandInst(const SingleOperandInst &) = delete;
   void operator=(const SingleOperandInst &) = delete;
-  
+
+  // Make pushOperand private to ensure derived classes don't use it.
+  using Instruction::pushOperand;
+
+ protected:
+  explicit SingleOperandInst(ValueKind K, Value *Op) : Instruction(K) {
+    pushOperand(Op);
+  }
+
+ public:
+  enum { SingleOperandIdx };
+
+  explicit SingleOperandInst(
+      const SingleOperandInst *src,
+      std::vector<Value *> operands)
+      : Instruction(src, operands) {
+    assert(operands.size() == 1 && "SingleOperandInst must have 1 operand!");
+  }
+
+  Value *getSingleOperand() const {
+    return getOperand(0);
+  }
+
+  SideEffectKind getSideEffect() {
+    
+  }
+
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::SingleOperandInstKind);
+  }
 };
 
 class TerminatorInst : public Instruction {
@@ -196,6 +226,31 @@ class AllocStackInst : public Instruction {
 
   static bool classof(const Value *V) {
     return kindIsA(V->getKind(), ValueKind::AllocStackInstKind);
+  }
+};
+
+class LoadStackInst : public SingleOperandInst {
+  LoadStackInst(const LoadStackInst &) = delete;
+  void operator=(const LoadStackInst &) = delete;
+
+ public:
+  explicit LoadStackInst(AllocStackInst *alloc)
+      : SingleOperandInst(ValueKind::LoadStackInstKind, alloc) {}
+  explicit LoadStackInst(
+      const LoadStackInst *src,
+      std::vector<Value *> operands)
+      : SingleOperandInst(src, operands) {}
+
+  AllocStackInst *getPtr() const {
+    return dynamic_cast<AllocStackInst *>(getSingleOperand());
+  }
+
+  SideEffectKind getSideEffect() {
+    return SideEffectKind::MayRead;
+  }
+
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::LoadStackInstKind);
   }
 };
 

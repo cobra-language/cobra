@@ -13,7 +13,7 @@ namespace parser {
 
 Parser::Parser(Context &context, const char* buffer, std::size_t bufferSize)
     : context_(context), lexer_(buffer, bufferSize, context.getAllocator()) {
-  
+  initializeIdentifiers();
 }
 
 std::optional<ASTNode *> Parser::parse() {
@@ -21,6 +21,11 @@ std::optional<ASTNode *> Parser::parse() {
   auto res = parseProgram();
   
   return res;
+}
+
+void Parser::initializeIdentifiers() {
+  for (unsigned i = 0; i != NUM_JS_TOKENS; ++i)
+    tokenIdent_[i] = lexer_.getIdentifier(tokenKindStr((TokenKind)i));
 }
 
 bool Parser::eat(TokenKind kind) {
@@ -578,14 +583,14 @@ inline unsigned getPrecedence(TokenKind kind) {
 std::optional<Expr *> Parser::parseBinaryExpression() {
   struct PrecedenceStackEntry {
     /// Left hand side expression.
-    NodePtr expr;
+    Expr *expr;
     // Operator for this expression.
     TokenKind opKind;
     // Start location for the left hand side expression.
     SMLoc exprStartLoc;
 
     PrecedenceStackEntry(
-        NodePtr expr,
+        Expr *expr,
         TokenKind opKind,
         SMLoc exprStartLoc)
         : expr(expr), opKind(opKind), exprStartLoc(exprStartLoc) {}

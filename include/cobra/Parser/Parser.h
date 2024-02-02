@@ -75,9 +75,9 @@ private:
   
   void initializeIdentifiers();
   
-  StringRef *tokenIdent_[NUM_JS_TOKENS];
+  UniqueString *tokenIdent_[NUM_JS_TOKENS];
   
-  StringRef *getTokenIdent(TokenKind kind) const {
+  UniqueString *getTokenIdent(TokenKind kind) const {
     return tokenIdent_[(unsigned)kind];
   }
   
@@ -150,7 +150,7 @@ private:
   
   std::optional<IdentifierExpr *> parseBindingIdentifier();
     
-  bool validateBindingIdentifier(SMRange range, StringRef *id, TokenKind kind);
+  bool validateBindingIdentifier(SMRange range, UniqueString *id, TokenKind kind);
   
   std::optional<ASTNode *> parseExpressionOrLabelledStatement();
   

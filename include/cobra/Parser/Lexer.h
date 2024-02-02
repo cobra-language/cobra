@@ -146,9 +146,9 @@ class Token {
   TokenKind kind_{TokenKind::none};
   SMRange range_{};
   double numeric_{};
-  StringRef *ident_{nullptr};
-  StringRef *stringLiteral_{nullptr};
-  StringRef *rawString_{nullptr};
+  UniqueString *ident_{nullptr};
+  UniqueString *stringLiteral_{nullptr};
+  UniqueString *rawString_{nullptr};
   
 public:
   Token() = default;
@@ -173,16 +173,16 @@ public:
     return numeric_;
   }
   
-  StringRef *getIdentifier() const {
+  UniqueString *getIdentifier() const {
     assert(getKind() == TokenKind::identifier);
     return ident_;
   }
   
-  StringRef *getResWordOrIdentifier() const {
+  UniqueString *getResWordOrIdentifier() const {
     return ident_;
   }
   
-  StringRef *getStringLiteral() const {
+  UniqueString *getStringLiteral() const {
     assert(getKind() == TokenKind::string_literal);
     return stringLiteral_;
   }
@@ -218,12 +218,12 @@ private:
     numeric_ = literal;
   }
   
-  void setIdentifier(StringRef *ident) {
+  void setIdentifier(UniqueString *ident) {
     kind_ = TokenKind::identifier;
     ident_ = ident;
   }
   
-  void setResWord(TokenKind kind, StringRef *ident) {
+  void setResWord(TokenKind kind, UniqueString *ident) {
     assert(kind > TokenKind::_first_resword && kind < TokenKind::_last_resword);
     kind_ = kind;
     ident_ = ident;
@@ -249,7 +249,7 @@ private:
   std::unique_ptr<StringTable> ownStrTab_;
   StringTable &strTab_;
   
-  StringRef *resWordIdent_
+  UniqueString *resWordIdent_
       [ord(TokenKind::_last_resword) - ord(TokenKind::_first_resword) + 1];
   
 public:
@@ -269,7 +269,7 @@ public:
   
   const Token *advance();
 
-  StringRef *&resWordIdent(TokenKind kind) {
+  UniqueString *&resWordIdent(TokenKind kind) {
     assert(
         kind >= TokenKind::_first_resword && kind <= TokenKind::_last_resword);
     return resWordIdent_[ord(kind) - ord(TokenKind::_first_resword)];
@@ -280,7 +280,7 @@ public:
   
   char peakChar();
   
-  StringRef *getIdentifier(StringRef name) {
+  UniqueString *getIdentifier(StringRef name) {
     return strTab_.getString(name);
   }
   

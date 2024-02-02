@@ -56,7 +56,7 @@ class UniqueString {
 /// and must be kept small.
 class Identifier {
  public:
-  using PtrType = StringRef *;
+  using PtrType = UniqueString *;
 
   explicit Identifier() = default;
 
@@ -76,7 +76,7 @@ class Identifier {
     return ptr_;
   }
 
-  static Identifier getFromPointer(StringRef *ptr) {
+  static Identifier getFromPointer(UniqueString *ptr) {
     return Identifier(ptr);
   }
   
@@ -91,23 +91,18 @@ class Identifier {
     return !(*this == RHS);
   }
   
-  std::string string() const {
+  const StringRef &str() const {
     return ptr_->str();
   }
-  
-  const StringRef *str() const {
-    return ptr_;
-  }
-
   const char *c_str() const {
-    return ptr_->data();
+    return ptr_->c_str();
   }
 };
 
 class StringTable {
   Allocator &allocator_;
   
-  std::map<StringRef, StringRef *> strMap_{};
+  std::map<StringRef, UniqueString *> strMap_{};
 
   StringTable(const StringTable &) = delete;
   StringTable &operator=(const StringTable &_) = delete;
@@ -116,15 +111,15 @@ class StringTable {
   explicit StringTable(Allocator &allocator) : allocator_(allocator){};
 
   /// Return a unique zero-terminated copy of the supplied string \p name.
-  StringRef *getString(StringRef name) {
+  UniqueString *getString(StringRef name) {
     // Already in the map?
     auto it = strMap_.find(name);
     if (it != strMap_.end())
       return it->second;
 
     // Allocate a zero-terminated copy of the string
-    auto *str = new (allocator_.Allocate<StringRef>())
-        StringRef(zeroTerminate(allocator_, name));
+    auto *str = new (allocator_.Allocate<UniqueString>())
+        UniqueString(zeroTerminate(allocator_, name));
     strMap_.insert({str->str(), str});
     return str;
   }

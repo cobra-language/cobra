@@ -397,7 +397,7 @@ std::optional<ASTNode *> Parser::parseIdentifierOrPattern() {
 std::optional<IdentifierExpr *> Parser::parseBindingIdentifier() {
   SMRange identRng = tok_->getSourceRange();
   
-  StringRef *id = tok_->getResWordOrIdentifier();
+  UniqueString *id = tok_->getResWordOrIdentifier();
   TokenKind kind = tok_->getKind();
   
   if (!validateBindingIdentifier(tok_->getSourceRange(), id, kind)) {
@@ -428,7 +428,7 @@ std::optional<IdentifierExpr *> Parser::parseBindingIdentifier() {
       new (context_) IdentifierExpr(id, type, optional));
 }
 
-bool Parser::validateBindingIdentifier(SMRange range, StringRef *id, TokenKind kind) {
+bool Parser::validateBindingIdentifier(SMRange range, UniqueString *id, TokenKind kind) {
   return kind == TokenKind::identifier;
 }
 
@@ -609,7 +609,7 @@ std::optional<Expr *> Parser::parseBinaryExpression() {
   
   while (unsigned precedence = getPrecedence(tok_->getKind())) {
     while (!stack.empty() && precedence <= getPrecedence(stack.back().opKind)) {
-      StringRef *opIdent = getTokenIdent(stack.back().opKind);
+      UniqueString *opIdent = getTokenIdent(stack.back().opKind);
       topExpr = setLocation(
             stack.back().exprStartLoc,
             topExprEndLoc,
@@ -632,7 +632,7 @@ std::optional<Expr *> Parser::parseBinaryExpression() {
   }
   
   while (!stack.empty()) {
-    StringRef *opIdent = getTokenIdent(stack.back().opKind);
+    UniqueString *opIdent = getTokenIdent(stack.back().opKind);
     topExpr = setLocation(
           stack.back().exprStartLoc,
           topExprEndLoc,
@@ -659,7 +659,7 @@ std::optional<Expr *> Parser::parseUnaryExpression() {
       
     case TokenKind::plusplus:
     case TokenKind::minusminus: {
-      StringRef *op = getTokenIdent(tok_->getKind());
+      UniqueString *op = getTokenIdent(tok_->getKind());
       advance();
       auto expr = parseUnaryExpression();
       if (!expr)

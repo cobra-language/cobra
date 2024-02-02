@@ -15,7 +15,7 @@
 namespace cobra {
 
 class Scope {
-  using ValueListType = std::map<std::string, Value *>;
+  using ValueListType = std::map<Identifier, Value *>;
   
   Scope(const Scope &) = delete;
   Scope &operator=(const Scope &) = delete;
@@ -54,11 +54,11 @@ public:
   }
   
   void insert(Identifier K, Value *V) {
-    values.insert({K.string(), V});
+    values.insert({K, V});
   }
   
   Value *lookup(Identifier K) {
-    auto it = values.find(K.string());
+    auto it = values.find(K);
     return it == values.end() ? nullptr : it->second;
   }
   

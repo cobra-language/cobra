@@ -19,7 +19,7 @@ Value *TreeIRGen::visitNumericLiteralExpr(NumericLiteralExpr *ne) {
 }
 
 Value *TreeIRGen::visitStringLiteralExpr(StringLiteralExpr *se) {
-  return Builder.getLiteralString(*se->value);
+  return Builder.getLiteralString(se->value->str());
 }
 
 Value *TreeIRGen::visitCallExpr(CallExpr *ce) {

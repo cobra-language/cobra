@@ -26,8 +26,8 @@ class ParamDecl;
 class VariableDecl;
 class BlockStmt;
 
-using NodeLabel = StringRef *;
-using NodeString = StringRef *;
+using NodeLabel = UniqueString *;
+using NodeString = UniqueString *;
 using NodePtr = ASTNode *;
 using NodeBoolean = bool;
 using NodeNumber = double;

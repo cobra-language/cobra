@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include <cctype>
 #include <string>
+#include <sstream>
 
 #include "cobra/AST/Context.h"
 #include "cobra/IR/IR.h"
@@ -81,6 +81,13 @@ void IRPrinter::printTypeLabel(Type T) {
   os << " : " << &T;
 }
 
+
+static std::string NumberToString(const double value){
+  std::ostringstream os;
+  os << value;
+  return os.str();
+}
+
 void IRPrinter::printValueLabel(Instruction *I, Value *V, unsigned opIndex) {
   auto &ctx = I->getContext();
   
@@ -94,7 +101,7 @@ void IRPrinter::printValueLabel(Instruction *I, Value *V, unsigned opIndex) {
       // Ensure we output -0 correctly
       os << "-0";
     } else {
-      auto str = std::to_string(LN->getValue());
+      auto str = NumberToString(LN->getValue());
       os << str;
     }
   } else if (auto LE = dynamic_cast<LiteralEmpty *>(V)) {

@@ -299,6 +299,8 @@ class Type {
   }
   
   void print(std::ostream &OS) const;
+    
+  friend std::ostream& operator<<(std::ostream &OS, const Type &T);
 
   constexpr bool operator==(Type RHS) const {
     return bitmask_ == RHS.bitmask_;

@@ -21,7 +21,17 @@ Value *TreeIRGen::visitBlockStmt(BlockStmt *bs) {
 }
 
 Value *TreeIRGen::visitReturnStmt(ReturnStmt *rs) {
-  
+  Value *Value;
+  // Generate IR for the return value, or undefined if this is an empty return
+  // statement.
+  if (auto *A = rs->argument) {
+    Value = visitExpr(A);
+  } else {
+    Value = Builder.getLiteralUndefined();
+  }
+  Builder.createReturnInst(Value);
+  auto Parent = Builder.getInsertionBlock()->getParent();
+  Builder.setInsertionBlock(Builder.createBasicBlock(Parent));
 }
 
 Value *TreeIRGen::visitIfStmt(IfStmt *is) {

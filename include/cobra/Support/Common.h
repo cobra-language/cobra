@@ -25,6 +25,26 @@
 #define COBRA_DEBUGBREAK() __builtin_trap()
 #endif
 
+#if __cplusplus > 201402L && __has_cpp_attribute(nodiscard)
+#define COBRA_NODISCARD [[nodiscard]]
+#elif !__cplusplus
+// Workaround for llvm.org/PR23435, since clang 3.6 and below emit a spurious
+// error when __has_cpp_attribute is given a scoped attribute in C mode.
+#define COBRA_NODISCARD
+#elif __has_cpp_attribute(clang::warn_unused_result)
+#define COBRA_NODISCARD [[clang::warn_unused_result]]
+#else
+#define COBRA_NODISCARD
+#endif
+
+#ifdef __GNUC__
+#define LLVM_ATTRIBUTE_NORETURN __attribute__((noreturn))
+#elif defined(_MSC_VER)
+#define LLVM_ATTRIBUTE_NORETURN __declspec(noreturn)
+#else
+#define LLVM_ATTRIBUTE_NORETURN
+#endif
+
 #define FATAL_ERROR(fmt) \
   do { fprintf(stderr, "FATAL ERROR in %s:%d:%s(): " fmt "\n", __FILE__, \
       __LINE__, __func__); exit(-2); } while (0)

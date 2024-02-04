@@ -295,7 +295,7 @@ void Type::print(std::ostream &OS) const {
   }
 }
 
-std::ostream &operator<<(std::ostream &OS, const Type &T) {
+std::ostream& cobra::operator<<(std::ostream &OS, const Type &T) {
   T.print(OS);
   return OS;
 }

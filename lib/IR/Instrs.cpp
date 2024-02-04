@@ -9,9 +9,28 @@
 
 using namespace cobra;
 
+//BasicBlock *TerminatorInst::getSuccessor(unsigned idx) const {
+//#undef TERMINATOR
+//#define TERMINATOR(CLASS, PARENT)           \
+//  if (auto I = const_cast<CLASS *>(this)) \
+//    return I->getSuccessor(idx);
+//#include "cobra/IR/Instrs.def"
+//}
+//
+//void TerminatorInst::setSuccessor(unsigned idx, BasicBlock *B) {
+//#undef TERMINATOR
+//#define TERMINATOR(CLASS, PARENT)           \
+//  if (auto I = const_cast<CLASS *>(this)) \
+//    return I->setSuccessor(idx, B);
+//#include "cobra/IR/Instrs.def"
+//}
+
 bool cobra::isSideEffectFree(Type T) {
   return T.isPrimitive();
 }
+
+const char *UnaryOperatorInst::opStringRepr[] =
+    {"delete", "void", "typeof", "+", "-", "~", "!", "++", "--"};
 
 const char *BinaryOperatorInst::opStringRepr[] = {
     "",   "==", "!=",  "===", "!==", "<", "<=", ">",         ">=",
@@ -29,24 +48,40 @@ unsigned TerminatorInst::getNumSuccessors() {
   if (auto I = dynamic_cast<CLASS *>(this)) \
     return I->getNumSuccessors();
 #include "cobra/IR/Instrs.def"
+  COBRA_UNREACHABLE();
 }
 
-//BasicBlock *TerminatorInst::getSuccessor(unsigned idx) const {
-//#undef TERMINATOR
-//#define TERMINATOR(CLASS, PARENT)           \
-//  if (auto I = const_cast<CLASS *>(this)) \
-//    return I->getSuccessor(idx);
-//#include "cobra/IR/Instrs.def"
-//}
-//
-//void TerminatorInst::setSuccessor(unsigned idx, BasicBlock *B) {
-//#undef TERMINATOR
-//#define TERMINATOR(CLASS, PARENT)           \
-//  if (auto I = const_cast<CLASS *>(this)) \
-//    return I->setSuccessor(idx, B);
-//#include "cobra/IR/Instrs.def"
-//}
+UnaryOperatorInst::OpKind UnaryOperatorInst::parseOperator(StringRef op) {
+  for (int i = 0; i < static_cast<int>(BinaryOperatorInst::OpKind::LAST_OPCODE);
+       i++) {
+    if (op == UnaryOperatorInst::opStringRepr[i]) {
+      return static_cast<UnaryOperatorInst::OpKind>(i);
+    }
+  }
+  
+  COBRA_UNREACHABLE();
+}
 
+SideEffectKind UnaryOperatorInst::getSideEffect() {
+  if (getOperatorKind() == OpKind::DeleteKind) {
+    return SideEffectKind::Unknown;
+  }
+
+  if (isSideEffectFree(getSingleOperand()->getType())) {
+    return SideEffectKind::None;
+  }
+
+  switch (getOperatorKind()) {
+    case OpKind::VoidKind: // void
+    case OpKind::TypeofKind: // typeof
+      return SideEffectKind::None;
+
+    default:
+      break;
+  }
+
+  return SideEffectKind::Unknown;
+}
 
 static BinaryOperatorInst::OpKind parseOperator_impl(
     StringRef op,
@@ -57,6 +92,8 @@ static BinaryOperatorInst::OpKind parseOperator_impl(
       return static_cast<BinaryOperatorInst::OpKind>(i);
     }
   }
+  
+  COBRA_UNREACHABLE();
 }
 
 PhiInst::PhiInst(const ValueListType &values, const BasicBlockListType &blocks)

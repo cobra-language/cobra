@@ -26,6 +26,8 @@ void TreeIRGen::emitFunction(FuncDecl *fd) {
   emitStatement(fd->body);
   
   emitFunctionEpilogue(Builder.getLiteralUndefined());
+  
+  newFunction->dump();
 }
 
 void TreeIRGen::emitFunctionPreamble(BasicBlock *entry) {

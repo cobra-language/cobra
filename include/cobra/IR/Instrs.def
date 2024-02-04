@@ -26,7 +26,7 @@
 MARK_FIRST(SingleOperandInst)
 DEF_VALUE(SingleOperandInst, Instruction)
 DEF_VALUE(LoadStackInst, SingleOperandInst)
-
+DEF_VALUE(UnaryOperatorInst, SingleOperandInst)
 MARK_LAST(SingleOperandInst)
 
 DEF_VALUE(PhiInst, Instruction)

@@ -6,6 +6,7 @@
  */
 
 #include "cobra/IR/IR.h"
+#include "cobra/Utils/IRPrinter.h"
 
 using namespace cobra;
 
@@ -93,6 +94,10 @@ Parameter::Parameter(Function *parent, Identifier name)
   Parent->addParameter(this);
 }
 
+Identifier Parameter::getName() const {
+  return Name;
+}
+
 Instruction::Instruction(const Instruction *src, std::vector<Value *> operands)
     : Instruction(src->getKind()) {
   assert(src->getNumOperands() == operands.size() && "invalid number of operands");
@@ -157,6 +162,11 @@ void Instruction::eraseFromParent() {
   getParent()->erase(this);
 }
 
+void Instruction::dump(std::ostream &os) {
+  IRPrinter D(getParent()->getContext(), os);
+  D.visitInstruction(*this);
+}
+
 void Instruction::replaceFirstOperandWith(Value *OldValue, Value *NewValue) {
   for (int i = 0, e = getNumOperands(); i < e; i++) {
     if (OldValue == getOperand(i)) {
@@ -177,9 +187,18 @@ std::string Instruction::getName() {
   }
 }
 
+Context &Instruction::getContext() const {
+  return Parent->getContext();
+}
+
 BasicBlock::BasicBlock(Function *parent) : Value(ValueKind::BasicBlockKind), Parent(parent) {
   assert(Parent && "Invalid parent function");
   Parent->addBlock(this);
+}
+
+void BasicBlock::dump(std::ostream &os) {
+  IRPrinter D(getParent()->getContext(), os);
+  D.visitBasicBlock(*this);
 }
 
 void BasicBlock::insert(iterator InsertPt, Instruction *I) {
@@ -216,10 +235,23 @@ void BasicBlock::eraseFromParent() {
   }
 }
 
+Context &BasicBlock::getContext() const {
+  return Parent->getContext();
+}
+
 Function::~Function() {
   for (auto *p : Parameters) {
     Value::destroy(p);
   }
+}
+
+void Function::dump(std::ostream &os) {
+  IRPrinter D(getParent()->getContext(), os);
+  D.visitFunction(*this);
+}
+
+Context &Function::getContext() const {
+  return Parent->getContext();
 }
 
 void Function::addBlock(BasicBlock *BB) {
@@ -234,7 +266,36 @@ Module::~Module() {
   
 }
 
-
 void Module::push_back(Function *F) {
     FunctionList.push_back(F);
+}
+
+void Module::dump(std::ostream &os) {
+  IRPrinter D(getContext(), os);
+  D.visitModule(*this);
+}
+
+void Type::print(std::ostream &OS) const {
+  bool first = true;
+  for (unsigned i = 0; i < (unsigned)Type::TypeKind::LAST_TYPE; i++) {
+    // Don't print the object type annotations if the type is closure or regex.
+    if (i == (unsigned)Type::TypeKind::Object &&
+        (isClosureType() || isRegExpType())) {
+      continue;
+    }
+
+    if (bitmask_ & (1 << i)) {
+      if (!first) {
+        OS << "|";
+      }
+
+      OS << getKindStr((Type::TypeKind)i).str();
+      first = false;
+    }
+  }
+}
+
+std::ostream &operator<<(std::ostream &OS, const Type &T) {
+  T.print(OS);
+  return OS;
 }

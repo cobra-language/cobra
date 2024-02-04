@@ -9,6 +9,7 @@
 #define HERMES_UTILS_DUMPER_H
 
 #include <map>
+#include <ostream>
 
 #include "cobra/Support/StringRef.h"
 
@@ -42,6 +43,8 @@ struct InstructionNamer {
 struct IRPrinter {
   /// Indentation level.
   unsigned Indent;
+  
+  std::ostream &os;
 
   bool needEscape;
 
@@ -49,8 +52,9 @@ struct IRPrinter {
   InstructionNamer BBNamer;
   InstructionNamer ScopeNamer;
 
-  explicit IRPrinter(Context &ctx, bool escape = false)
+  explicit IRPrinter(Context &ctx, std::ostream &ost, bool escape = false)
       : Indent(0),
+        os(ost),
         needEscape(escape) {}
 
   virtual ~IRPrinter() = default;
@@ -60,9 +64,6 @@ struct IRPrinter {
   virtual void printValueLabel(Instruction *I, Value *V, unsigned opIndex);
   virtual void printTypeLabel(Type T);
   virtual void printInstruction(Instruction *I);
-  virtual void printInstructionDestination(Instruction *I);
-  virtual void printSourceLocation(SMLoc loc);
-  virtual void printSourceLocation(SMRange rng);
 
   /// Prints \p F's name in the following format:
   ///
@@ -86,10 +87,10 @@ struct IRPrinter {
   std::string escapeStr(StringRef name);
 
   /// Declare the functions we are going to reimplement.
-  void visitInstruction(const Instruction &I);
-  void visitBasicBlock(const BasicBlock &BB);
-  void visitFunction(const Function &F);
-  void visitModule(const Module &M);
+  void visitInstruction(Instruction &I);
+  void visitBasicBlock(BasicBlock &BB);
+  void visitFunction(Function &F);
+  void visitModule(Module &M);
 };
 
 } // namespace hermes

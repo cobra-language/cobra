@@ -297,6 +297,8 @@ class Type {
   constexpr bool isProperSubsetOf(Type t) const {
     return bitmask_ != t.bitmask_ && !(bitmask_ & ~t.bitmask_);
   }
+  
+  void print(std::ostream &OS) const;
 
   constexpr bool operator==(Type RHS) const {
     return bitmask_ == RHS.bitmask_;
@@ -453,6 +455,8 @@ class Parameter : public Value {
   void setParent(Function *parent) {
     Parent = parent;
   }
+  
+  Identifier getName() const;
 
   static bool classof(const Value *V) {
     return V->getKind() == ValueKind::ParameterKind;
@@ -704,10 +708,13 @@ public:
   
   void eraseFromParent();
   
+  void dump(std::ostream &os = std::cout);
+  
   void replaceFirstOperandWith(Value *OldValue, Value *NewValue);
   
   std::string getName();
   
+  Context &getContext() const;
   BasicBlock *getParent() const {
     return Parent;
   }
@@ -733,6 +740,8 @@ private:
 public:
   explicit BasicBlock(Function *parent);
   
+  void dump(std::ostream &os = std::cout);
+  
   void insert(iterator InsertPt, Instruction *I);
   
   void push_back(Instruction *I);
@@ -740,6 +749,11 @@ public:
   void remove(Instruction *I);
   void erase(Instruction *I);
   
+  InstListType &getInstList() {
+    return InstList;
+  }
+  
+  Context &getContext() const;
   Function *getParent() const {
     return Parent;
   }
@@ -800,9 +814,20 @@ private:
   ParameterListType Parameters;
   
 public:
-  explicit Function(Module *parent, Identifier name) : Value(ValueKind::FunctionKind), Parent(parent), Name(name) {};
+  explicit Function(Module *parent, Identifier name)
+      : Value(ValueKind::FunctionKind), Parent(parent), Name(name) {};
   
   ~Function();
+  
+  Module *getParent() const {
+    return Parent;
+  }
+  
+  const Identifier getName() const {
+    return Name;
+  }
+  
+  Context &getContext() const;
   
   void addBlock(BasicBlock *BB);
   void addParameter(Parameter *A);
@@ -810,6 +835,12 @@ public:
   BasicBlockListType &getBasicBlockList() {
     return BasicBlockList;
   }
+  
+  ParameterListType &getParameters() {
+    return Parameters;
+  }
+  
+  void dump(std::ostream &os = std::cout);
   
   using iterator = BasicBlockListType::iterator;
   
@@ -857,7 +888,17 @@ public:
     return *Ctx;
   }
   
+  FunctionListType &getFunctionList() {
+    return FunctionList;
+  }
+  
   void push_back(Function *F);
+  
+  void dump(std::ostream &os = std::cout);
+  
+  static bool classof(const Value *V) {
+    return V->getKind() == ValueKind::ModuleKind;
+  }
 };
 
 }

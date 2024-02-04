@@ -15,7 +15,6 @@ using namespace Lowering;
 
 void TreeIRGen::emitFunction(FuncDecl *fd) {
   Identifier functionName = getNameFieldFromID(fd->id);
-  std::cout << functionName.c_str() << std::endl;
   Function *newFunction = Builder.createFunction(functionName);
   this->curFunction = newFunction;
   
@@ -24,9 +23,7 @@ void TreeIRGen::emitFunction(FuncDecl *fd) {
   emitParameters(fd);
     
   emitStatement(fd->body);
-  
-  emitFunctionEpilogue(Builder.getLiteralUndefined());
-  
+    
   newFunction->dump();
 }
 
@@ -43,9 +40,7 @@ void TreeIRGen::emitFunctionPreamble(BasicBlock *entry) {
 
 void TreeIRGen::emitParameters(AbstractFunctionDecl *funcNode) {
   for (auto paramDecl : funcNode->params) {
-    auto paramName = getNameFieldFromID(paramDecl->id);
-    std::cout << paramName.c_str() << std::endl;
-    
+    auto paramName = getNameFieldFromID(paramDecl->id);    
     auto *param = Builder.createParameter(this->curFunction, paramName);
     
     if (paramDecl->init) {

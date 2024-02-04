@@ -205,8 +205,8 @@ public:
 
 class ReturnStmt : public Stmt {
 public:
-  NodePtr argument;
-  explicit ReturnStmt(NodePtr argument)
+  Expr *argument;
+  explicit ReturnStmt(Expr *argument)
       : Stmt(StmtKind::Return),
       argument(std::move(argument)) {
     

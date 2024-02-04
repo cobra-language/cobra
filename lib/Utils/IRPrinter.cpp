@@ -78,9 +78,8 @@ void IRPrinter::printTypeLabel(Type T) {
   if (T.isAnyType())
     return;
   
-  os << " : " << &T;
+  os << " : " << T;
 }
-
 
 static std::string NumberToString(const double value){
   std::ostringstream os;

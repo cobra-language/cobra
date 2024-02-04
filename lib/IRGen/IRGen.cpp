@@ -37,7 +37,6 @@ Value *TreeIRGen::visitVariableDecl(VariableDecl *vd) {
   Identifier name{};
   if (dynamic_cast<IdentifierExpr *>(vd->id))
     name = getNameFieldFromID(vd->id);
-  std::cout << "VariableDecl: " << name.c_str() << std::endl;
 //    Variable *V = Builder.createVariable(Variable::DeclKind::Var, name);
 //    currentScope->insert(&name, V);
   auto *stackVar = Builder.createAllocStackInst(name);

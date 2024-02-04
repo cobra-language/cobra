@@ -31,6 +31,10 @@ public:
     return stringTable_.getIdentifier(str);
   }
   
+  StringRef toString(Identifier iden) {
+    return iden.str();
+  }
+  
   template <typename T>
   T *allocateNode(size_t num = 1) {
     return allocator_.template Allocate<T>(num);

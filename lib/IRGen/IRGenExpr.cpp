@@ -52,7 +52,6 @@ Value *TreeIRGen::visitBinaryExpr(BinaryExpr *be) {
   
   BinaryOperatorInst *result = Builder.createBinaryOperatorInst(lhs, rhs, Kind);
   return result;
-  printf("visitBinaryExpr");
 }
 
 Value *TreeIRGen::visitSpreadElementExpr(SpreadElementExpr *se) {

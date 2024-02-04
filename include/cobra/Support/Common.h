@@ -24,3 +24,16 @@
 #define COBRA_UNREACHABLE() __builtin_unreachable()
 #define COBRA_DEBUGBREAK() __builtin_trap()
 #endif
+
+#define FATAL_ERROR(fmt) \
+  do { fprintf(stderr, "FATAL ERROR in %s:%d:%s(): " fmt "\n", __FILE__, \
+      __LINE__, __func__); exit(-2); } while (0)
+
+#define FATAL_ERRORF(fmt, ...) \
+  do { fprintf(stderr, "FATAL ERROR in %s:%d:%s(): " fmt "\n", __FILE__, \
+      __LINE__, __func__, __VA_ARGS__); exit(-2); } while (0)
+
+#define TODO do { \
+    fprintf(stderr, "Exit due to TODO in %s:%d:%s()\n", __FILE__, __LINE__, __func__); \
+    abort(); \
+    } while (0)

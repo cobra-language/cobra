@@ -1,18 +1,9 @@
-//===--- PatternNodes.def - Swift Pattern AST Metaprogramming ---*- C++ -*-===//
-//
-// This source file is part of the Swift.org open source project
-//
-// Copyright (c) 2014 - 2017 Apple Inc. and the Swift project authors
-// Licensed under Apache License v2.0 with Runtime Library Exception
-//
-// See https://swift.org/LICENSE.txt for license information
-// See https://swift.org/CONTRIBUTORS.txt for the list of Swift project authors
-//
-//===----------------------------------------------------------------------===//
-//
-// This file defines macros used for macro-metaprogramming with patterns.
-//
-//===----------------------------------------------------------------------===//
+/*
+ * Copyright (c) the Cobra project authors.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
 /// PATTERN(Id, Parent)
 ///   The pattern's enumerator value is PatternKind::Id.  The pattern's

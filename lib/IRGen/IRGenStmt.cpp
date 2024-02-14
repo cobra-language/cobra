@@ -63,7 +63,7 @@ Value *TreeIRGen::visitVariableStmt(VariableStmt *vs) {
 }
 
 Value *TreeIRGen::visitExpressionStmt(ExpressionStmt *es) {
-  
+  Value *value = visitExpr(es->expression);
 }
 
 Instruction *TreeIRGen::emitLoad(Value *from) {

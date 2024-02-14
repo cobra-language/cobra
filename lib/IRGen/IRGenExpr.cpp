@@ -32,9 +32,12 @@ Value *TreeIRGen::visitMemberExpr(MemberExpr *me) {
 
 Value *TreeIRGen::visitIdentifierExpr(IdentifierExpr *ie) {
   auto StrName = getNameFieldFromID(ie);
-  auto *Var = dynamic_cast<AllocStackInst *>(ensureVariableExists(ie));
-  
-  return Builder.createLoadStackInst(Var);
+  auto *Var = ensureVariableExists(ie);
+  if (returnAdd) {
+    returnAdd = false;
+    return Var;
+  }
+  return Builder.createLoadStackInst(dynamic_cast<AllocStackInst *>(Var));
 }
 
 Value *TreeIRGen::visitUnaryExpr(UnaryExpr *ue) {
@@ -64,7 +67,11 @@ Value *TreeIRGen::visitConditionalExpr(ConditionalExpr *ce) {
 }
 
 Value *TreeIRGen::visitAssignmentExpr(AssignmentExpr *ae) {
+  returnAdd = true;
+  auto left = visitExpr(ae->left);
+  auto right = visitExpr(ae->right);
   
+  Builder.createStoreStackInst(right, dynamic_cast<AllocStackInst *>(left));
 }
 
 void TreeIRGen::emitExpressionBranch(

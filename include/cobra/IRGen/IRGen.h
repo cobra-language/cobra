@@ -41,6 +41,8 @@ class TreeIRGen : public ASTVisitor<TreeIRGen, Value *, Value *, Value *> {
   Scope *currentScope{};
   std::vector<Scope *> ScopeStack;
   
+  bool returnAdd;
+  
   NameTableTy nameTable{};
   
 public:

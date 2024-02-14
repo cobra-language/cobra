@@ -240,9 +240,9 @@ public:
 
 class ExpressionStmt : public Stmt {
 public:
-  NodePtr expression;
+  Expr *expression;
   NodeString directive;
-  explicit ExpressionStmt(NodePtr expression, NodeString directive)
+  explicit ExpressionStmt(Expr *expression, NodeString directive)
       : Stmt(StmtKind::Expression),
       expression(std::move(expression)),
       directive(std::move(directive)) {

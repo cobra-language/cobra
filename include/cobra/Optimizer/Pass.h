@@ -1,0 +1,93 @@
+/*
+ * Copyright (c) the Cobra project authors.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#ifndef Pass_h
+#define Pass_h
+
+#include "cobra/Support/StringRef.h"
+
+#include <memory>
+
+namespace cobra {
+
+class Function;
+class Module;
+class Instruction;
+class IRBuilder;
+
+/// This class represents a pass, which is a transformation of the IR. Passes
+/// are either Function passes, which transform one function, and are not
+/// allowed to create new functions or modify other functions, or module
+/// passes which operate on the entire module and are free to manipulate
+/// multiple functions.
+class Pass {
+ public:
+  enum class PassKind {
+    Function,
+    Module,
+  };
+
+ private:
+  /// Stores the kind of derived class.
+  const PassKind kind;
+  /// The textual name of the pass.
+  StringRef name;
+
+ public:
+  /// Constructor. \p K indicates the kind of pass this is.
+  explicit Pass(Pass::PassKind K, StringRef name) : kind(K), name(name) {}
+
+  virtual ~Pass() = default;
+
+  /// Returns the kind of the pass.
+  PassKind getKind() const {
+    return kind;
+  }
+
+  /// Returns the textual name of the pass.
+  StringRef getName() const {
+    return name;
+  }
+};
+
+class FunctionPass : public Pass {
+ public:
+  explicit FunctionPass(StringRef name)
+      : Pass(Pass::PassKind::Function, name) {}
+  ~FunctionPass() override = default;
+
+  /// Runs the current pass on the function \p F.
+  /// \returns true if the function was modified.
+  virtual bool runOnFunction(Function *F) = 0;
+
+  static bool classof(const Pass *S) {
+    return S->getKind() == PassKind::Function;
+  }
+};
+
+class ModulePass : public Pass {
+ public:
+  explicit ModulePass(StringRef name)
+      : Pass(Pass::PassKind::Module, name) {}
+  ~ModulePass() override = default;
+
+  /// Runs the current pass on the module \p M.
+  /// \returns true if module was modified.
+  virtual bool runOnModule(Module *M) = 0;
+
+  static bool classof(const Pass *S) {
+    return S->getKind() == PassKind::Module;
+  }
+};
+
+/// Pass header declaration.
+#define PASS(ID, NAME, DESCRIPTION) std::unique_ptr<Pass> create##ID();
+#include "Passes.def"
+
+} // namespace cobra
+
+#endif 

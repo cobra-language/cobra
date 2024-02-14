@@ -1,0 +1,28 @@
+/*
+ * Copyright (c) the Cobra project authors.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+//===----------------------------------------------------------------------===//
+//
+// This file defines macros used for macro-metaprogramming with Hermes Passes.
+//
+//===----------------------------------------------------------------------===//
+
+/// PASS(Id, Name, Description)
+///   There exists a global function hermes::create##Id().
+///
+///   This macro must be defined by the includer.
+#ifndef PASS
+#error "Macro must be defined by includer"
+#endif
+
+PASS(DCE, "dce", "Eliminate dead code")
+PASS(CSE, "cse", "Common subexpression elimination")
+PASS(Mem2Reg, "mem2reg", "Construct SSA")
+PASS(SimplifyCFG, "simplifycfg", "Simplify CFG")
+PASS(Inlining, "inlining", "Inlining")
+
+#undef PASS

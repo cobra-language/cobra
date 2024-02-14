@@ -7,8 +7,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef String_hpp
-#define String_hpp
+#ifndef String_h
+#define String_h
 
 #include <string>
 
@@ -140,4 +140,4 @@ inline std::string &operator+=(std::string &buffer, StringRef string) {
 
 }
 
-#endif /* String_hpp */
+#endif /* String_h */

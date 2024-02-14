@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Lexer_hpp
-#define Lexer_hpp
+#ifndef Lexer_h
+#define Lexer_h
 
 #include <stdio.h>
 #include <string>
@@ -310,4 +310,4 @@ public:
 }
 }
 
-#endif /* Lexer_hpp */
+#endif /* Lexer_h */

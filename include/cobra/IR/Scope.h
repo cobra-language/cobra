@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Scope_hpp
-#define Scope_hpp
+#ifndef Scope_h
+#define Scope_h
 
 #include <stdio.h>
 #include <map>
@@ -71,4 +71,4 @@ private:
 };
 
 }
-#endif /* Scope_hpp */
+#endif /* Scope_h */

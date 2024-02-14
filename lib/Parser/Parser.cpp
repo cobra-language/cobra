@@ -437,9 +437,11 @@ std::optional<ASTNode *> Parser::parseExpressionOrLabelledStatement() {
   
   SMLoc startLoc = tok_->getStartLoc();
   auto optExpr = parseExpression();
+  startLoc = tok_->getStartLoc();
   if (!optExpr)
     return std::nullopt;
   
+  startLoc = tok_->getStartLoc();
   if (!eatSemi())
     return std::nullopt;
   
@@ -454,38 +456,37 @@ std::optional<IfStmt *> Parser::parseIfStatement() {
   assert(match(TokenKind::rw_if));
   SMLoc startLoc = advance().Start;
 
-  SMLoc condLoc = tok_->getStartLoc();
   if (!eat(TokenKind::l_paren))
     return std::nullopt;
   
-  auto optTest = parseExpression();
-  if (!optTest)
+  auto condition = parseExpression();
+  if (!condition)
     return std::nullopt;
   
   if (!eat(TokenKind::r_paren))
     return std::nullopt;
   
-  auto optConsequent = parseStatement();
-  if (!optConsequent)
+  auto thenStmt = parseStatement();
+  if (!thenStmt)
     return std::nullopt;
   
   if (matchAndEat(TokenKind::rw_else)) {
-    auto optAlternate = parseStatement();
-    if (!optAlternate)
+    auto elseStmt = parseStatement();
+    if (!elseStmt)
       return std::nullopt;
     return setLocation(
         startLoc,
-        optAlternate.value(),
+        elseStmt.value(),
         new (context_) IfStmt(
-            optTest.value(),
-            optConsequent.value(),
-            optAlternate.value()));
+            condition.value(),
+            thenStmt.value(),
+            elseStmt.value()));
   } else {
     return setLocation(
         startLoc,
-        optConsequent.value(),
+        thenStmt.value(),
         new (context_) IfStmt(
-            optTest.value(), optConsequent.value(), nullptr));
+            condition.value(), thenStmt.value(), nullptr));
   }
 }
 
@@ -513,49 +514,51 @@ std::optional<ASTNode *> Parser::parseReturnStatement() {
 }
 
 std::optional<Expr *> Parser::parseAssignmentExpression() {
-  struct State {
-    SMLoc leftStartLoc = {};
-    std::optional<ASTNode *> optLeftExpr = std::nullopt;
-    std::string *op = nullptr;
-    SMLoc debugLoc = {};
-
-    explicit State() {}
-  };
-  
-  auto optRes = parseConditionalExpression();
+  SMLoc startLoc = tok_->getStartLoc();
+  auto left = parseConditionalExpression();
   if (!Token::isAssignmentOp(tok_->getKind())) {
-    return optRes;
+    return left;
   }
   
-  std::vector<State> stack;
+  auto op = getTokenIdent(tok_->getKind());
+  advance();
   
-  stack.emplace_back();
+  auto right = parseAssignmentExpression();
   
-  for (;;) {
-    if (!optRes)
-      return std::nullopt;
-    if (!stack.back().op) {
-      stack.pop_back();
-      break;
-    }
-    stack.emplace_back();
-  }
-  
-  return optRes;
+  return setLocation(
+      startLoc,
+      getPrevTokenEndLoc(),
+      new (context_) AssignmentExpr(left.value(), right.value(), op));
 }
 
 std::optional<Expr *> Parser::parseConditionalExpression() {
   SMLoc startLoc = tok_->getStartLoc();
-  auto optExpr = parseBinaryExpression();
+  auto cond = parseBinaryExpression();
+  if (!cond) {
+    return std::nullopt;
+  }
   
   if (!match(TokenKind::question)) {
-    return optExpr;
+    return cond;
   }
   
   advance();
   
+  auto left = parseAssignmentExpression();
+  if (!left) {
+    return std::nullopt;
+  }
+    
+  auto right = parseAssignmentExpression();
+  if (!right) {
+    return std::nullopt;
+  }
   
-  return std::nullopt;
+  return setLocation(
+      startLoc,
+      getPrevTokenEndLoc(),
+      new (context_)
+          ConditionalExpr(cond.value(), left.value(), right.value()));
 }
 
 namespace {

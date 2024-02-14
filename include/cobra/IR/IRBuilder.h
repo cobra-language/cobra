@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef IRBuilder_hpp
-#define IRBuilder_hpp
+#ifndef IRBuilder_h
+#define IRBuilder_h
 
 #include <stdio.h>
 #include "cobra/IR/IR.h"
@@ -102,4 +102,4 @@ public:
 
 }
 
-#endif /* IRBuilder_hpp */
+#endif /* IRBuilder_h */

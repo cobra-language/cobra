@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Interpreter_hpp
-#define Interpreter_hpp
+#ifndef Interpreter_h
+#define Interpreter_h
 
 namespace cobra {
 namespace vm {
@@ -18,4 +18,4 @@ class Interpreter {
 }
 }
 
-#endif /* Interpreter_hpp */
+#endif /* Interpreter_h */

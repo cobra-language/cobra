@@ -35,7 +35,25 @@ Value *TreeIRGen::visitReturnStmt(ReturnStmt *rs) {
 }
 
 Value *TreeIRGen::visitIfStmt(IfStmt *is) {
+  auto parent = Builder.getInsertionBlock()->getParent();
+  auto thenBB = Builder.createBasicBlock(parent);
+  auto elseBB = Builder.createBasicBlock(parent);
+  auto continueBB = Builder.createBasicBlock(parent);
   
+  emitExpressionBranch(is->Condition, thenBB, elseBB, nullptr);
+  
+  Builder.setInsertionBlock(thenBB);
+  visit(is->Then);
+  Builder.createBranchInst(continueBB);
+
+  // IRGen the Else, if it exists:
+  Builder.setInsertionBlock(elseBB);
+  if (is->Else) {
+    visit(is->Else);
+  }
+
+  Builder.createBranchInst(continueBB);
+  Builder.setInsertionBlock(continueBB);
 }
 
 Value *TreeIRGen::visitVariableStmt(VariableStmt *vs) {

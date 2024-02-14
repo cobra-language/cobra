@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Base64_hpp
-#define Base64_hpp
+#ifndef Base64_h
+#define Base64_h
 
 #include <stdio.h>
 
-#endif /* Base64_hpp */
+#endif /* Base64_h */

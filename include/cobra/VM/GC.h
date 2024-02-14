@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef GC_hpp
-#define GC_hpp
+#ifndef GC_h
+#define GC_h
 
 
-#endif /* GC_hpp */
+#endif /* GC_h */

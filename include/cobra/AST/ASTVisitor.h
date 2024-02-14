@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef ASTVisitor_hpp
-#define ASTVisitor_hpp
+#ifndef ASTVisitor_h
+#define ASTVisitor_h
 
 #include "cobra/AST/Tree.h"
 
@@ -72,4 +72,4 @@ public:
 
 }
 
-#endif /* ASTVisitor_hpp */
+#endif /* ASTVisitor_h */

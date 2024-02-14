@@ -5,11 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef VM_hpp
-#define VM_hpp
+#ifndef VM_h
+#define VM_h
 
 class VM {
     
 };
 
-#endif /* VM_hpp */
+#endif /* VM_h */

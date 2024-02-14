@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef GCCell_hpp
-#define GCCell_hpp
+#ifndef GCCell_h
+#define GCCell_h
 
 #include "cobra/VM/CBValue.h"
 
@@ -31,4 +31,4 @@ public:
 }
 }
 
-#endif /* GCCell_hpp */
+#endif /* GCCell_h */

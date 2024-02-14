@@ -1,5 +1,10 @@
 function printParity(x: number) : number {
   var y = 100;
-  var z = x + y;
-  return z;
+  var s;
+  if (x % 2 == 0) {
+    s = y + 1;
+  } else {
+    s = y + 2;
+  }
+  return s;
 }

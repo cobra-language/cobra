@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Tree_hpp
-#define Tree_hpp
+#ifndef Tree_h
+#define Tree_h
 
 #include <stdint.h>
 #include <vector>
@@ -215,15 +215,15 @@ public:
 
 class IfStmt : public Stmt {
 public:
-  NodePtr test;
-  NodePtr consequent;
-  NodePtr alternate;
+  Expr *Condition;
+  NodePtr Then;
+  NodePtr Else;
   StmtKind kind;
-  explicit IfStmt(NodePtr test, NodePtr consequent, NodePtr alternate)
+  explicit IfStmt(Expr *Condition, NodePtr Then, NodePtr Else)
       : Stmt(StmtKind::If),
-      test(std::move(test)),
-      consequent(std::move(consequent)) ,
-      alternate(std::move(alternate)) {
+    Condition(std::move(Condition)),
+    Then(std::move(Then)) ,
+    Else(std::move(Else)) {
         kind = StmtKind::If;
   }
 };
@@ -372,6 +372,32 @@ public:
   }
 };
 
+class ConditionalExpr : public Expr {
+public:
+  Expr *condition;
+  Expr *left;
+  Expr *right;
+  explicit ConditionalExpr(Expr *condition, Expr *left, Expr *right)
+      : Expr(ExprKind::Conditional),
+    condition(std::move(condition)),
+    left(std::move(left)),
+    right(std::move(right)) {
+  }
+};
+
+class AssignmentExpr : public Expr {
+public:
+  Expr *left;
+  Expr *right;
+  NodeLabel Operator;
+  explicit AssignmentExpr(Expr *left, Expr *right, NodeLabel Operator)
+      : Expr(ExprKind::Assignment),
+      left(std::move(left)) ,
+      right(std::move(right)) ,
+      Operator(std::move(Operator)) {
+  }
+};
+
 class AnyKeywordNode : public ASTNode {
 public:
   explicit AnyKeywordNode() {
@@ -410,4 +436,4 @@ public:
 
 }
 
-#endif /* Tree_hpp */
+#endif /* Tree_h */

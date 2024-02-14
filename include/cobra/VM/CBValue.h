@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef CBValue_hpp
-#define CBValue_hpp
+#ifndef CBValue_h
+#define CBValue_h
 
 #include <stdio.h>
 #include <map>
@@ -213,4 +213,4 @@ typedef enum {
 }
 }
 
-#endif /* CBValue_hpp */
+#endif /* CBValue_h */

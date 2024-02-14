@@ -12,8 +12,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef SMLoc_hpp
-#define SMLoc_hpp
+#ifndef SMLoc_h
+#define SMLoc_h
 
 #include <stdio.h>
 #include <cassert>
@@ -68,4 +68,4 @@ public:
 
 }
 
-#endif /* SMLoc_hpp */
+#endif /* SMLoc_h */

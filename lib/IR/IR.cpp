@@ -27,6 +27,10 @@ void Value::destroy(Value *V) {
 //  }
 }
 
+const Value::UseListTy &Value::getUsers() const {
+  return Users;
+}
+
 bool Value::hasOneUser() const {
     return 1 == Users.size();
 }
@@ -238,6 +242,18 @@ void BasicBlock::eraseFromParent() {
 Context &BasicBlock::getContext() const {
   return Parent->getContext();
 }
+
+Function::Function(
+    Module *parent,
+    Identifier name,
+    bool isGlobal,
+    Function *insertBefore)
+    : Value(ValueKind::FunctionKind),
+      Parent(parent),
+      Name(name),
+      IsGlobal(isGlobal) {
+  parent->push_back(this);
+};
 
 Function::~Function() {
   for (auto *p : Parameters) {

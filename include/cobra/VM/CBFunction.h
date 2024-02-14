@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef CBFunction_hpp
-#define CBFunction_hpp
+#ifndef CBFunction_h
+#define CBFunction_h
 
 #include <stdio.h>
 
-#endif /* CBFunction_hpp */
+#endif /* CBFunction_h */

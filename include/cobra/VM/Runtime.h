@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Runtime_hpp
-#define Runtime_hpp
+#ifndef Runtime_h
+#define Runtime_h
 
 namespace cobra {
 namespace vm {
@@ -18,4 +18,4 @@ class Runtime {
 }
 }
 
-#endif /* Runtime_hpp */
+#endif /* Runtime_h */

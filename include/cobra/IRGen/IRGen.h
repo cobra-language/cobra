@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef IRGen_hpp
-#define IRGen_hpp
+#ifndef IRGen_h
+#define IRGen_h
 
 #include <stdio.h>
 #include <map>
@@ -85,8 +85,11 @@ public:
   
   Value *visitBinaryExpr(BinaryExpr *be);
   
+  Value *visitConditionalExpr(ConditionalExpr *ce);
+  
   Value *visitSpreadElementExpr(SpreadElementExpr *se);
   
+  Value *visitAssignmentExpr(AssignmentExpr *ae);
   
   void emitFunction(FuncDecl *fd);
   
@@ -101,8 +104,12 @@ public:
   Instruction *emitLoad(Value *from);
   
   Instruction *emitStore(Value *storedValue, Value *ptr, bool declInit);
-    
-  Value *genBinaryExpression(BinaryExpr *bin);
+      
+  void emitExpressionBranch(
+      Expr *expr,
+      BasicBlock *onTrue,
+      BasicBlock *onFalse,
+      BasicBlock *onNullish);
   
   Value *ensureVariableExists(IdentifierExpr *id);
   
@@ -113,4 +120,4 @@ public:
 }
 }
 
-#endif /* IRGen_hpp */
+#endif /* IRGen_h */

@@ -8,6 +8,7 @@ add_cobra_library(cobraFrontend
   IR/IR.cpp
   IR/IRBuilder.cpp
   IR/Instrs.cpp
+  IR/Dominance.cpp
   Utils/IRPrinter.cpp
   IRGen/IRGenStmt.cpp
   IRGen/IRGenExpr.cpp
@@ -20,3 +21,5 @@ add_subdirectory(AST)
 add_subdirectory(Parser)
 add_subdirectory(Support)
 add_subdirectory(BCGen)
+add_subdirectory(Optimizer)
+add_subdirectory(Driver)

@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef CBObject_hpp
-#define CBObject_hpp
+#ifndef CBObject_h
+#define CBObject_h
 
 #include "cobra/VM/CBValue.h"
 #include "cobra/VM/GCCell.h"
@@ -21,4 +21,4 @@ class CBObject {
 }
 }
 
-#endif /* CBObject_hpp */
+#endif /* CBObject_h */

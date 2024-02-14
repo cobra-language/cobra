@@ -59,7 +59,20 @@ Value *TreeIRGen::visitSpreadElementExpr(SpreadElementExpr *se) {
 }
 
 
-Value *TreeIRGen::genBinaryExpression(BinaryExpr *bin) {
+Value *TreeIRGen::visitConditionalExpr(ConditionalExpr *ce) {
   
+}
+
+Value *TreeIRGen::visitAssignmentExpr(AssignmentExpr *ae) {
   
+}
+
+void TreeIRGen::emitExpressionBranch(
+    Expr *expr,
+    BasicBlock *onTrue,
+    BasicBlock *onFalse,
+    BasicBlock *onNullish) {
+  
+  Value *condVal = visitExpr(expr);
+  Builder.createCondBranchInst(condVal, onTrue, onFalse);
 }

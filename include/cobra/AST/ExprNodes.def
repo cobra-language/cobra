@@ -65,6 +65,8 @@ EXPR(Identifier, Expr)
 EXPR(Unary, Expr)
 EXPR(PostfixUnary, Expr)
 EXPR(Binary, Expr)
+EXPR(Conditional, Expr)
+EXPR(Assignment, Expr)
 EXPR(SpreadElement, Expr)
 
 // Don't forget to update the LAST_EXPR below when adding a new Expr here.

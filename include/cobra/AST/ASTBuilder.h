@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef ASTBuilder_hpp
-#define ASTBuilder_hpp
+#ifndef ASTBuilder_h
+#define ASTBuilder_h
 
 namespace cobra {
 
@@ -16,4 +16,4 @@ class ASTBuilder {
 
 }
 
-#endif /* ASTBuilder_hpp */
+#endif /* ASTBuilder_h */

@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef IR_hpp
-#define IR_hpp
+#ifndef IR_h
+#define IR_h
 
 #include <list>
 #include "cobra/Support/StringTable.h"
@@ -371,6 +371,8 @@ public:
   virtual ~Value() = default;
   
   static void destroy(Value *V);
+  
+  const UseListTy &getUsers() const;
   
   bool hasOneUser() const;
 
@@ -812,12 +814,17 @@ private:
   
   Identifier Name;
   
+  bool IsGlobal;
+  
   BasicBlockListType BasicBlockList{};
   ParameterListType Parameters;
   
 public:
-  explicit Function(Module *parent, Identifier name)
-      : Value(ValueKind::FunctionKind), Parent(parent), Name(name) {};
+  explicit Function(
+      Module *parent,
+      Identifier name,
+      bool isGlobal,
+      Function *insertBefore = nullptr);
   
   ~Function();
   
@@ -905,4 +912,4 @@ public:
 
 }
 
-#endif /* IR_hpp */
+#endif /* IR_h */

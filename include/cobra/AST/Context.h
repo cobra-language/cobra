@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Context_hpp
-#define Context_hpp
+#ifndef Context_h
+#define Context_h
 
 #include "cobra/Support/Allocator.h"
 #include "cobra/Support/StringTable.h"
@@ -48,4 +48,4 @@ public:
 
 }
 
-#endif /* Context_hpp */
+#endif /* Context_h */

@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef SemanticChecker_hpp
-#define SemanticChecker_hpp
+#ifndef SemanticChecker_h
+#define SemanticChecker_h
 
 #include <stdio.h>
 #include "cobra/AST/ASTVisitor.h"

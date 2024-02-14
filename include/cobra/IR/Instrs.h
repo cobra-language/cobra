@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Instrs_hpp
-#define Instrs_hpp
+#ifndef Instrs_h
+#define Instrs_h
 
 #include <stdio.h>
 #include "cobra/IR/IR.h"
@@ -259,20 +259,20 @@ class StoreStackInst : public Instruction {
   void operator=(const StoreStackInst &) = delete;
 
  public:
-  enum { StoredValueIdx, PtrIdx };
+  enum { Src, Dest };
 
-  Value *getValue() const {
-    return getOperand(StoredValueIdx);
+  Value *getSrc() const {
+    return getOperand(Src);
   }
-  AllocStackInst *getPtr() const {
-    return dynamic_cast<AllocStackInst *>(getOperand(PtrIdx));
+  AllocStackInst *getDest() const {
+    return dynamic_cast<AllocStackInst *>(getOperand(Dest));
   }
 
-  explicit StoreStackInst(Value *storedValue, AllocStackInst *ptr)
+  explicit StoreStackInst(Value *src, AllocStackInst *dest)
       : Instruction(ValueKind::StoreStackInstKind) {
     setType(Type::createNoType());
-    pushOperand(storedValue);
-    pushOperand(ptr);
+    pushOperand(src);
+    pushOperand(dest);
   }
 
   SideEffectKind getSideEffect() {
@@ -472,4 +472,4 @@ class PhiInst : public Instruction {
 
 }
 
-#endif /* Instrs_hpp */
+#endif /* Instrs_h */

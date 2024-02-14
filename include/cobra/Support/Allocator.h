@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Allocator_hpp
-#define Allocator_hpp
+#ifndef Allocator_h
+#define Allocator_h
 
 #include <stdio.h>
 #include <cstddef>
@@ -77,4 +77,4 @@ private:
 
 }
 
-#endif /* Allocator_hpp */
+#endif /* Allocator_h */

@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef CodeBlock_hpp
-#define CodeBlock_hpp
+#ifndef CodeBlock_h
+#define CodeBlock_h
 
 #include <stdio.h>
 
-#endif /* CodeBlock_hpp */
+#endif /* CodeBlock_h */

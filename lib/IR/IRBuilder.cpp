@@ -14,7 +14,7 @@ BasicBlock *IRBuilder::createBasicBlock(Function *Parent) {
 }
 
 Function *IRBuilder::createFunction(Identifier OriginalName) {
-  return new Function(M, OriginalName);
+  return new Function(M, OriginalName, false);
 }
 
 Parameter *IRBuilder::createParameter(Function *Parent, Identifier Name) {

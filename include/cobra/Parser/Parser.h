@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Parser_hpp
-#define Parser_hpp
+#ifndef Parser_h
+#define Parser_h
 
 #include "cobra/Support/Allocator.h"
 #include "cobra/Parser/Lexer.h"
@@ -187,4 +187,4 @@ private:
 }
 }
 
-#endif /* Parser_hpp */
+#endif /* Parser_h */

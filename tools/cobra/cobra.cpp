@@ -9,11 +9,10 @@
 #include <string>
 #include <fstream>
 #include "cobra/VM/VM.h"
-#include "cobra/Parser/Parser.h"
-#include "cobra/IRGen/IRGen.h"
+#include "cobra/Driver/Driver.h"
 
 using namespace cobra;
-using namespace Lowering;
+using namespace driver;
 
 static std::string loadFile(std::string path) {
   std::ifstream file{path};
@@ -26,16 +25,7 @@ static std::string loadFile(std::string path) {
 int main(int argc, const char * argv[]) {
   
   std::string source = loadFile(argv[1]);
-  auto context = std::make_shared<Context>();
-  Module M(context);
-  
-  parser::Parser cbParser(*context, source.c_str(), source.size());
-  auto parsedCb = cbParser.parse();
-  
-  NodePtr ast = parsedCb.value();
-    
-  TreeIRGen irGen(ast, &M);
-  irGen.visitChildren();
+  driver::compile(source);
   
 //  auto to = cbLexer.advance();
 //

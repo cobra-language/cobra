@@ -30,11 +30,11 @@ public:
   std::optional<ASTNode *> parse();
   
 private:
+  Context &context_;
+  
   Lexer lexer_;
   
   const Token *tok_{};
-  
-  Context &context_;
   
   template <class Node, class StartLoc, class EndLoc>
   Node *setLocation(StartLoc start, EndLoc end, Node *node) {

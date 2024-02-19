@@ -9,7 +9,7 @@
 
 using namespace cobra;
 
-//BasicBlock *TerminatorInst::getSuccessor(unsigned idx) const {
+//BasicBlock *TerminatorInst::getSuccessor(unsigned idx) {
 //#undef TERMINATOR
 //#define TERMINATOR(CLASS, PARENT)           \
 //  if (auto I = const_cast<CLASS *>(this)) \

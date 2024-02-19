@@ -7,3 +7,10 @@
 
 #include "cobra/BCGen/Bytecode.h"
 
+namespace cobra {
+
+class ByteCodeFunction {
+  
+};
+
+}

@@ -212,6 +212,10 @@ void IRPrinter::visitFunction(Function &F) {
   
   for (auto BB : F.getBasicBlockList())
     visitBasicBlock(*BB);
+  
+  os << "function_end"
+     << "\n";
+  os << "\n";
 }
 
 void IRPrinter::visitBasicBlock(BasicBlock &BB) {

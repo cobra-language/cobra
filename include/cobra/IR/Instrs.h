@@ -81,15 +81,12 @@ class BranchInst : public TerminatorInst {
   enum { BranchDestIdx };
 
   BasicBlock *getBranchDest() const {
-    this->getParent()->getParent()->dump();
     return dynamic_cast<BasicBlock *>(getOperand(BranchDestIdx));
   }
 
   explicit BranchInst(BasicBlock *parent, BasicBlock *dest)
       : TerminatorInst(ValueKind::BranchInstKind) {
     pushOperand(dest);
-        auto a = dynamic_cast<BasicBlock *>(getOperand(BranchDestIdx));
-        a->dump();
   }
   explicit BranchInst(const BranchInst *src, std::vector<Value *> operands)
       : TerminatorInst(src, operands) {}

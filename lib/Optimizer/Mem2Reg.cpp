@@ -38,8 +38,6 @@ static void promoteAllocation(AllocStackInst *ASI) {
 bool Mem2Reg::runOnFunction(Function *F) {
   std::vector<AllocStackInst *> allocas;
   
-  F->getParent()->dump();
-  
   BasicBlock *BB = F->front();
     
   for (auto *succ : successors(BB)) {

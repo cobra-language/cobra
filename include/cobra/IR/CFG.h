@@ -9,6 +9,7 @@
 #define CFG_h
 
 #include "cobra/Support/iterator_range.h"
+#include "cobra/Support/iterator.h"
 #include "cobra/IR/IR.h"
 #include "cobra/IR/Instrs.h"
 
@@ -117,7 +118,10 @@ inline unsigned pred_count(const BasicBlock *BB) {
 }
 
 template <class InstructionT, class BlockT>
-class SuccIterator {
+class SuccIterator
+    : public llvh::iterator_facade_base<SuccIterator<InstructionT, BlockT>,
+                                  std::random_access_iterator_tag, BlockT, int,
+                                  BlockT *, BlockT *> {
 public:
   using difference_type = int;
   using pointer = BlockT *;

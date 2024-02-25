@@ -214,11 +214,13 @@ void BasicBlock::insert(iterator InsertPt, Instruction *I) {
 TerminatorInst *BasicBlock::getTerminator() {
   if (InstList.empty())
     return nullptr;
+  return dynamic_cast<TerminatorInst *>(InstList.back())
 }
 
 const TerminatorInst *BasicBlock::getTerminator() const {
   if (InstList.empty())
     return nullptr;
+  return dynamic_cast<TerminatorInst *>(InstList.back())
 }
 
 void BasicBlock::push_back(Instruction *I) {

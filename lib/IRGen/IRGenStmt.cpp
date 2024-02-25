@@ -31,7 +31,7 @@ Value *TreeIRGen::visitReturnStmt(ReturnStmt *rs) {
   }
   Builder.createReturnInst(Value);
   auto Parent = Builder.getInsertionBlock()->getParent();
-  Builder.setInsertionBlock(Builder.createBasicBlock(Parent));
+//  Builder.setInsertionBlock(Builder.createBasicBlock(Parent));
 }
 
 Value *TreeIRGen::visitIfStmt(IfStmt *is) {

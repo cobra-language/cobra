@@ -20,6 +20,7 @@ class Function;
 class BasicBlock;
 class Instruction;
 class Context;
+class TerminatorInst;
 
 class Type {
   enum TypeKind {
@@ -402,6 +403,22 @@ public:
   static bool classof(const Value *) {
     return true;
   }
+  
+  using iterator = UseListTy::iterator;
+  using const_iterator = UseListTy::const_iterator;
+
+  inline const_iterator users_begin() const {
+    return Users.begin();
+  }
+  inline const_iterator users_end() const {
+    return Users.end();
+  }
+  inline iterator users_begin() {
+    return Users.begin();
+  }
+  inline iterator users_end() {
+    return Users.end();
+  }
 };
 
 class Variable : public Value {
@@ -748,6 +765,9 @@ public:
   
   void insert(iterator InsertPt, Instruction *I);
   
+  TerminatorInst *getTerminator();
+  const TerminatorInst *getTerminator() const;
+  
   void push_back(Instruction *I);
   void eraseFromParent();
   void remove(Instruction *I);
@@ -761,6 +781,8 @@ public:
   Function *getParent() const {
     return Parent;
   }
+  
+  std::list<BasicBlock *> getPredecessors();
   
   inline iterator begin() {
     return InstList.begin();

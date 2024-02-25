@@ -9,6 +9,7 @@
 #define Mem2Reg_h
 
 #include "cobra/IR/IR.h"
+#include "cobra/IR/CFG.h"
 #include "cobra/Optimizer/Pass.h"
 
 namespace cobra {

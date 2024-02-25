@@ -9,21 +9,21 @@
 
 using namespace cobra;
 
-//BasicBlock *TerminatorInst::getSuccessor(unsigned idx) {
-//#undef TERMINATOR
-//#define TERMINATOR(CLASS, PARENT)           \
-//  if (auto I = const_cast<CLASS *>(this)) \
-//    return I->getSuccessor(idx);
-//#include "cobra/IR/Instrs.def"
-//}
-//
-//void TerminatorInst::setSuccessor(unsigned idx, BasicBlock *B) {
-//#undef TERMINATOR
-//#define TERMINATOR(CLASS, PARENT)           \
-//  if (auto I = const_cast<CLASS *>(this)) \
-//    return I->setSuccessor(idx, B);
-//#include "cobra/IR/Instrs.def"
-//}
+BasicBlock *TerminatorInst::getSuccessor(unsigned idx) {
+#undef TERMINATOR
+#define TERMINATOR(CLASS, PARENT)           \
+  if (auto I = static_cast<CLASS *>(this)) \
+    return I->getSuccessor(idx);
+#include "cobra/IR/Instrs.def"
+}
+
+void TerminatorInst::setSuccessor(unsigned idx, BasicBlock *B) {
+#undef TERMINATOR
+#define TERMINATOR(CLASS, PARENT)           \
+  if (auto I = static_cast<CLASS *>(this)) \
+    return I->setSuccessor(idx, B);
+#include "cobra/IR/Instrs.def"
+}
 
 bool cobra::isSideEffectFree(Type T) {
   return T.isPrimitive();

@@ -144,6 +144,8 @@ void Instruction::setOperand(Value *Val, unsigned Index) {
 }
 
 Value *Instruction::getOperand(unsigned Index) const {
+  auto c = Operands.size();
+  auto b = Operands[Index].second;
   return Operands[Index].first;
 }
 
@@ -252,21 +254,6 @@ void BasicBlock::eraseFromParent() {
 Context &BasicBlock::getContext() const {
   return Parent->getContext();
 }
-
-//std::list<BasicBlock *> BasicBlock::getPredecessors() {
-//  auto Uses = getUsers();
-//  std::vector<std::shared_ptr<BasicBlock>> Predecessors;
-//  Predecessors.reserve(Uses.size());
-//  // (2) get the use's father
-//  for (const auto &item : Uses) {
-//    const auto *user = item->getUser();
-//    const Instruction *InstUser = dynamic_cast<const Instruction *>(user);
-//    assert(InstUser && "The user of BasicBlock must be Instruction.");
-//    auto Parent = InstUser->getParent();
-//    Predecessors.emplace_back(Parent);
-//  }
-//  return Predecessors;
-//}
 
 Function::Function(
     Module *parent,

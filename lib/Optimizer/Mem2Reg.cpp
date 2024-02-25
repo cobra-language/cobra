@@ -10,6 +10,7 @@
 #include "cobra/Optimizer/Mem2Reg.h"
 #include "cobra/IR/IRBuilder.h"
 #include "cobra/IR/Instrs.h"
+#include "cobra/IR/CFG.h"
 
 #include <queue>
 
@@ -36,7 +37,27 @@ static void promoteAllocation(AllocStackInst *ASI) {
 
 bool Mem2Reg::runOnFunction(Function *F) {
   std::vector<AllocStackInst *> allocas;
+  
   BasicBlock *BB = F->front();
+  
+  auto a = successors(BB);
+  auto c = a.begin();
+  
+  for (auto *succ : successors(BB)) {
+    succ->dump();
+  }
+  
+  
+  
+  BasicBlock *B = F->back();
+  
+  B->dump();
+  
+  auto b = predecessors(B);
+  for (auto *pre : predecessors(B)) {
+    pre->dump();
+  }
+  
   bool changed = false;
   
   while (true) {

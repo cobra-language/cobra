@@ -62,7 +62,9 @@ public:
  explicit TerminatorInst(const TerminatorInst *src, std::vector<Value *> operands)
      : Instruction(src, operands) {}
   
-  unsigned getNumSuccessors();
+  virtual ~TerminatorInst() = default;
+  
+  unsigned getNumSuccessors() ;
   BasicBlock *getSuccessor(unsigned idx);
   void setSuccessor(unsigned idx, BasicBlock *B);
   
@@ -97,7 +99,7 @@ class BranchInst : public TerminatorInst {
     return kindIsA(V->getKind(), ValueKind::BranchInstKind);
   }
 
-  unsigned getNumSuccessors() const {
+  unsigned getNumSuccessors() {
     return 1;
   }
   BasicBlock *getSuccessor(unsigned idx) const {
@@ -150,7 +152,7 @@ class CondBranchInst : public TerminatorInst {
     return kindIsA(V->getKind(), ValueKind::CondBranchInstKind);
   }
 
-  unsigned getNumSuccessors() const {
+  unsigned getNumSuccessors() {
     return 2;
   }
   BasicBlock *getSuccessor(unsigned idx) const {

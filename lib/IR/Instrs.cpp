@@ -45,7 +45,7 @@ const char *BinaryOperatorInst::assignmentOpStringRepr[] = {
 unsigned TerminatorInst::getNumSuccessors() {
 #undef TERMINATOR
 #define TERMINATOR(CLASS, PARENT)           \
-  if (auto I = dynamic_cast<CLASS *>(this)) \
+  if (auto I = static_cast<CLASS *>(this)) \
     return I->getNumSuccessors();
 #include "cobra/IR/Instrs.def"
   COBRA_UNREACHABLE();

@@ -39,12 +39,18 @@ bool Mem2Reg::runOnFunction(Function *F) {
   std::vector<AllocStackInst *> allocas;
   
   BasicBlock *BB = F->front();
+  
+  auto c = successors(BB);
+  auto d = c.begin();
     
   for (auto *succ : successors(BB)) {
-    succ->dump();
+//    auto p = succ->getParent();
+    auto b = succ;
+    printf("aa");
+//    succ->dump();
   }
   
-  
+  F->dump();
   
   BasicBlock *B = F->back();
   

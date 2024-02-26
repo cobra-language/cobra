@@ -33,24 +33,19 @@ void DominatorTree::computeDomTree(BasicBlock *EntryBlock) {
   assert(FindEntry && "must have entry node");
   RootNode = FindEntry;
 
-  // (2) DFS() �õ� PostOrder �Լ� ReversePostOrder
   for (auto item : DomTreeNodes)
     item.second->setVisitColor(color::WHITE);
   DFS(RootNode);
 
-  // (3) Dominance Info.
   Calcuate();
 }
 
-// DFS() - We will get post-order and reverse post-order of CFG through
-// Depth-first searching.
 void DominatorTree::DFS(DomTreeNodePtr Node) {
   static int DFSCounter = 0;
   static int PostOrder = 0;
   Node->setDFSInNum(DFSCounter++);
   Node->setVisitColor(color::GRAY);
 
-  // Get the successors of the Node.
   auto TermiInst = Node->getBlock()->getTerminator();
   if (TermiInst == nullptr) {
     Node->setDFSOutNum(DFSCounter++);
@@ -59,23 +54,22 @@ void DominatorTree::DFS(DomTreeNodePtr Node) {
     return;
   }
 
-//  std::vector<DomTreeNodePtr> SuccNodes;
-//  for (unsigned i = 0, size = TermiInst->getNumSuccessors(); i < size; i++) {
-//    SuccNodes.push_back(getDomTreeNode(TermiInst->getSuccessor(i)));
-//  }
+  std::vector<DomTreeNodePtr> SuccNodes;
+  for (unsigned i = 0, size = TermiInst->getNumSuccessors(); i < size; i++) {
+    SuccNodes.push_back(getDomTreeNode(TermiInst->getSuccessor(i)));
+  }
 
-//  for (const auto &item : SuccNodes) {
-//    if (item->getVisitColor() == color::WHITE) {
-//      item->setDFSFather(Node);
-//      DFS(item);
-//    }
-//  }
+  for (const auto &item : SuccNodes) {
+    if (item->getVisitColor() == color::WHITE) {
+      item->setDFSFather(Node);
+      DFS(item);
+    }
+  }
   Node->setDFSOutNum(DFSCounter++);
   Node->setPostNumber(PostOrder++);
   Node->setVisitColor(color::BLACK);
 }
 
-// To Do: optimization
 void DominatorTree::getPostOrder() {
   for (const auto &item : DomTreeNodes)
     item.second->setVisitColor(color::WHITE);
@@ -104,7 +98,6 @@ void DominatorTree::getReversePostOrder() {
     ReversePostOrder.push_back(PostOrder[i]);
 }
 
-// Get the predecessors of the \parm Node.
 std::vector<DomTreeNodePtr>
 DominatorTree::getDomNodePredsFromCFG(DomTreeNodePtr Node) {
   auto Result = PredecessorrsOfCFG.find(Node);
@@ -113,11 +106,15 @@ DominatorTree::getDomNodePredsFromCFG(DomTreeNodePtr Node) {
 
   std::vector<DomTreeNodePtr> PredDomTreeNode;
   auto BB = Node->getBlock();
-  auto Preds = BB->getPredecessors();
+  auto Preds = predecessors(BB);
+  int PredCount = 0;
 
-  for (const auto &pred : Preds)
+  for (const auto &pred : Preds) {
     PredDomTreeNode.push_back(getDomTreeNode(pred));
-  if (Preds.size() > 1)
+    PredCount += 1;
+  }
+
+  if (PredCount > 1)
     JoinNodes.push_back(Node);
   PredecessorrsOfCFG.insert({Node, PredDomTreeNode});
   return PredDomTreeNode;
@@ -140,7 +137,6 @@ void DominatorTree::Calcuate() {
   if (ReversePostOrder.size() == 0)
     getReversePostOrder();
 
-  // iterate
   bool changed = true;
   RootNode->setIDom(RootNode);
 
@@ -150,10 +146,8 @@ void DominatorTree::Calcuate() {
       if (CurNode == RootNode)
         continue;
 
-      // Get the predecessors of current node.
       auto PredDomNodeFromCFG = getDomNodePredsFromCFG(CurNode);
 
-      // (1) Find the first non-nullptr predecessor.
       auto getAvailiablePred = [&PredDomNodeFromCFG]() -> DomTreeNodePtr {
         for (auto pred : PredDomNodeFromCFG) {
           if (pred->getIDom() != nullptr)
@@ -195,8 +189,6 @@ void DominatorTree::InsertFrontier(DomTreeNodePtr Node,
   }
 }
 
-// Compute the forward dominance frontier(Use Cooper's algorithm).
-// The algorithm to compute the dominance frontier.
 void DominatorTree::ComputeDomFrontier() {
   DomTreeNodePtr runner = nullptr;
   // Just compute the join points.

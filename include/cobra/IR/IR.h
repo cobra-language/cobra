@@ -781,9 +781,7 @@ public:
   Function *getParent() const {
     return Parent;
   }
-  
-  std::list<BasicBlock *> getPredecessors();
-  
+    
   inline iterator begin() {
     return InstList.begin();
   }

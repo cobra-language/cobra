@@ -23,6 +23,8 @@
 #include <map>
 #include <set>
 #include "cobra/IR/IR.h"
+#include "cobra/IR/Instrs.h"
+#include "cobra/IR/CFG.h"
 
 namespace cobra {
 
@@ -108,17 +110,14 @@ private:
   void getPostOrder();
   void getReversePostOrder();
 
-  // compute the DomTree.
   void computeDomTree(BasicBlock *EntryBlock);
 
   std::vector<DomTreeNodePtr> getDomNodePredsFromCFG(DomTreeNodePtr Node);
   // Intersect() - This function only be using to get closest parent of A and B.
   DomTreeNodePtr Intersect(DomTreeNodePtr A, DomTreeNodePtr B);
 
-  // Insert the frontier.
   void InsertFrontier(DomTreeNodePtr Node, DomTreeNodePtr FrontierItem);
 
-  // ComputeDomFrontier() - Compute the forward dominance frontier.
   void ComputeDomFrontier();
 
 public:
@@ -139,7 +138,6 @@ public:
 
   void DFS(DomTreeNodePtr Node);
 
-  // Calcuate - compute a dominator tree for the given function.
   void Calcuate();
 
   // dominates - Return true if A dominates B. This perform the special

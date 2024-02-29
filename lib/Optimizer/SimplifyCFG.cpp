@@ -40,8 +40,8 @@ static bool removeUnreachedBasicBlocks(Function *F) {
   workList.push_back(*F->begin());
   while (!workList.empty()) {
     auto BB = workList.back();
+    workList.pop_back();
         
-    // Already visited?
     if (!visited.insert(BB).second)
       continue;
 
@@ -51,7 +51,7 @@ static bool removeUnreachedBasicBlocks(Function *F) {
   
   for (auto it = F->begin(), e = F->end(); it != e;) {
     auto *BB = *it++;
-    if (std::find(visited.begin(), visited.end(), BB) != visited.end()) {
+    if (std::find(visited.begin(), visited.end(), BB) == visited.end()) {
       ++NumUnreachableBlock;
       deleteBasicBlock(BB);
       changed = true;

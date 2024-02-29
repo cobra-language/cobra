@@ -26,7 +26,6 @@ void PassManager::run(Module *M) {
       for (auto F : M->getFunctionList()) {
         FP->runOnFunction(F);
       }
-      M->dump();
       // Move to the next pass.
       continue;
     }

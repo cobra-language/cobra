@@ -12,7 +12,7 @@ using namespace cobra;
 BasicBlock *TerminatorInst::getSuccessor(unsigned idx) {
 #undef TERMINATOR
 #define TERMINATOR(CLASS, PARENT)           \
-  if (auto I = static_cast<CLASS *>(this)) \
+  if (auto I = dynamic_cast<CLASS *>(this)) \
     return I->getSuccessor(idx);
 #include "cobra/IR/Instrs.def"
 }
@@ -45,7 +45,7 @@ const char *BinaryOperatorInst::assignmentOpStringRepr[] = {
 unsigned TerminatorInst::getNumSuccessors() {
 #undef TERMINATOR
 #define TERMINATOR(CLASS, PARENT)           \
-  if (auto I = static_cast<CLASS *>(this)) \
+  if (auto I = dynamic_cast<CLASS *>(this)) \
     return I->getNumSuccessors();
 #include "cobra/IR/Instrs.def"
   COBRA_UNREACHABLE();
@@ -165,8 +165,19 @@ BinaryOperatorInst::getBinarySideEffect(Type leftTy, Type rightTy, OpKind op) {
   return SideEffectKind::Unknown;
 }
 
+unsigned PhiInst::getNumEntries() const {
+  // The PHI operands are just pairs of values and basic blocks.
+  return getNumOperands() / 2;
+}
+
 static unsigned indexOfPhiEntry(unsigned index) {
   return index * 2;
+}
+
+std::pair<Value *, BasicBlock *> PhiInst::getEntry(unsigned i) const {
+  return std::make_pair(
+      getOperand(indexOfPhiEntry(i)),
+      dynamic_cast<BasicBlock *>(getOperand(indexOfPhiEntry(i) + 1)));
 }
 
 void PhiInst::removeEntry(unsigned index) {

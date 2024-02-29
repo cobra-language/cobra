@@ -245,10 +245,13 @@ void BasicBlock::eraseFromParent() {
     (*begin())->eraseFromParent();
   }
   
-  auto BlockList = getParent()->getBasicBlockList();
-  for (auto it = BlockList.begin(), e = BlockList.end(); it != e; it++) {
+  for (auto it = getParent()->getBasicBlockList().begin(),
+       e = getParent()->getBasicBlockList().end();
+       it != e;
+       it++) {
     if (this == *it) {
-      BlockList.erase(it);
+      getParent()->getBasicBlockList().erase(it);
+      break;
     }
   }
 }

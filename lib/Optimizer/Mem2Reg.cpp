@@ -40,26 +40,24 @@ bool Mem2Reg::runOnFunction(Function *F) {
   
   BasicBlock *BB = F->front();
   
-  auto c = successors(BB);
-  auto d = c.begin();
+  F->dump();
     
   for (auto *succ : successors(BB)) {
 //    auto p = succ->getParent();
     auto b = succ;
-    printf("aa");
-//    succ->dump();
+    succ->dump();
   }
   
-  F->dump();
-  
-  BasicBlock *B = F->back();
-  
-  B->dump();
-  
-  auto b = predecessors(B);
-  for (auto *pre : predecessors(B)) {
-    pre->dump();
-  }
+//  F->dump();
+//  
+//  BasicBlock *B = F->back();
+//  
+//  B->dump();
+//  
+//  auto b = predecessors(B);
+//  for (auto *pre : predecessors(B)) {
+//    pre->dump();
+//  }
   
   bool changed = false;
   

@@ -165,8 +165,19 @@ BinaryOperatorInst::getBinarySideEffect(Type leftTy, Type rightTy, OpKind op) {
   return SideEffectKind::Unknown;
 }
 
+unsigned PhiInst::getNumEntries() const {
+  // The PHI operands are just pairs of values and basic blocks.
+  return getNumOperands() / 2;
+}
+
 static unsigned indexOfPhiEntry(unsigned index) {
   return index * 2;
+}
+
+std::pair<Value *, BasicBlock *> PhiInst::getEntry(unsigned i) const {
+  return std::make_pair(
+      getOperand(indexOfPhiEntry(i)),
+      dynamic_cast<BasicBlock *>(getOperand(indexOfPhiEntry(i) + 1)));
 }
 
 void PhiInst::removeEntry(unsigned index) {

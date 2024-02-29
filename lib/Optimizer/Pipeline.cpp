@@ -15,7 +15,7 @@
 
 void cobra::runFullOptimizationPasses(Module &M) {
   PassManager PM;
-  PM.addSimplifyCFG();
+//  PM.addSimplifyCFG();
   PM.addMem2Reg();
   
 

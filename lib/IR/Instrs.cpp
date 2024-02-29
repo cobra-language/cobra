@@ -164,3 +164,31 @@ BinaryOperatorInst::getBinarySideEffect(Type leftTy, Type rightTy, OpKind op) {
   // This binary operation may execute arbitrary code.
   return SideEffectKind::Unknown;
 }
+
+static unsigned indexOfPhiEntry(unsigned index) {
+  return index * 2;
+}
+
+void PhiInst::removeEntry(unsigned index) {
+  unsigned startIdx = indexOfPhiEntry(index);
+  // Remove the value:
+  removeOperand(startIdx);
+  // Remove the basic block. Notice that we use the same index because the
+  // list is shifted.
+  removeOperand(startIdx);
+}
+
+void PhiInst::removeEntry(BasicBlock *BB) {
+  unsigned i = 0;
+  // For each one of the entries:
+  while (i < getNumEntries()) {
+    // If this entry is from the BB we want to remove, then remove it.
+    if (getEntry(i).second == BB) {
+      removeEntry(i);
+      // keep the current iteration index.
+      continue;
+    }
+    // Else, move to the next entry.
+    i++;
+  }
+}

@@ -137,3 +137,10 @@ PhiInst *IRBuilder::createPhiInst(
   insert(PI);
   return PI;
 }
+
+PhiInst *IRBuilder::createPhiInst() {
+  PhiInst::ValueListType values;
+  PhiInst::BasicBlockListType blocks;
+
+  return createPhiInst(values, blocks);
+}

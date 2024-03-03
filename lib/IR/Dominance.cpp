@@ -35,12 +35,17 @@ void DominatorTree::computeDomTree(BasicBlock *EntryBlock) {
 
   for (auto item : DomTreeNodes)
     item.second->setVisitColor(color::WHITE);
-  DFS(RootNode);
+  dfs(RootNode);
 
-  Calcuate();
+  calcuate();
 }
 
-void DominatorTree::DFS(DomTreeNodePtr Node) {
+std::set<DomTreeNodePtr> &DominatorTree::getDominanceFrontier(BasicBlock *BB) {
+  auto Node = getDomTreeNode(BB);
+  return DominanceFrontier[Node];
+}
+
+void DominatorTree::dfs(DomTreeNodePtr Node) {
   static int DFSCounter = 0;
   static int PostOrder = 0;
   Node->setDFSInNum(DFSCounter++);
@@ -62,7 +67,7 @@ void DominatorTree::DFS(DomTreeNodePtr Node) {
   for (const auto &item : SuccNodes) {
     if (item->getVisitColor() == color::WHITE) {
       item->setDFSFather(Node);
-      DFS(item);
+      dfs(item);
     }
   }
   Node->setDFSOutNum(DFSCounter++);
@@ -120,7 +125,7 @@ DominatorTree::getDomNodePredsFromCFG(DomTreeNodePtr Node) {
   return PredDomTreeNode;
 }
 
-DomTreeNodePtr DominatorTree::Intersect(DomTreeNodePtr A, DomTreeNodePtr B) {
+DomTreeNodePtr DominatorTree::intersect(DomTreeNodePtr A, DomTreeNodePtr B) {
   DomTreeNodePtr finger1 = A;
   DomTreeNodePtr finger2 = B;
 
@@ -133,7 +138,7 @@ DomTreeNodePtr DominatorTree::Intersect(DomTreeNodePtr A, DomTreeNodePtr B) {
   return finger1;
 }
 
-void DominatorTree::Calcuate() {
+void DominatorTree::calcuate() {
   if (ReversePostOrder.size() == 0)
     getReversePostOrder();
 
@@ -165,7 +170,7 @@ void DominatorTree::Calcuate() {
         if (pred == NewIDom)
           continue;
         if (pred->getIDom() != nullptr)
-          NewIDom = Intersect(NewIDom, pred);
+          NewIDom = intersect(NewIDom, pred);
       }
 
       // (3) Judge the IDom is changed.
@@ -177,7 +182,7 @@ void DominatorTree::Calcuate() {
   }
 }
 
-void DominatorTree::InsertFrontier(DomTreeNodePtr Node,
+void DominatorTree::insertFrontier(DomTreeNodePtr Node,
                                    DomTreeNodePtr FrontierItem) {
   auto NodeEntry = DominanceFrontier.find(Node);
   if (NodeEntry != DominanceFrontier.end()) {
@@ -189,7 +194,7 @@ void DominatorTree::InsertFrontier(DomTreeNodePtr Node,
   }
 }
 
-void DominatorTree::ComputeDomFrontier() {
+void DominatorTree::computeDomFrontier() {
   DomTreeNodePtr runner = nullptr;
   // Just compute the join points.
   for (const auto &Node : JoinNodes) {
@@ -197,15 +202,15 @@ void DominatorTree::ComputeDomFrontier() {
     for (auto pred : preds) {
       runner = pred;
       while (runner != Node->getIDom()) {
-        InsertFrontier(runner, Node);
+        insertFrontier(runner, Node);
         runner = runner->getIDom();
       }
     }
   }
 }
 
-void DominatorTree::ComputeDomFrontierOnFunction(Function *F) {
+void DominatorTree::computeDomFrontierOnFunction(Function *F) {
   if (RootNode->getIDom() == nullptr)
     runOnFunction(F);
-  ComputeDomFrontier();
+  computeDomFrontier();
 }

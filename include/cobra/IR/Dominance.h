@@ -114,21 +114,23 @@ private:
 
   std::vector<DomTreeNodePtr> getDomNodePredsFromCFG(DomTreeNodePtr Node);
   // Intersect() - This function only be using to get closest parent of A and B.
-  DomTreeNodePtr Intersect(DomTreeNodePtr A, DomTreeNodePtr B);
+  DomTreeNodePtr intersect(DomTreeNodePtr A, DomTreeNodePtr B);
 
-  void InsertFrontier(DomTreeNodePtr Node, DomTreeNodePtr FrontierItem);
+  void insertFrontier(DomTreeNodePtr Node, DomTreeNodePtr FrontierItem);
 
-  void ComputeDomFrontier();
+  void computeDomFrontier();
 
 public:
   void runOnFunction(Function *F);
 
-  void ComputeDomFrontierOnFunction(Function *F);
+  void computeDomFrontierOnFunction(Function *F);
 
   DomTreeNodePtr getDomTreeNode(BasicBlock *BB) const;
 
   // getRootNode - This returns the entry node for the CFG of the function.
   DomTreeNodePtr getRootNode() { return RootNode; }
+  
+  std::set<DomTreeNodePtr> &getDominanceFrontier(BasicBlock *BB);
   
   bool properlyDominates(DomTreeNodePtr Node) const;
   
@@ -136,9 +138,10 @@ public:
   
   bool dominates(DomTreeNodePtr A, DomTreeNodePtr B) const;
 
-  void DFS(DomTreeNodePtr Node);
+  void dfs(DomTreeNodePtr Node);
 
-  void Calcuate();
+  // Compute a dominator tree for the given function.
+  void calcuate();
 
   // dominates - Return true if A dominates B. This perform the special
   // checks necessary if A and B are in the same basic block.

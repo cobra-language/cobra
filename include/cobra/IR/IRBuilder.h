@@ -34,6 +34,8 @@ class IRBuilder {
 public:
   explicit IRBuilder(Module *Mod) : M(Mod) {}
   
+  explicit IRBuilder(Function *F) : M(F->getParent()) {}
+  
   Module *getModule() {
     return M;
   }
@@ -97,6 +99,8 @@ public:
   PhiInst *createPhiInst(
       const PhiInst::ValueListType &values,
       const PhiInst::BasicBlockListType &blocks);
+  
+  PhiInst *createPhiInst();
   
 };
 

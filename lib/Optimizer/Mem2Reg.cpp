@@ -18,7 +18,7 @@
 
 using namespace cobra;
 
-using NodePriorityQueue = std::priority_queue<DomTreeNodePtr>;
+using NodePriorityQueue = std::priority_queue<BasicBlock *>;
 using BlockToInstMap = std::map<BasicBlock *, Instruction *>;
 
 static bool isAllocaPromotable(AllocStackInst *ASI) {
@@ -45,7 +45,7 @@ static void collectStackAllocations(Function *F, std::vector<AllocStackInst *> &
   }
 }
 
-static void promoteAllocStackToSSA(AllocStackInst *ASI, DominatorTree &DT) {
+static void promoteAllocStackToSSA(AllocStackInst *ASI, DominanceInfo &DT) {
   NodePriorityQueue PQ;
   std::unordered_set<BasicBlock *> phiBlocks;
   
@@ -53,26 +53,23 @@ static void promoteAllocStackToSSA(AllocStackInst *ASI, DominatorTree &DT) {
   
   for (auto *U : ASI->getUsers()) {
     if (dynamic_cast<StoreStackInst *>(U)) {
-        if (auto Node = DT.getDomTreeNode(U->getParent())) {
-          PQ.push(Node);
-        }
+      PQ.push(U->getParent());
     }
   }
   
-  std::unordered_set<DomTreeNodePtr> visited;
-  std::vector<DomTreeNodePtr> workList;
+  std::unordered_set<BasicBlock *> visited;
+  std::vector<BasicBlock *> workList;
   
   while (!PQ.empty()) {
-    DomTreeNodePtr root = PQ.top();
+    BasicBlock *root = PQ.top();
     PQ.pop();
     
     workList.clear();
     workList.push_back(root);
     
     while (!workList.empty()) {
-      auto node = workList.back();
+      auto BB = workList.back();
       workList.pop_back();
-      BasicBlock *BB = node.get()->getBlock();
       BB->dump();
       
       for (auto frontier : DT.getDominanceFrontier(BB)) {
@@ -80,8 +77,7 @@ static void promoteAllocStackToSSA(AllocStackInst *ASI, DominatorTree &DT) {
           continue;
         }
         
-        auto phi = frontier.get()->getBlock();
-        if (phiBlocks.insert(phi).second) {
+        if (phiBlocks.insert(frontier).second) {
           PQ.push(frontier);
           workList.push_back(frontier);
         }
@@ -106,9 +102,17 @@ bool Mem2Reg::runOnFunction(Function *F) {
   F->dump();
   
   bool changed = false;
-  DominatorTree DT;
-  DT.runOnFunction(F);
-  DT.calcuate();
+  DominanceInfo DT(F);
+  
+  auto B = F->front();
+  B->dump();
+  
+  for (auto *succ : successors(B)) {
+    succ->dump();
+    for (auto frontier : DT.getDominanceFrontier(succ)) {
+      frontier->dump();
+    }
+  }
   
   std::vector<AllocStackInst *> allocas;
   

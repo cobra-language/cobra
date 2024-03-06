@@ -102,6 +102,38 @@ public:
   
   PhiInst *createPhiInst();
   
+  /// This is an RAII object that destroys instructions when it is destroyed.
+  class InstructionDestroyer {
+    InstructionDestroyer(const InstructionDestroyer &) = delete;
+    void operator=(const InstructionDestroyer &) = delete;
+
+    std::vector<Instruction *> list{};
+
+   public:
+    explicit InstructionDestroyer() = default;
+
+    /// \returns true if the instruction \p A is already in the destruction
+    /// queue. Notice that this is an O(n) search and should only be used for
+    /// debugging.
+    bool hasInstruction(Instruction *A) {
+      return std::find(list.begin(), list.end(), A) != list.end();
+    }
+
+    /// Add the instruction \p  A to the list of instructions to delete.
+    void add(Instruction *A) {
+#ifndef NDEBUG
+      assert(!hasInstruction(A) && "Instruction already in list!");
+#endif
+      list.push_back(A);
+    }
+
+    ~InstructionDestroyer() {
+      for (auto *I : list) {
+        I->eraseFromParent();
+      }
+    }
+  };
+  
 };
 
 }

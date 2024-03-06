@@ -192,7 +192,7 @@ void IRPrinter::printInstruction(Instruction *I) {
 }
 
 void IRPrinter::visitModule(Module &M) {
-  for (auto F : M.getFunctionList())
+  for (auto F : *&M)
     visitFunction(*F);
 }
 
@@ -201,8 +201,8 @@ void IRPrinter::visitFunction(Function &F) {
   BBNamer.clear();
   InstNamer.clear();
   
-  for (auto BB : UF->getBasicBlockList())
-    for (auto I : BB->getInstList())
+  for (auto BB : *UF)
+    for (auto I : *BB)
       InstNamer.getNumber(I);
   
   printFunctionHeader(UF);
@@ -210,7 +210,7 @@ void IRPrinter::visitFunction(Function &F) {
   printFunctionVariables(UF);
   os << "\n";
   
-  for (auto BB : F.getBasicBlockList())
+  for (auto BB : *&F)
     visitBasicBlock(*BB);
   
   os << "function_end"
@@ -224,7 +224,7 @@ void IRPrinter::visitBasicBlock(BasicBlock &BB) {
   Indent += 2;
 
   // Use IRVisitor dispatch to visit the instructions.
-  for (auto I : BB.getInstList())
+  for (auto I : *&BB)
     visitInstruction(*I);
 
   Indent -= 2;

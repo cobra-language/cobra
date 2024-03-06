@@ -7,6 +7,7 @@
 
 #include "cobra/IR/IR.h"
 #include "cobra/Utils/IRPrinter.h"
+#include "cobra/Support/Common.h"
 
 using namespace cobra;
 
@@ -75,6 +76,7 @@ void Value::replaceAllUsesWith(Value *Other) {
 StringRef Value::getKindStr() const {
   switch (Kind) {
     default:
+      COBRA_UNREACHABLE();
 #define DEF_VALUE(XX, PARENT) \
   case ValueKind::XX##Kind:   \
     return StringRef(#XX);
@@ -144,8 +146,6 @@ void Instruction::setOperand(Value *Val, unsigned Index) {
 }
 
 Value *Instruction::getOperand(unsigned Index) const {
-  auto c = Operands.size();
-  auto b = Operands[Index].second;
   return Operands[Index].first;
 }
 
@@ -164,8 +164,16 @@ void Instruction::eraseFromParent() {
   // Release this instruction from the use-list of other instructions.
   for (unsigned i = 0; i < getNumOperands(); i++)
     setOperand(nullptr, i);
-
-  getParent()->erase(this);
+  
+  for (auto it = getParent()->begin(),
+       e = getParent()->end();
+       it != e;
+       it++) {
+    if (this == *it) {
+      getParent()->getInstList().erase(it);
+      break;
+    }
+  }
 }
 
 void Instruction::dump(std::ostream &os) {
@@ -185,7 +193,7 @@ void Instruction::replaceFirstOperandWith(Value *OldValue, Value *NewValue) {
 std::string Instruction::getName() {
   switch (getKind()) {
     default:
-      break;
+      COBRA_UNREACHABLE();
 #define DEF_VALUE(XX, PARENT) \
   case ValueKind::XX##Kind:   \
     return #XX;
@@ -244,9 +252,9 @@ void BasicBlock::eraseFromParent() {
     (*begin())->replaceAllUsesWith(nullptr);
     (*begin())->eraseFromParent();
   }
-  
-  for (auto it = getParent()->getBasicBlockList().begin(),
-       e = getParent()->getBasicBlockList().end();
+    
+  for (auto it = getParent()->begin(),
+       e = getParent()->end();
        it != e;
        it++) {
     if (this == *it) {
@@ -292,6 +300,14 @@ void Function::addBlock(BasicBlock *BB) {
 }
 void Function::addParameter(Parameter *A) {
   Parameters.push_back(A);
+}
+
+void Function::erase(BasicBlock *BB) {
+  for (auto it = begin(), e = end(); it != e; it++) {
+    if (BB == *it) {
+      BasicBlockList.erase(it);
+    }
+  }
 }
 
 Module::~Module() {

@@ -270,30 +270,23 @@ static void promoteAllocationToPhi(
   }
 }
 
-bool Mem2Reg::runOnFunction(Function *F) {
-  F->dump();
+static void pruneAllocStackUsage(Function *F) {
   
+}
+
+bool Mem2Reg::runOnFunction(Function *F) {
   bool changed = false;
   DominanceInfo DT(F);
   
   DomTreeLevelMap domTreeLevels;
   computeDomTreeLevels(&DT, domTreeLevels);
   
-//  auto B = F->front();
-//  B->dump();
-//
-//  for (auto *succ : successors(B)) {
-//    succ->dump();
-//    for (auto frontier : DT.getDominanceFrontier(DT.getNode(succ))) {
-//      frontier->getBlock()->dump();
-//    }
-//  }
+  // a list of stack allocations to promote.
+  std::vector<AllocStackInst *> allocations;
   
-  std::vector<AllocStackInst *> allocas;
+  collectStackAllocations(F, allocations);
   
-  collectStackAllocations(F, allocas);
-  
-  for (auto *ASI : allocas) {
+  for (auto *ASI : allocations) {
     promoteAllocationToPhi(ASI, DT, domTreeLevels);
   }
   

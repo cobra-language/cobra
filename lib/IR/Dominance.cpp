@@ -9,16 +9,23 @@
 
 using namespace cobra;
 
-DominanceInfo::DominanceInfo(Function *F) {
+DominanceInfo::DominanceInfo(Function *F) : Parent(F) {
   assert(F->begin() != F->end() && "Function is empty!");
-  calculate(F);
+  calculate();
 }
 
-void DominanceInfo::calculate(Function *F) {
-  createReversePostOrder(F);
-  createIDoms(F);
-  createDominanceFrontier(F);
-  createDominanceTreeSuccs(F);
+void DominanceInfo::calculate() {
+  for (auto BB : *Parent)
+    DomTreeNodes.insert({BB, std::make_unique<DomTreeNode>(BB, nullptr)});
+  
+  auto FindEntry = getNode(Parent->front());
+  assert(FindEntry && "must have entry node");
+  RootNode = FindEntry;
+  
+  createReversePostOrder();
+  createIDoms();
+  createDominanceFrontier();
+  createDominanceTreeSuccs();
 }
 
 void DominanceInfo::postOrderVisit(BasicBlock *BB, std::set<BasicBlock *> &Visited) {
@@ -27,88 +34,103 @@ void DominanceInfo::postOrderVisit(BasicBlock *BB, std::set<BasicBlock *> &Visit
       if (Visited.find(B) == Visited.end())
         postOrderVisit(B, Visited);
   }
-  postOrderID[BB] = reversePostOrder.size();
-  reversePostOrder.push_back(BB);
+  PostOrderMap[getNode(BB)] = ReversePostOrder.size();
+  ReversePostOrder.push_back(getNode(BB));
 }
 
-BasicBlock *DominanceInfo::intersect(BasicBlock *BB1, BasicBlock *BB2) {
-  while (BB1 != BB2) {
-    while (postOrderID[BB1] < postOrderID[BB2]) {
-      BB1 = getIDom(BB1);
+DomTreeNode *DominanceInfo::intersect(DomTreeNode *A, DomTreeNode *B) {
+  while (A != B) {
+    while (PostOrderMap[A] < PostOrderMap[B]) {
+      A = A->getIDom();
     }
-    while (postOrderID[BB2] < postOrderID[BB1]) {
-      BB2 = getIDom(BB2);
+    while (PostOrderMap[B] < PostOrderMap[A]) {
+      B = B->getIDom();
     }
   }
-  return BB1;
+  return A;
 }
 
-void DominanceInfo::createReversePostOrder(Function *F) {
-  reversePostOrder.clear();
-  postOrderID.clear();
+std::vector<DomTreeNode *> DominanceInfo::getDomNodePreds(DomTreeNode *Node) {
+  auto R = PredecessorrsOfNode.find(Node);
+  if (R != PredecessorrsOfNode.end())
+    return R->second;
+  
+  std::vector<DomTreeNode *> PredDomTreeNodes;
+  auto preds = predecessors(Node->getBlock());
+  
+  for (auto pre : preds)
+    PredDomTreeNodes.push_back(getNode(pre));
+  
+  if (std::distance(preds.begin(), preds.end()) >= 2)
+    JoinNodes.push_back(Node);
+  
+  PredecessorrsOfNode.insert({Node, PredDomTreeNodes});
+  return PredDomTreeNodes;
+}
+
+void DominanceInfo::createReversePostOrder() {
+  ReversePostOrder.clear();
+  PostOrderMap.clear();
   
   std::set<BasicBlock *> visited;
-  reversePostOrder.reverse();
+  postOrderVisit(Parent->front(), visited);
+  ReversePostOrder.reverse();
 }
 
-void DominanceInfo::createIDoms(Function *F) {
-  auto Root = F->front();
-  setIDom(Root, Root);
+void DominanceInfo::createIDoms() {
+  RootNode->setIDom(RootNode);
   
   bool changed = true;
   while (changed) {
     changed = false;
-    for (auto BB : reversePostOrder) {
-      if (BB == Root)
+    for (auto Node : ReversePostOrder) {
+      if (Node == RootNode)
         continue;
       
       // (1) Find the first non-nullptr predecessor.
-      BasicBlock *pred = nullptr;
-      for (auto predecessor : predecessors(BB)) {
-        if (getIDom(predecessor)) {
-          pred = predecessor;
+      DomTreeNode *IDom = nullptr;
+      for (auto pred : getDomNodePreds(Node)) {
+        if (pred->getIDom()) {
+          IDom = pred;
           break;
         }
       }
       
       // (2) Traverse other predecessors.
-      BasicBlock *newIDom = pred;
-      for (auto *predecessor : predecessors(BB)) {
-        if (predecessor == pred)
+      DomTreeNode *newIDom = IDom;
+      for (auto *pred : getDomNodePreds(Node)) {
+        if (pred == IDom)
           continue;
         
-        if (getIDom(predecessor))
-          newIDom = intersect(predecessor, newIDom);
+        if (pred->getIDom())
+          newIDom = intersect(pred, newIDom);
       }
       
       // (3) Judge the IDom is changed.
-      if (getIDom(BB) != newIDom) {
-        setIDom(BB, newIDom);
+      if (Node->getIDom() != newIDom) {
+        Node->setIDom(newIDom);
         changed = true;
       }
     }
   }
 }
 
-void DominanceInfo::createDominanceFrontier(Function *F) {
-  for (auto &BB : F->getBasicBlockList()) {
-    auto preds = predecessors(BB);
-    if (std::distance(preds.begin(), preds.end()) >= 2) {
-      for (auto *pred : preds) {
-        auto runner = pred;
-        while (runner != getIDom(BB)) {
-          addDominanceFrontier(runner, BB);
-          runner = getIDom(runner);
-        }
+void DominanceInfo::createDominanceFrontier() {
+  for (auto &Node : JoinNodes) {
+    for (auto *pred : getDomNodePreds(Node)) {
+      auto runner = pred;
+      while (runner != Node->getIDom()) {
+        addDominanceFrontier(runner, Node);
+        runner = runner->getIDom();
       }
     }
   }
 }
 
-void DominanceInfo::createDominanceTreeSuccs(Function *F) {
-  for (auto &BB : F->getBasicBlockList()) {
-    auto idom = getIDom(BB);
-    if (idom != BB)
-      addDominanceTreeSucc(idom, BB);
+void DominanceInfo::createDominanceTreeSuccs() {
+  for (auto &Node : JoinNodes) {
+    auto idom = Node->getIDom();
+    if (idom != Node)
+      addDominanceTreeSucc(idom, Node);
   }
 }

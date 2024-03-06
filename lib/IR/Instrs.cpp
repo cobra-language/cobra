@@ -15,6 +15,7 @@ BasicBlock *TerminatorInst::getSuccessor(unsigned idx) {
   if (auto I = dynamic_cast<CLASS *>(this)) \
     return I->getSuccessor(idx);
 #include "cobra/IR/Instrs.def"
+  COBRA_UNREACHABLE();
 }
 
 void TerminatorInst::setSuccessor(unsigned idx, BasicBlock *B) {
@@ -23,6 +24,7 @@ void TerminatorInst::setSuccessor(unsigned idx, BasicBlock *B) {
   if (auto I = static_cast<CLASS *>(this)) \
     return I->setSuccessor(idx, B);
 #include "cobra/IR/Instrs.def"
+  COBRA_UNREACHABLE();
 }
 
 bool cobra::isSideEffectFree(Type T) {
@@ -178,6 +180,16 @@ std::pair<Value *, BasicBlock *> PhiInst::getEntry(unsigned i) const {
   return std::make_pair(
       getOperand(indexOfPhiEntry(i)),
       dynamic_cast<BasicBlock *>(getOperand(indexOfPhiEntry(i) + 1)));
+}
+
+void PhiInst::updateEntry(unsigned i, Value *val, BasicBlock *BB) {
+  setOperand(val, indexOfPhiEntry(i));
+  setOperand(BB, indexOfPhiEntry(i) + 1);
+}
+
+void PhiInst::addEntry(Value *val, BasicBlock *BB) {
+  pushOperand(val);
+  pushOperand(BB);
 }
 
 void PhiInst::removeEntry(unsigned index) {

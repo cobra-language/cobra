@@ -869,6 +869,8 @@ public:
     return Parameters;
   }
   
+  void erase(BasicBlock *BB);
+  
   void dump(std::ostream &os = std::cout);
   
   using iterator = BasicBlockListType::iterator;
@@ -917,11 +919,26 @@ public:
     return *Ctx;
   }
   
+  using iterator = FunctionListType::iterator;
+  
   FunctionListType &getFunctionList() {
     return FunctionList;
   }
   
   void push_back(Function *F);
+  
+  inline iterator begin() {
+    return FunctionList.begin();
+  }
+  inline iterator end() {
+    return FunctionList.end();
+  }
+  inline size_t size() const {
+    return FunctionList.size();
+  }
+  inline bool empty() const {
+    return FunctionList.empty();
+  }
   
   void dump(std::ostream &os = std::cout);
   

@@ -23,8 +23,9 @@ void PassManager::addPass(std::unique_ptr<Pass> P) {
 void PassManager::run(Module *M) {
   for (std::unique_ptr<Pass> &P : pipeline_) {
     if (auto *FP = dynamic_cast<FunctionPass *>(P.get())) {;
-      for (auto F : M->getFunctionList()) {
+      for (auto &F : *M) {
         FP->runOnFunction(F);
+        F->dump();
       }
       // Move to the next pass.
       continue;

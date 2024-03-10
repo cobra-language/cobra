@@ -25,8 +25,13 @@ void PassManager::run(Module *M) {
     if (auto *FP = dynamic_cast<FunctionPass *>(P.get())) {;
       for (auto &F : *M) {
         FP->runOnFunction(F);
-        F->dump();
       }
+      // Move to the next pass.
+      continue;
+    }
+    
+    if (auto *MP = dynamic_cast<ModulePass *>(P.get())) {;
+      MP->runOnModule(M);
       // Move to the next pass.
       continue;
     }

@@ -39,7 +39,6 @@ class DomTreeNode {
   mutable unsigned DFSNumIn = ~0;
   mutable unsigned DFSNumOut = ~0;
   
-  
 public:
   DomTreeNode(BasicBlock *BB, DomTreeNode *iDom)
       : TheBB(BB), IDom(iDom), Level(IDom ? IDom->Level + 1 : 0) {}
@@ -138,6 +137,7 @@ private:
   
   void postOrderVisit(BasicBlock *BB, std::set<BasicBlock *> &Visited);
   
+  // Intersect() - This function only be using to get closest parent of A and B.
   DomTreeNode *intersect(DomTreeNode *A, DomTreeNode *B);
   
   std::vector<DomTreeNode *> getDomNodePreds(DomTreeNode *Node);

@@ -66,6 +66,7 @@ static void computeDomTreeLevels(DominanceInfo *DT, DomTreeLevelMap &DomTreeLeve
   }
 }
 
+/// Get the values for this AllocStack variable that are flowing out of StartBB.
 static Value *getLiveOutValue(
     BasicBlock *startBB,
     BlockToInstMap &phiLoc,
@@ -125,6 +126,36 @@ static Value *getLiveInValue(
   return getLiveOutValue(IDom->getBlock(), phiLoc, DT, stores);
 }
 
+static void addBlockPhis(
+    AllocStackInst *ASI,
+    std::unordered_set<BasicBlock *> &phiBlocks,
+    BlockToInstMap &phiLoc) {
+  IRBuilder builder(ASI->getParent()->getParent());
+  
+  for (auto *BB : phiBlocks) {
+    builder.setInsertionPoint(*BB->begin());
+    // Create an empty phi node and register it as the phi for ASI for block BB.
+    phiLoc[BB] = builder.createPhiInst();
+  }
+}
+
+static void collectLoadsAndStores(
+    AllocStackInst *ASI,
+    std::vector<LoadStackInst *> &loads,
+    BlockToInstMap &stores) {
+  for (auto *U : ASI->getUsers()) {
+    if (auto *L = dynamic_cast<LoadStackInst *>(U)) {
+      loads.push_back(L);
+      continue;
+    }
+    if (auto *S = dynamic_cast<StoreStackInst *>(U)) {
+      assert(!stores.count(S->getParent()) && "multiple stores per block!");
+      stores[S->getParent()] = S;
+      continue;
+    }
+  }
+}
+
 static void promoteAllocationToPhi(
     AllocStackInst *ASI,
     DominanceInfo &DT,
@@ -135,8 +166,6 @@ static void promoteAllocationToPhi(
   // The "piggy-bank" data-structure that we use for processing the dom-tree
   // bottom-up.
   NodePriorityQueue priorityQueue;
-
-  ASI->dump();
 
   // Collect all of the stores into the AllocStack. We know that at this point
   // we have at most one store per block.
@@ -214,29 +243,14 @@ static void promoteAllocationToPhi(
 
   BlockToInstMap phiLoc;
 
-  IRBuilder builder(ASI->getParent()->getParent());
-
-  for (auto *BB : phiBlocks) {
-    builder.setInsertionPoint(*BB->begin());
-    // Create an empty phi node and register it as the phi for ASI for block BB.
-    phiLoc[BB] = builder.createPhiInst();
-  }
+  // For all phi nodes we've decided to insert:
+  addBlockPhis(ASI, phiBlocks, phiLoc);
   
   BlockToInstMap stores;
   std::vector<LoadStackInst *> loads;
   
   // Collect all loads/stores for the ASI.
-  for (auto *U : ASI->getUsers()) {
-    if (auto *L = dynamic_cast<LoadStackInst *>(U)) {
-      loads.push_back(L);
-      continue;
-    }
-    if (auto *S = dynamic_cast<StoreStackInst *>(U)) {
-      assert(!stores.count(S->getParent()) && "multiple stores per block!");
-      stores[S->getParent()] = S;
-      continue;
-    }
-  }
+  collectLoadsAndStores(ASI, loads, stores);
   
   // For all phi nodes we've decided to insert:
   for (auto *BB : phiBlocks) {
@@ -270,8 +284,10 @@ static void promoteAllocationToPhi(
   }
 }
 
-static void pruneAllocStackUsage(Function *F) {
+static bool pruneAllocStackUsage(Function *F) {
+  bool changed = false;
   
+  return changed;
 }
 
 bool Mem2Reg::runOnFunction(Function *F) {
@@ -286,9 +302,13 @@ bool Mem2Reg::runOnFunction(Function *F) {
   
   collectStackAllocations(F, allocations);
   
+  changed |= pruneAllocStackUsage(F);
+  
   for (auto *ASI : allocations) {
     promoteAllocationToPhi(ASI, DT, domTreeLevels);
   }
+  
+  F->dump();
   
   return changed;
 }

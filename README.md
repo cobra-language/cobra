@@ -43,7 +43,7 @@ The compiler pipeline is organized as below. Incidentally, early stages of this 
 * Parsing (10%)
 * Type checking (0%)
 * IR lowering (10%)
-* IR analysis and transformations (0%)
+* IR analysis and transformations (10%)
 * Bytecode generation (0%)
 * Bytecode Interpreter (0%)
 * Machine code generation (0%)

@@ -32,6 +32,10 @@ const Value::UseListTy &Value::getUsers() const {
   return Users;
 }
 
+unsigned Value::getNumUsers() const {
+  return Users.size();
+}
+
 bool Value::hasOneUser() const {
     return 1 == Users.size();
 }

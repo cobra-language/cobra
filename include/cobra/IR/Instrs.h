@@ -43,7 +43,7 @@ class SingleOperandInst : public Instruction {
   }
 
   SideEffectKind getSideEffect() {
-    
+    COBRA_UNREACHABLE();
   }
 
   static bool classof(const Value *V) {
@@ -67,6 +67,10 @@ public:
   unsigned getNumSuccessors() ;
   BasicBlock *getSuccessor(unsigned idx);
   void setSuccessor(unsigned idx, BasicBlock *B);
+  
+  SideEffectKind getSideEffect() {
+    COBRA_UNREACHABLE();
+  }
   
   static bool classof(const Value *V) {
     return kindIsA(V->getKind(), ValueKind::TerminatorInstKind);
@@ -160,6 +164,7 @@ class CondBranchInst : public TerminatorInst {
       return getTrueDest();
     if (idx == 1)
       return getFalseDest();
+    COBRA_UNREACHABLE();
   }
   void setSuccessor(unsigned idx, BasicBlock *B) {
     assert(idx <= 1 && "CondBranchInst only have 2 successors!");

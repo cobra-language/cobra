@@ -9,6 +9,17 @@
 
 using namespace cobra;
 
+SideEffectKind Instruction::getDerivedSideEffect() {
+  switch (getKind()) {
+    default:
+      COBRA_UNREACHABLE();
+#define DEF_VALUE(XX, PARENT) \
+  case ValueKind::XX##Kind:   \
+    return dynamic_cast<XX *>(this)->getSideEffect();
+#include "cobra/IR/Instrs.def"
+  }
+}
+
 BasicBlock *TerminatorInst::getSuccessor(unsigned idx) {
 #undef TERMINATOR
 #define TERMINATOR(CLASS, PARENT)           \

@@ -375,6 +375,8 @@ public:
   
   const UseListTy &getUsers() const;
   
+  unsigned getNumUsers() const;
+  
   bool hasOneUser() const;
 
   void removeUse(Use U);
@@ -704,6 +706,8 @@ class Instruction : public Value {
   
   SMLoc location_{};
   
+  SideEffectKind getDerivedSideEffect();
+  
 protected:
   explicit Instruction(ValueKind kind) : Value(kind), Parent(nullptr) {}
   
@@ -729,6 +733,10 @@ public:
   
   void eraseFromParent();
   
+  bool mayWriteMemory() {
+    return getDerivedSideEffect() >= SideEffectKind::MayWrite;
+  }
+  
   void dump(std::ostream &os = std::cout);
   
   void replaceFirstOperandWith(Value *OldValue, Value *NewValue);
@@ -753,6 +761,7 @@ class BasicBlock : public Value {
 public:
   using InstListType = std::list<Instruction *>;
   using iterator = InstListType::iterator;
+  using reverse_iterator = InstListType::reverse_iterator;
   
 private:
  InstListType InstList{};
@@ -787,6 +796,12 @@ public:
   }
   inline iterator end() {
     return InstList.end();
+  }
+  inline reverse_iterator rbegin() {
+    return InstList.rbegin();
+  }
+  inline reverse_iterator rend() {
+    return InstList.rend();
   }
   inline size_t size() const {
     return InstList.size();

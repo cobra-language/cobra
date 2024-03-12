@@ -8,6 +8,21 @@
 #ifndef CBFunction_h
 #define CBFunction_h
 
-#include <stdio.h>
+#include "cobra/VM/CBObject.h"
+
+namespace cobra {
+namespace vm {
+
+class Executable : public CBObject {
+  
+  
+};
+
+class CBFunction : public Executable {
+  
+};
+
+}
+}
 
 #endif /* CBFunction_h */

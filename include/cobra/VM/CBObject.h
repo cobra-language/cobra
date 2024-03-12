@@ -14,7 +14,21 @@
 namespace cobra {
 namespace vm {
 
-class CBObject {
+class CBFunction;
+class CBClasObject;
+
+class CBObject : public GCCell {
+  /// ptr to class object
+  CBClasObject* clazz;
+  
+  
+};
+
+class CBClasObject : public CBObject {
+  CBClasObject* super;
+  
+  /// virtual methods defined in this class; invoked through vtable
+  CBFunction* virtualMethods;
   
 };
 

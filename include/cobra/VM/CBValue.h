@@ -31,6 +31,9 @@ inline double BitsToDouble(uint64_t Bits) {
 }
 
 /// A NaN-box encoded value.
+/// An CBValue is anything that can appear on the left hand side of an assignment
+/// expression. It represents some storage location in memory that can be read
+/// from and written to.
 class CBValue {
 public:
   using TagType = intptr_t;

@@ -28,6 +28,7 @@ class CBClasObject : public CBObject {
   CBClasObject* super;
   
   /// virtual methods defined in this class; invoked through vtable
+  int virtualMethodCount;
   CBFunction* virtualMethods;
   
 };

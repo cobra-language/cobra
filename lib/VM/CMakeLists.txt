@@ -16,6 +16,8 @@ add_cobra_library(cobraVMRuntime
   Runtime.cpp
   String.cpp
   VM.cpp
+  CardTable.cpp
+  HeapRegion.cpp
   LINK_LIBS cobraSupport
 )
 

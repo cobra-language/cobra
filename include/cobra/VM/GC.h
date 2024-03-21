@@ -9,6 +9,7 @@
 #define GC_h
 
 #include "cobra/VM/HeapRegion.h"
+#include "cobra/VM/CardTable.h"
 
 namespace cobra {
 namespace vm {
@@ -58,7 +59,8 @@ public:
   
   void writeBarrier(const GCCell *value);
   
-  
+private:
+  std::unique_ptr<CardTable> cardTable;
 };
 
 }

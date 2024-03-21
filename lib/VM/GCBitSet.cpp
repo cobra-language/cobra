@@ -5,11 +5,4 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/HeapRegion.h"
-
-using namespace cobra;
-using namespace vm;
-
-inline bool HeapRegion::alloc(uint32_t size) {
-  
-}
+#include "cobra/VM/GCBitSet.h"

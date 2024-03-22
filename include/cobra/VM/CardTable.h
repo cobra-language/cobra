@@ -13,6 +13,11 @@
 namespace cobra {
 namespace vm {
 
+// Art
+
+// Maintain a card table from the the write barrier. All writes of
+// non-null values to heap addresses should go through an entry in
+// WriteBarrier, and from there to here.
 class CardTable {
 public:
   static constexpr size_t kLogCardSize = 9;

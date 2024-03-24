@@ -13,6 +13,8 @@
 namespace cobra {
 namespace vm {
 
+static const uint32_t LogHeapAlign = 3;
+
 class MarkBitSet {
   MarkBitSet() = default;
 
@@ -25,9 +27,42 @@ class MarkBitSet {
   
 private:
   static constexpr size_t kNumBits = 1;
-  BitSet<kNumBits> bits;
+  BitSet<kNumBits> bitSet;
+  
+public:
+  static constexpr size_t size() {
+    return kNumBits;
+  }
+  
+  inline size_t index(const void *ptr) const {
+    return (reinterpret_cast<uintptr_t>(ptr) - reinterpret_cast<uintptr_t>(this)) >> LogHeapAlign;
+  }
+  
+  inline bool at(size_t idx) const {
+    assert(idx < kNumBits && "precondition: ind must be within the index range");
+    return bitSet.contains(idx);
+  }
+  
+  inline void mark(size_t idx) {
+    assert(idx < kNumBits && "precondition: ind must be within the index range");
+    bitSet.set(idx, true);
+  }
+  
+  inline void mark(const void *ptr) {
+    size_t idx = index(ptr);
+    mark(idx);
+  }
+  
+  inline void clear() {
+    bitSet.reset();
+  }
+
+  inline void markAll() {
+    bitSet.set();
+  }
   
 };
+
 
 
 }

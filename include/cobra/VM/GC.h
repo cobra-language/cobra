@@ -10,7 +10,6 @@
 
 #include "cobra/VM/HeapRegion.h"
 #include "cobra/VM/CardTable.h"
-#include "cobra/VM/MarkBitSet.h"
 
 namespace cobra {
 namespace vm {
@@ -62,7 +61,6 @@ public:
   
 private:
   std::unique_ptr<CardTable> cardTable;
-  MarkBitSet markBitSet;
 };
 
 }

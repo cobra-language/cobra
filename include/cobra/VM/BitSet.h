@@ -70,6 +70,11 @@ public:
       bits[wordIdx] &= ~mask;
   }
   
+  inline void set() {
+    std::fill_n(
+        bits.begin(), kNumWords, std::numeric_limits<uintptr_t>::max());
+  }
+  
   inline void reset() {
     std::fill_n(bits.begin(), kNumWords, 0);
   }

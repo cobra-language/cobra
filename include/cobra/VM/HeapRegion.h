@@ -17,12 +17,12 @@ namespace cobra {
 namespace vm {
 
 static constexpr size_t KB = 1024;
-constexpr size_t CeilingOnPageSize = 16 * KB;
 
 class HeapRegion {
 public:
-  static constexpr size_t KHeapRegionSize = std::max(16 * KB, CeilingOnPageSize);
-  static constexpr size_t kMask = ~(KHeapRegionSize - 1);
+  static constexpr size_t KLogSize = 20;
+  static constexpr size_t KSize = {1 << KLogSize};
+  static constexpr size_t kMask = ~(KSize - 1);
   
   HeapRegion() = default;
   

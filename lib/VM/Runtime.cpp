@@ -6,3 +6,19 @@
  */
 
 #include "cobra/VM/Runtime.h"
+
+using namespace cobra;
+using namespace vm;
+
+Runtime::~Runtime() {
+  
+}
+
+std::shared_ptr<Runtime> Runtime::create() {
+  return std::shared_ptr<Runtime>{new Runtime()};
+}
+
+bool Runtime::runBytecode() {
+  CodeBlock *code = new CodeBlock();
+  return Interpreter::interpretFunction(code);
+}

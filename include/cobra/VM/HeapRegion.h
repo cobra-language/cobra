@@ -52,7 +52,7 @@ public:
   
 private:
   
-    
+  
 };
 
 /* static */
@@ -78,6 +78,8 @@ MarkBitSet *HeapRegion::getMarkBitSet(const void *ptr) {
 void HeapRegion::setCellMarkBit(const GCCell *cell) {
   MarkBitSet *markBits = getMarkBitSet(cell);
   
+}
+
 }
 
 }

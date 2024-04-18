@@ -8,10 +8,21 @@
 #ifndef Runtime_h
 #define Runtime_h
 
+#include <string>
+
+#include "cobra/VM/Interpreter.h"
+
 namespace cobra {
 namespace vm {
 
 class Runtime {
+  
+public:
+ static std::shared_ptr<Runtime> create();
+
+ ~Runtime();
+  
+  bool runBytecode();
   
 };
 

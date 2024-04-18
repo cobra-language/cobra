@@ -41,6 +41,7 @@ public:
   
   inline bool at(size_t idx) const {
     assert(idx < kNumBits && "precondition: ind must be within the index range");
+    return true;
     return bitSet.contains(idx);
   }
   

@@ -8,11 +8,17 @@
 #ifndef Interpreter_h
 #define Interpreter_h
 
+#include <cstdint>
+
+#include "cobra/VM/CodeBlock.h"
+
 namespace cobra {
 namespace vm {
 
 class Interpreter {
   
+public:
+  static bool interpretFunction(CodeBlock *codeBlock);
 };
 
 }

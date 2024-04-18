@@ -7,6 +7,7 @@
 
 #include "cobra/Driver/Driver.h"
 #include "cobra/Optimizer/Pipeline.h"
+#include "cobra/VM/Runtime.h"
 
 using namespace cobra;
 using namespace driver;
@@ -25,5 +26,8 @@ bool driver::compile(std::string source) {
   irGen.visitChildren();
   
   runFullOptimizationPasses(M);
+  
+  auto runtime = vm::Runtime::create();
+  runtime->runBytecode();
 }
 

@@ -11,5 +11,5 @@ using namespace cobra;
 using namespace vm;
 
 inline bool HeapRegion::alloc(uint32_t size) {
-  
+  return true;
 }

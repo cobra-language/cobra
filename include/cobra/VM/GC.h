@@ -8,6 +8,8 @@
 #ifndef GC_h
 #define GC_h
 
+#include <string>
+
 #include "cobra/VM/HeapRegion.h"
 #include "cobra/VM/CardTable.h"
 

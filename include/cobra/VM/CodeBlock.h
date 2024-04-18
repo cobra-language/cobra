@@ -10,4 +10,16 @@
 
 #include <stdio.h>
 
+namespace cobra {
+namespace vm {
+
+class CodeBlock {
+public:
+  CodeBlock() = default;
+
+};
+
+}
+}
+
 #endif /* CodeBlock_h */

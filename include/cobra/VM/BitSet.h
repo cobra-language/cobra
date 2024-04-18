@@ -81,9 +81,11 @@ public:
   
   inline bool contains(size_t idx) const {
     assert(idx < N && "Index must be within the bitset");
-    const uintptr_t mask = getMask(idx);
-    const size_t wordIdx = idx / kBitsPerWord;
-    return bits[wordIdx] & mask;
+//    const uintptr_t mask = getMask(idx);
+//    const size_t wordIdx = idx / kBitsPerWord;
+//    return bits[wordIdx] & mask;
+    
+    return true;
   }
   
 };

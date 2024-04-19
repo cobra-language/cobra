@@ -89,8 +89,6 @@ struct Inst {
 #define DEFINE_OPCODE(name) name##Inst i##name;
 #include "cobra/BCGen/BytecodeList.def"
   };
-  
-  OpCode op_Code;
 };
 LLVM_PACKED_END
 

@@ -7,5 +7,6 @@ add_cobra_library(cobraBackend
   RegAlloc.cpp
   Bytecode.cpp
   Lowering.cpp
+  BytecodeGenerator.cpp
   LINK_LIBS cobraFrontend cobraOptimizer
 )

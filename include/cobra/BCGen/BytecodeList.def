@@ -83,15 +83,14 @@ DEFINE_OPCODE_0(Unreachable)
 /// Arg1 = {}
 DEFINE_OPCODE_1(NewObject, Reg8)
 
-/// Create a new function using the built-in constructor (regardless of
-/// whether it was overridden).
-/// Arg1 = {}
-DEFINE_OPCODE_1(NewFunction, Reg8)
-
 /// Create a new array of a given size.
 /// Arg1 = new Array(Arg2)
 DEFINE_OPCODE_2(NewArray, Reg8, UInt16)
 
+/// Create a closure.
+/// Arg1 is the register in which to store the closure.
+/// Arg2 is index in the function table.
+DEFINE_OPCODE_2(NewFunction, Reg8, UInt16)
 
 /// Arg1 = Arg2 (Register copy)
 DEFINE_OPCODE_2(Mov, Reg8, Reg8)
@@ -110,6 +109,13 @@ DEFINE_OPCODE_3(Mod, Reg8, Reg8, Reg8)
 
 /// Arg1 = Arg2 - Arg3
 DEFINE_OPCODE_3(Sub, Reg8, Reg8, Reg8)
+
+
+/// Get an object property by string table index.
+DEFINE_OPCODE_1(GetField, UInt32)
+
+/// Set an object property by string index.
+DEFINE_OPCODE_1(SetField, UInt32)
 
 /// Call a function.
 /// Arg1 is the destination of the return value.
@@ -160,6 +166,10 @@ DEFINE_RET_TARGET(Call4)
 /// return Arg1;
 DEFINE_OPCODE_1(Ret, Reg8)
 
+/// Load a function parameter by index. Starts at 0 with 'this'.
+/// Arg1 = Arg2 == 0 ? this : arguments[Arg2 - 1];
+DEFINE_OPCODE_2(LoadParam, Reg8, UInt8)
+
 /// Load a constant string value by string table index.
 DEFINE_OPCODE_2(LoadConstString, Reg8, UInt16)
 OPERAND_STRING_ID(LoadConstString, 2)
@@ -171,10 +181,33 @@ DEFINE_OPCODE_1(LoadConstNull, Reg8)
 DEFINE_OPCODE_1(LoadConstTrue, Reg8)
 DEFINE_OPCODE_1(LoadConstFalse, Reg8)
 
-/// Load a function parameter by index. Starts at 0 with 'this'.
-/// Arg1 = Arg2 == 0 ? this : arguments[Arg2 - 1];
-DEFINE_OPCODE_2(LoadParam, Reg8, UInt8)
+/// Convert a value to a number.
+/// Arg1 = Arg2 - 0
+DEFINE_OPCODE_2(ToNumber, Reg8, Reg8)
 
+/// Convert a value to a string.
+DEFINE_OPCODE_2(ToString, Reg8, Reg8)
+
+// Jump instructions must be defined through the following DEFINE_JUMP macros.
+// The numeric suffix indicates number of operands the instruction takes.
+// The macros will automatically generate two opcodes for each definition,
+// one short jump that takes Addr8 as target and one long jump that takes
+// Addr32 as target. The address is relative to the offset of the instruction.
+#define DEFINE_JUMP_1(name)           \
+  DEFINE_OPCODE_1(name, Addr8)        \
+  DEFINE_OPCODE_1(name##Long, Addr32) \
+  DEFINE_JUMP_LONG_VARIANT(name, name##Long)
+
+#define DEFINE_JUMP_2(name)                 \
+  DEFINE_OPCODE_2(name, Addr8, Reg8)        \
+  DEFINE_OPCODE_2(name##Long, Addr32, Reg8) \
+  DEFINE_JUMP_LONG_VARIANT(name, name##Long)
+
+/// Unconditional branch to Arg1.
+DEFINE_JUMP_1(Jmp)
+/// Conditional branches to Arg1 based on Arg2.
+DEFINE_JUMP_2(JmpTrue)
+DEFINE_JUMP_2(JmpFalse)
 
 
 #undef DEFINE_JUMP_1

@@ -100,6 +100,16 @@ bool Interpreter::interpretFunction(CodeBlock *codeBlock) {
       DISPATCH;
     }
     
+    CASE(GetField) {
+      
+      DISPATCH;
+    }
+    
+    CASE(SetField) {
+      
+      DISPATCH;
+    }
+    
     CASE(Call) {
       
       DISPATCH;
@@ -126,6 +136,16 @@ bool Interpreter::interpretFunction(CodeBlock *codeBlock) {
     }
     
     CASE(Ret) {
+      
+      DISPATCH;
+    }
+    
+    CASE(ToNumber) {
+      
+      DISPATCH;
+    }
+    
+    CASE(ToString) {
       
       DISPATCH;
     }
@@ -165,7 +185,35 @@ bool Interpreter::interpretFunction(CodeBlock *codeBlock) {
       DISPATCH;
     }
     
+    CASE(Jmp) {
+      
+      DISPATCH;
+    }
     
+    CASE(JmpLong) {
+      
+      DISPATCH;
+    }
+    
+    CASE(JmpTrue) {
+
+      DISPATCH;
+    }
+    
+    CASE(JmpTrueLong) {
+      
+      DISPATCH;
+    }
+    
+    CASE(JmpFalse) {
+
+      DISPATCH;
+    }
+    
+    CASE(JmpFalseLong) {
+
+      DISPATCH;
+    }
 
   }
 

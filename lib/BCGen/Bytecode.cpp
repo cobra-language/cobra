@@ -7,10 +7,17 @@
 
 #include "cobra/BCGen/Bytecode.h"
 
-namespace cobra {
+using namespace cobra;
 
-class ByteCodeFunction {
-  
-};
+void BytecodeModule::setFunction(
+    uint32_t index,
+    std::unique_ptr<BytecodeFunction> F) {
+  assert(index < getNumFunctions() && "Function ID out of bound");
+  functions_[index] = std::move(F);
+}
 
+BytecodeFunction &BytecodeModule::getFunction(unsigned index) {
+  assert(index < getNumFunctions() && "Function ID out of bound");
+  assert(functions_[index] && "Invalid function");
+  return *functions_[index];
 }

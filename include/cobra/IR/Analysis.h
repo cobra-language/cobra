@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef HERMES_IR_ANALYSIS_H
-#define HERMES_IR_ANALYSIS_H
+#ifndef Analysis_h
+#define Analysis_h
 
 #include "cobra/IR/CFG.h"
 #include "cobra/IR/IR.h"

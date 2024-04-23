@@ -13,3 +13,13 @@
 #include <algorithm>
 #include <queue>
 
+using namespace cobra;
+
+VirtualRegister VirtualRegisterAllocator::getRegister(Value *I) {
+  assert(isAllocated(I) && "Instruction is not allocated!");
+  return allocatedReg[I];
+}
+
+bool VirtualRegisterAllocator::isAllocated(Value *I) {
+  return allocatedReg.count(I);
+}

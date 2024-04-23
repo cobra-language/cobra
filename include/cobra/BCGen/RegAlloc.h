@@ -5,3 +5,29 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#ifndef RegAlloc_h
+#define RegAlloc_h
+
+#include "cobra/IR/IR.h"
+
+#include <map>
+
+namespace cobra {
+
+using VirtualRegister = unsigned;
+
+class VirtualRegisterAllocator {
+  
+  std::map<Value *, VirtualRegister> allocatedReg;
+  
+public:
+  VirtualRegister getRegister(Value *I);
+  
+  bool isAllocated(Value *I);
+  
+  
+};
+
+}
+
+#endif

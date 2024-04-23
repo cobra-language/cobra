@@ -15,6 +15,12 @@
 namespace cobra {
 namespace vm {
 
+// dalvik
+struct InterpSaveState {
+  
+  
+};
+
 class Interpreter {
   
 public:

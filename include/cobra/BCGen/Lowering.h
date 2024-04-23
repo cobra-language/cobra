@@ -5,3 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#ifndef Lowering_h
+#define Lowering_h
+
+namespace cobra {
+
+}
+
+#endif

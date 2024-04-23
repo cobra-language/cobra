@@ -18,3 +18,7 @@ BytecodeFunctionGenerator::generateBytecodeFunction() {
 void BytecodeGenerator::emitMov(param_t dest, param_t src) {
   
 }
+
+std::unique_ptr<BytecodeModule> BytecodeGenerator::generate() {
+  
+}

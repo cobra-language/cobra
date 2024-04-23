@@ -36,6 +36,7 @@ class BytecodeGenerator : public BytecodeInstructionGenerator {
   
 public:
   
+  std::unique_ptr<BytecodeModule> generate();
   
 };
 

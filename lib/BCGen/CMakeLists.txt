@@ -8,5 +8,7 @@ add_cobra_library(cobraBackend
   Bytecode.cpp
   Lowering.cpp
   BytecodeGenerator.cpp
+  BCGen.cpp
+  BytecodeRawData.cpp
   LINK_LIBS cobraFrontend cobraOptimizer
 )

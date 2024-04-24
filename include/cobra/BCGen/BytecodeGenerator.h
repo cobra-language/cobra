@@ -10,15 +10,16 @@
 
 #include <vector>
 
+#include "cobra/IR/IR.h"
 #include "cobra/BCGen/Bytecode.h"
 #include "cobra/BCGen/RegAlloc.h"
 #include "cobra/BCGen/BytecodeInstructionGenerator.h"
 
 namespace cobra {
 
-class BytecodeFunctionGenerator {
-  
-  std::vector<opcode_t> opcodes_{};
+class BytecodeFunctionGenerator : public BytecodeInstructionGenerator {
+    
+  void emitMov(param_t dest, param_t src);
   
 public:
   static std::unique_ptr<BytecodeFunctionGenerator> create() {
@@ -32,10 +33,20 @@ public:
 
 class BytecodeGenerator : public BytecodeInstructionGenerator {
   
-  void emitMov(param_t dest, param_t src);
+  std::map<Function *, std::unique_ptr<BytecodeFunctionGenerator>>
+      functionGenerators_{};
+  std::vector<Function *> functions;
+  std::map<Function *, unsigned> functionIDMap;
   
 public:
   
+  unsigned addFunction(Function *F);
+  
+  void setFunctionGenerator(
+      Function *F,
+      std::unique_ptr<BytecodeFunctionGenerator> BFG);
+  
+  std::unique_ptr<BytecodeModule> generate();
   
 };
 

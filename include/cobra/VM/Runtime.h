@@ -11,6 +11,7 @@
 #include <string>
 
 #include "cobra/VM/Interpreter.h"
+#include "cobra/BCGen/BytecodeRawData.h"
 
 namespace cobra {
 namespace vm {
@@ -22,7 +23,7 @@ public:
 
  ~Runtime();
   
-  bool runBytecode();
+  bool runBytecode(std::shared_ptr<BytecodeRawData> &&bytecode);
   
 };
 

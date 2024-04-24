@@ -8,6 +8,8 @@
 #include "cobra/Driver/Driver.h"
 #include "cobra/Optimizer/Pipeline.h"
 #include "cobra/VM/Runtime.h"
+#include "cobra/BCGen/BCGen.h"
+#include "cobra/BCGen/BytecodeRawData.h"
 
 using namespace cobra;
 using namespace driver;
@@ -27,7 +29,10 @@ bool driver::compile(std::string source) {
   
   runFullOptimizationPasses(M);
   
+  auto BM = generateBytecode(&M);
+  
   auto runtime = vm::Runtime::create();
-  runtime->runBytecode();
+  auto BR = cobra::BytecodeRawData::create(std::move(BM));
+  runtime->runBytecode(std::move(BR));
 }
 

@@ -17,12 +17,13 @@
 
 using namespace cobra;
 
-std::unique_ptr<BytecodeModule> generateBytecode(Module *M) {
+std::unique_ptr<BytecodeModule> cobra::generateBytecode(Module *M) {
   BytecodeGenerator BCGen{};
   
   for (auto &F : *M) {
     VirtualRegisterAllocator RA{};
   }
   
+  return BCGen.generate();
 }
 

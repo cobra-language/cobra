@@ -144,3 +144,9 @@ PhiInst *IRBuilder::createPhiInst() {
 
   return createPhiInst(values, blocks);
 }
+
+MovInst *IRBuilder::createMovInst(Value *input) {
+  auto MI = new MovInst(input);
+  insert(MI);
+  return MI;
+}

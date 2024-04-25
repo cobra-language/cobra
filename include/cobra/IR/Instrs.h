@@ -477,6 +477,27 @@ class PhiInst : public Instruction {
   }
 };
 
+class MovInst : public SingleOperandInst {
+  MovInst(const MovInst &) = delete;
+  void operator=(const MovInst &) = delete;
+
+ public:
+  explicit MovInst(Value *input)
+      : SingleOperandInst(ValueKind::MovInstKind, input) {
+    setType(input->getType());
+  }
+  explicit MovInst(const MovInst *src, std::vector<Value *> operands)
+      : SingleOperandInst(src, operands) {}
+
+  SideEffectKind getSideEffect() {
+    return SideEffectKind::None;
+  }
+
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::MovInstKind);
+  }
+};
+
 }
 
 #endif /* Instrs_h */

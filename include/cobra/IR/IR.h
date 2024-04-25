@@ -741,6 +741,8 @@ public:
   
   void replaceFirstOperandWith(Value *OldValue, Value *NewValue);
   
+  void moveBefore(Instruction *Later);
+  
   std::string getName();
   
   Context &getContext() const;

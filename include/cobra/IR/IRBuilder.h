@@ -102,6 +102,8 @@ public:
   
   PhiInst *createPhiInst();
   
+  MovInst *createMovInst(Value *input);
+  
   /// This is an RAII object that destroys instructions when it is destroyed.
   class InstructionDestroyer {
     InstructionDestroyer(const InstructionDestroyer &) = delete;

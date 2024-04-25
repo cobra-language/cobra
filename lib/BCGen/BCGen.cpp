@@ -11,6 +11,7 @@
 #include "cobra/BCGen/BytecodeGenerator.h"
 #include "cobra/Optimizer/Pass.h"
 #include "cobra/Optimizer/PassManager.h"
+#include "cobra/IR/Analysis.h"
 
 #include <algorithm>
 #include <queue>
@@ -22,6 +23,9 @@ std::unique_ptr<BytecodeModule> cobra::generateBytecode(Module *M) {
   
   for (auto &F : *M) {
     VirtualRegisterAllocator RA{};
+    
+    PostOrderAnalysis PO(F);
+    std::vector<BasicBlock *> order(PO.rbegin(), PO.rend());
   }
   
   return BCGen.generate();

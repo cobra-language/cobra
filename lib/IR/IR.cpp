@@ -194,6 +194,17 @@ void Instruction::replaceFirstOperandWith(Value *OldValue, Value *NewValue) {
   }
 }
 
+void Instruction::moveBefore(Instruction *Later) {
+  if (this == Later)
+    return;
+
+  getParent()->getInstList().remove(this);
+  auto InsertionPoint = Later->getParent()->getIterator(Later);
+  Later->getParent()->getInstList().insert(InsertionPoint, this);
+
+  setParent(Later->getParent());
+}
+
 std::string Instruction::getName() {
   switch (getKind()) {
     default:

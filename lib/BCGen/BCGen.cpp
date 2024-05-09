@@ -22,7 +22,7 @@ std::unique_ptr<BytecodeModule> cobra::generateBytecode(Module *M) {
   BytecodeGenerator BCGen{};
   
   for (auto &F : *M) {
-    VirtualRegisterAllocator RA{};
+    VirtualRegisterAllocator RA{F};
     
     PostOrderAnalysis PO(F);
     std::vector<BasicBlock *> order(PO.rbegin(), PO.rend());

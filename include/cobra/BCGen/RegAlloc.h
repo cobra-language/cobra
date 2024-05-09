@@ -20,7 +20,23 @@ class VirtualRegisterAllocator {
   
   std::map<Value *, VirtualRegister> allocatedReg;
   
+  Function *F;
+  
+  void resolvePhis(std::vector<BasicBlock *> order);
+  
+  void calculateLocalLiveness();
+  
+  void calculateGlobalLiveness();
+  
+  void coalesce(std::vector<BasicBlock *> order);
+  
 public:
+  explicit VirtualRegisterAllocator(Function *func) : F(func) {}
+
+  virtual ~VirtualRegisterAllocator() = default;
+  
+  void allocate();
+  
   VirtualRegister getRegister(Value *I);
   
   bool isAllocated(Value *I);

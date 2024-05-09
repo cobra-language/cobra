@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#define DEBUG_TYPE "dce"
+#define DEBUG_TYPE "SSADestruction"
 
-#include "cobra/Optimizer/PhiElimination.h"
+#include "cobra/Optimizer/SSADestruction.h"
 #include "cobra/IR/IRBuilder.h"
 #include "cobra/IR/Instrs.h"
 #include "cobra/IR/Analysis.h"
@@ -120,16 +120,61 @@ bool static lowerPhis(Function *F) {
   return changed;
 }
 
-bool PhiElimination::runOnFunction(Function *F) {
+void static splitCriticalEdge(Function *F) {
+  
+}
+
+bool static lowerPhis2(Function *F) {
+  bool changed = false;
+
+  std::vector<PhiInst *> PHIs;
+  IRBuilder builder(F);
+  
+  PostOrderAnalysis PO(F);
+  std::vector<BasicBlock *> order(PO.rbegin(), PO.rend());
+  
+  for (auto BB : order) {
+    auto preds = predecessors(BB);
+    // Not split critical edges
+    if (std::distance(preds.begin(), preds.end()) >= 2)
+      continue;
+    for (auto Inst : *BB) {
+      if (auto *P = dynamic_cast<PhiInst *>(Inst)) {
+        PHIs.push_back(P);
+      }
+    }
+  }
+  
+  for (PhiInst *P : PHIs) {
+    for (unsigned i = 0, e = P->getNumEntries(); i < e; ++i) {
+      auto E = P->getEntry(i);
+      auto *term = E.second->getTerminator();
+      builder.setInsertionPoint(term);
+      auto *mov = builder.createMovInst(E.first);
+      
+      
+    }
+    
+  }
+  
+  
+  
+  
+  
+}
+
+bool SSADestruction::runOnFunction(Function *F) {
   bool changed = false;
 
   changed |= lowerPhis(F);
+  
+  F->dump();
 
   return changed;
 }
 
-std::unique_ptr<Pass> cobra::createPhiElimination() {
-  return std::make_unique<PhiElimination>();
+std::unique_ptr<Pass> cobra::createSSADestruction() {
+  return std::make_unique<SSADestruction>();
 }
 
 #undef DEBUG_TYPE

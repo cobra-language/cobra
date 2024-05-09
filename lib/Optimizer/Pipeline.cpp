@@ -18,7 +18,7 @@ void cobra::runFullOptimizationPasses(Module &M) {
   PM.addSimplifyCFG();
   PM.addMem2Reg();
   PM.addDCE();
-  PM.addPhiElimination();
+  PM.addSSADestruction();
 
   PM.run(&M);
 }

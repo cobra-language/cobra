@@ -5,18 +5,18 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef PhiElimination_h
-#define PhiElimination_h
+#ifndef SSADestruction_h
+#define SSADestruction_h
 
 #include "cobra/IR/IR.h"
 #include "cobra/Optimizer/Pass.h"
 
 namespace cobra {
 
-class PhiElimination : public FunctionPass {
+class SSADestruction : public FunctionPass {
  public:
-  explicit PhiElimination() : FunctionPass("PhiElimination") {}
-  ~PhiElimination() override = default;
+  explicit SSADestruction() : FunctionPass("SSADestruction") {}
+  ~SSADestruction() override = default;
 
   bool runOnFunction(Function *F) override;
 };

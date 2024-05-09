@@ -11,6 +11,6 @@ add_cobra_library(cobraOptimizer
   PassManager.cpp
   Pipeline.cpp
   SimplifyCFG.cpp
-  PhiElimination.cpp
+  SSADestruction.cpp
   LINK_LIBS cobraFrontend
 )

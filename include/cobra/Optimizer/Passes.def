@@ -24,6 +24,6 @@ PASS(CSE, "cse", "Common subexpression elimination")
 PASS(Mem2Reg, "mem2reg", "Construct SSA")
 PASS(SimplifyCFG, "simplifycfg", "Simplify CFG")
 PASS(Inlining, "inlining", "Inlining")
-PASS(PhiElimination, "phielimination", "Phi Elimination")
+PASS(SSADestruction, "ssadestruction", "SSA Destruction")
 
 #undef PASS

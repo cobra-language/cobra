@@ -12,7 +12,7 @@ add_cobra_library(cobraVMRuntime
   GC.cpp
   GCCell.cpp
   Interpreter.cpp
-  PrimitiveBox.cpp
+  Primitive.cpp
   Runtime.cpp
   String.cpp
   VM.cpp

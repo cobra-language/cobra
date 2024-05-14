@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef PrimitiveBox_h
-#define PrimitiveBox_h
+#ifndef Primitive_h
+#define Primitive_h
 
 #include "cobra/VM/CBObject.h"
 #include <string>
@@ -50,4 +50,4 @@ public:
 }
 }
 
-#endif /* PrimitiveBox_h */
+#endif /* Primitive_h */

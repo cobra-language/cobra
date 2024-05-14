@@ -5,4 +5,4 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/PrimitiveBox.h"
+#include "cobra/VM/Primitive.h"

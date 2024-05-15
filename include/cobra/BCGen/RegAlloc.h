@@ -17,13 +17,33 @@ namespace cobra {
 
 
 static const unsigned DEFAULT_REGISTER_COUNT = 30;
-using VirtualRegister = unsigned;
+//using VirtualRegister = unsigned;
+
+struct VirtualRegister {
+  unsigned value{0};
+  
+  unsigned getIndex() const {
+    return value;
+  }
+  
+  bool operator==(VirtualRegister RHS) const {
+    return value == RHS.value;
+  }
+  bool operator!=(VirtualRegister RHS) const {
+    return !(*this == RHS);
+  }
+};
 
 class VirtualRegisters {
   BitVector registers{DEFAULT_REGISTER_COUNT};
   
 public:
   VirtualRegisters() = default;
+  /// \returns true if the register \r is used;
+  bool isUsed(VirtualRegister r);
+
+  /// \returns true if the register \r is free;
+  bool isFree(VirtualRegister r);
   
   VirtualRegister allocateRegister();
 };

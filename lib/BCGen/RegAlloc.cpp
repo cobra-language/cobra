@@ -16,9 +16,32 @@
 
 using namespace cobra;
 
+bool VirtualRegisters::isUsed(VirtualRegister r) {
+  return !registers.test(r.getIndex());
+}
+
+bool VirtualRegisters::isFree(VirtualRegister r) {
+  return !isUsed(r);
+}
+
 VirtualRegister VirtualRegisters::allocateRegister() {
+  if (registers.none()) {
+    // If all bits are set, create a new register and return it.
+    unsigned numRegs = registers.size();
+    registers.resize(numRegs + 1, false);
+    VirtualRegister R = VirtualRegister{numRegs};
+    assert(isUsed(R) && "Error allocating a new register.");
+    return R;
+  }
   
-  return 1;
+  // Search for a free register to use.
+  unsigned i = registers.find_first();
+  assert(i >= 0 && "Unexpected failure to allocate a register");
+  VirtualRegister R = VirtualRegister{i};
+  assert(isFree(R) && "Error finding a free register");
+  registers.reset(i);
+  
+  return R;
 }
 
 static bool phiReadWrite(PhiInst *P) {

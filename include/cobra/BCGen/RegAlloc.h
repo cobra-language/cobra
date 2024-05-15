@@ -9,14 +9,18 @@
 #define RegAlloc_h
 
 #include "cobra/IR/IR.h"
+#include "cobra/Support/BitVector.h"
 
 #include <map>
 
 namespace cobra {
 
+
+static const unsigned DEFAULT_REGISTER_COUNT = 30;
 using VirtualRegister = unsigned;
 
 class VirtualRegisters {
+  BitVector registers{DEFAULT_REGISTER_COUNT};
   
 public:
   VirtualRegisters() = default;

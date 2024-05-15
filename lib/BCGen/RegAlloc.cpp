@@ -16,6 +16,11 @@
 
 using namespace cobra;
 
+VirtualRegister VirtualRegisters::allocateRegister() {
+  
+  return 1;
+}
+
 static bool phiReadWrite(PhiInst *P) {
   bool localPhiUse = false;
   bool externalUse = false;
@@ -111,6 +116,18 @@ void VirtualRegisterAllocator::resolvePhis(std::vector<BasicBlock *> order) {
       }
     }
   }
+}
+
+void calculateLocalLiveness() {
+  
+}
+
+void calculateGlobalLiveness() {
+  
+}
+
+void coalesce(std::vector<BasicBlock *> order) {
+  
 }
 
 void VirtualRegisterAllocator::allocate() {

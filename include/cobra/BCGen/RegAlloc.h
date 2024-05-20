@@ -34,11 +34,11 @@ struct VirtualRegister {
   }
 };
 
-class VirtualRegisters {
+class VirtualRegisterManager {
   BitVector registers{DEFAULT_REGISTER_COUNT};
   
 public:
-  VirtualRegisters() = default;
+  VirtualRegisterManager() = default;
   /// \returns true if the register \r is used;
   bool isUsed(VirtualRegister r);
 

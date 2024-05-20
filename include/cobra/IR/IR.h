@@ -456,6 +456,8 @@ public:
    return text;
  }
   
+  int getIndexInVariableList() const;
+  
 };
 
 class Parameter : public Value {

@@ -6,16 +6,110 @@
  */
 
 #include "cobra/BCGen/BytecodeGenerator.h"
+#include "cobra/Support/Common.h"
 
 using namespace cobra;
 
-std::unique_ptr<BytecodeFunction>
-BytecodeFunctionGenerator::generateBytecodeFunction() {
+unsigned BytecodeFunctionGenerator::encodeValue(Value *value) {
+  if (dynamic_cast<Instruction *>(value)) {
+    // TODO
+  } else if (auto *var = dynamic_cast<Variable *>(value)) {
+    return var->getIndexInVariableList();
+  } else {
+    COBRA_UNREACHABLE();
+  }
+}
+
+void BytecodeFunctionGenerator::emitMovIfNeeded(param_t dest, param_t src) {
+  if (dest == src)
+    return;
+  
+  this->emitMov(dest, src);
+}
+
+void BytecodeFunctionGenerator::generateSingleOperandInst(SingleOperandInst *Inst, BasicBlock *next) {
+  COBRA_UNREACHABLE();
+}
+
+void BytecodeFunctionGenerator::generateLoadStackInst(LoadStackInst *Inst, BasicBlock *next) {
+  auto dst = encodeValue(Inst);
+  auto src = encodeValue(Inst->getSingleOperand());
+  emitMovIfNeeded(dst, src);
+}
+
+void BytecodeFunctionGenerator::generateMovInst(MovInst *Inst, BasicBlock *next) {
+  auto dst = encodeValue(Inst);
+  auto src = encodeValue(Inst->getSingleOperand());
+  emitMovIfNeeded(dst, src);
+}
+
+void BytecodeFunctionGenerator::generateUnaryOperatorInst(UnaryOperatorInst *Inst, BasicBlock *next) {
+  
+}
+
+void BytecodeFunctionGenerator::generatePhiInst(PhiInst *Inst, BasicBlock *next) {
+  // PhiInst has been translated into a sequence of MOVs in RegAlloc
+  // Nothing to do here.
+}
+
+void BytecodeFunctionGenerator::generateBinaryOperatorInst(BinaryOperatorInst *Inst, BasicBlock *next) {
+  auto left = encodeValue(Inst->getLeftHandSide());
+  auto right = encodeValue(Inst->getRightHandSide());
+  auto res = encodeValue(Inst);
+  
+  using OpKind = BinaryOperatorInst::OpKind;
+  
+  switch (Inst->getOperatorKind()) {
+    case OpKind::EqualKind: // ==
+      this->emitEq(res, left, right);
+      break;
+    case OpKind::ModuloKind: // %   (%=)
+      this->emitMod(res, left, right);
+      break;
+    case OpKind::AddKind: // +   (+=)
+      this->emitAdd(res, left, right);
+      break;
+    default:
+      break;
+  }
+}
+
+void BytecodeFunctionGenerator::generateStoreStackInst(StoreStackInst *Inst, BasicBlock *next) {
+  COBRA_UNREACHABLE();
+}
+
+void BytecodeFunctionGenerator::generateAllocStackInst(AllocStackInst *Inst, BasicBlock *next) {
+  // This is a no-op.
+}
+
+void BytecodeFunctionGenerator::generateTerminatorInst(TerminatorInst *Inst, BasicBlock *next) {
+  COBRA_UNREACHABLE();
+}
+
+void BytecodeFunctionGenerator::generateBranchInst(BranchInst *Inst, BasicBlock *next) {
+  auto *dst = Inst->getBranchDest();
+  if (dst == next)
+    return;
+  
+  // TODO
+}
+
+void BytecodeFunctionGenerator::generateReturnInst(ReturnInst *Inst, BasicBlock *next) {
+  auto value = encodeValue(Inst->getValue());
+  this->emitRet(value);
+}
+
+void BytecodeFunctionGenerator::generateCondBranchInst(CondBranchInst *Inst, BasicBlock *next) {
+  
+}
+
+void BytecodeFunctionGenerator::generate(Instruction *ii, BasicBlock *next) {
   
 }
 
 
-void BytecodeFunctionGenerator::emitMov(param_t dest, param_t src) {
+std::unique_ptr<BytecodeFunction>
+BytecodeFunctionGenerator::generateBytecodeFunction() {
   
 }
 

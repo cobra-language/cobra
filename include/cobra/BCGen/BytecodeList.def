@@ -95,6 +95,9 @@ DEFINE_OPCODE_2(NewFunction, Reg8, UInt16)
 /// Arg1 = Arg2 (Register copy)
 DEFINE_OPCODE_2(Mov, Reg8, Reg8)
 
+/// Arg1 = Arg2 == Arg3 (JS equality)
+DEFINE_OPCODE_3(Eq, Reg8, Reg8, Reg8)
+
 /// Arg1 = Arg2 + Arg3
 DEFINE_OPCODE_3(Add, Reg8, Reg8, Reg8)
 

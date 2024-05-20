@@ -99,6 +99,13 @@ Variable::Variable(
 
 Variable::~Variable() {}
 
+int Variable::getIndexInVariableList() const {
+  int index = 0;
+
+  // TODO
+  COBRA_UNREACHABLE();
+}
+
 Parameter::Parameter(Function *parent, Identifier name)
     : Value(ValueKind::ParameterKind), Parent(parent), Name(std::move(name)) {
   Parent->addParameter(this);

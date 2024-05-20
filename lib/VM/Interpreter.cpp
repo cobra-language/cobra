@@ -70,6 +70,12 @@ bool Interpreter::interpretFunction(CodeBlock *codeBlock) {
       DISPATCH;
     }
     
+    CASE(Eq) {
+      
+      
+      DISPATCH;
+    }
+    
     CASE(Add) {
       
       

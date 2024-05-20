@@ -16,15 +16,15 @@
 
 using namespace cobra;
 
-bool VirtualRegisters::isUsed(VirtualRegister r) {
+bool VirtualRegisterManager::isUsed(VirtualRegister r) {
   return !registers.test(r.getIndex());
 }
 
-bool VirtualRegisters::isFree(VirtualRegister r) {
+bool VirtualRegisterManager::isFree(VirtualRegister r) {
   return !isUsed(r);
 }
 
-VirtualRegister VirtualRegisters::allocateRegister() {
+VirtualRegister VirtualRegisterManager::allocateRegister() {
   if (registers.none()) {
     // If all bits are set, create a new register and return it.
     unsigned numRegs = registers.size();

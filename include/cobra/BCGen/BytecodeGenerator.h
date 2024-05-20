@@ -18,15 +18,48 @@
 
 namespace cobra {
 
+struct Relocation {
+  enum RelocationType {
+    // A short jump instruction
+    JumpType = 0,
+    // A long jump instruction
+    LongJumpType,
+    // A basic block
+    BasicBlockType,
+    // A catch instruction
+    CatchType,
+  };
+  
+  /// The current location of this relocation.
+  offset_t loc;
+  /// Type of the relocation.
+  RelocationType type;
+  /// We multiplex pointer for different things under different types:
+  /// If the type is jump or long jump, pointer is the target basic block;
+  /// if the type is basic block, pointer is the pointer to it.
+  /// if the type is catch instruction, pointer is the pointer to it.
+  Value *pointer;
+};
+
 class BytecodeFunctionGenerator : public BytecodeInstructionGenerator {
-    
+  
+  Function *F_;
+  
+  VirtualRegisterAllocator &RA_;
+  
+  /// The list of all jump instructions and jump targets that require
+  /// relocation and address resolution.
+  std::vector<Relocation> relocations_{};
+      
   void emitMovIfNeeded(param_t dest, param_t src);
   
 public:
-  static std::unique_ptr<BytecodeFunctionGenerator> create() {
-    return std::unique_ptr<BytecodeFunctionGenerator>(
-        new BytecodeFunctionGenerator());
-  }
+  BytecodeFunctionGenerator(Function *F, VirtualRegisterAllocator &RA) : F_(F), RA_(RA) {}
+  
+  void resolveRelocations();
+  
+  /// Add long jump instruction to the relocation list.
+  void addJumpToRelocations(offset_t loc, BasicBlock *target);
   
   unsigned encodeValue(Value *value);
   

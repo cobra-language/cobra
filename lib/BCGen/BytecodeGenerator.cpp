@@ -10,9 +10,19 @@
 
 using namespace cobra;
 
+static constexpr param_t JumpTempValue = 0;
+
+void BytecodeFunctionGenerator::addJumpToRelocations(offset_t loc, BasicBlock *target) {
+  relocations_.push_back({loc, Relocation::RelocationType::LongJumpType, target});
+}
+
+void BytecodeFunctionGenerator::resolveRelocations() {
+  
+}
+
 unsigned BytecodeFunctionGenerator::encodeValue(Value *value) {
   if (dynamic_cast<Instruction *>(value)) {
-    // TODO
+    return RA_.getRegister(value).getIndex();
   } else if (auto *var = dynamic_cast<Variable *>(value)) {
     return var->getIndexInVariableList();
   } else {
@@ -79,7 +89,7 @@ void BytecodeFunctionGenerator::generateStoreStackInst(StoreStackInst *Inst, Bas
 }
 
 void BytecodeFunctionGenerator::generateAllocStackInst(AllocStackInst *Inst, BasicBlock *next) {
-  // This is a no-op.
+  COBRA_UNREACHABLE();
 }
 
 void BytecodeFunctionGenerator::generateTerminatorInst(TerminatorInst *Inst, BasicBlock *next) {
@@ -91,7 +101,8 @@ void BytecodeFunctionGenerator::generateBranchInst(BranchInst *Inst, BasicBlock 
   if (dst == next)
     return;
   
-  // TODO
+  auto loc = this->emitJmpLong(JumpTempValue);
+  addJumpToRelocations(loc, dst);
 }
 
 void BytecodeFunctionGenerator::generateReturnInst(ReturnInst *Inst, BasicBlock *next) {
@@ -100,7 +111,26 @@ void BytecodeFunctionGenerator::generateReturnInst(ReturnInst *Inst, BasicBlock 
 }
 
 void BytecodeFunctionGenerator::generateCondBranchInst(CondBranchInst *Inst, BasicBlock *next) {
+  auto condReg = encodeValue(Inst->getCondition());
+
+  BasicBlock *trueBlock = Inst->getTrueDest();
+  BasicBlock *falseBlock = Inst->getFalseDest();
   
+  if (next == trueBlock) {
+    auto loc = this->emitJmpFalseLong(JumpTempValue, condReg);
+    addJumpToRelocations(loc, falseBlock);
+    return;
+  }
+  
+  auto loc = this->emitJmpTrueLong(JumpTempValue, condReg);
+  addJumpToRelocations(loc, trueBlock);
+  
+  if (next == falseBlock) {
+    return;
+  }
+  
+  loc = this->emitJmpFalseLong(JumpTempValue, condReg);
+  addJumpToRelocations(loc, falseBlock);
 }
 
 void BytecodeFunctionGenerator::generate(Instruction *ii, BasicBlock *next) {

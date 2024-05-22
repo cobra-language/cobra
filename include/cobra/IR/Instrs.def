@@ -28,6 +28,8 @@ DEF_VALUE(SingleOperandInst, Instruction)
 DEF_VALUE(LoadStackInst, SingleOperandInst)
 DEF_VALUE(MovInst, SingleOperandInst)
 DEF_VALUE(UnaryOperatorInst, SingleOperandInst)
+DEF_VALUE(LoadConstInst, SingleOperandInst)
+DEF_VALUE(LoadParamInst, SingleOperandInst)
 MARK_LAST(SingleOperandInst)
 
 DEF_VALUE(PhiInst, Instruction)

@@ -33,7 +33,7 @@ class SingleOperandInst : public Instruction {
 
   explicit SingleOperandInst(
       const SingleOperandInst *src,
-      std::vector<Value *> operands)
+      std::vector<Value *> &operands)
       : Instruction(src, operands) {
     assert(operands.size() == 1 && "SingleOperandInst must have 1 operand!");
   }
@@ -59,7 +59,7 @@ protected:
  explicit TerminatorInst(ValueKind K) : Instruction(K) {}
   
 public:
- explicit TerminatorInst(const TerminatorInst *src, std::vector<Value *> operands)
+ explicit TerminatorInst(const TerminatorInst *src, std::vector<Value *> &operands)
      : Instruction(src, operands) {}
   
   virtual ~TerminatorInst() = default;
@@ -92,7 +92,7 @@ class BranchInst : public TerminatorInst {
       : TerminatorInst(ValueKind::BranchInstKind) {
     pushOperand(dest);
   }
-  explicit BranchInst(const BranchInst *src, std::vector<Value *> operands)
+  explicit BranchInst(const BranchInst *src, std::vector<Value *> &operands)
       : TerminatorInst(src, operands) {}
 
   SideEffectKind getSideEffect() {
@@ -145,7 +145,7 @@ class CondBranchInst : public TerminatorInst {
   }
   explicit CondBranchInst(
       const CondBranchInst *src,
-      std::vector<Value *> operands)
+      std::vector<Value *> &operands)
       : TerminatorInst(src, operands) {}
 
   SideEffectKind getSideEffect() {
@@ -186,7 +186,7 @@ class ReturnInst : public TerminatorInst {
   explicit ReturnInst(Value *val) : TerminatorInst(ValueKind::ReturnInstKind) {
     pushOperand(val);
   }
-  explicit ReturnInst(const ReturnInst *src, std::vector<Value *> operands)
+  explicit ReturnInst(const ReturnInst *src, std::vector<Value *> &operands)
       : TerminatorInst(src, operands) {}
 
   SideEffectKind getSideEffect() {
@@ -217,7 +217,7 @@ class AllocStackInst : public Instruction {
   }
   explicit AllocStackInst(
       const AllocStackInst *src,
-      std::vector<Value *> operands)
+      std::vector<Value *> &operands)
       : AllocStackInst(dynamic_cast<Label *>(operands[0])->get()) {
     // NOTE: we are playing a little trick here since the Label is not heap
     // allocated.
@@ -245,7 +245,7 @@ class LoadStackInst : public SingleOperandInst {
       : SingleOperandInst(ValueKind::LoadStackInstKind, alloc) {}
   explicit LoadStackInst(
       const LoadStackInst *src,
-      std::vector<Value *> operands)
+      std::vector<Value *> &operands)
       : SingleOperandInst(src, operands) {}
 
   AllocStackInst *getPtr() const {
@@ -338,7 +338,7 @@ class UnaryOperatorInst : public SingleOperandInst {
         op_(opKind) {}
   explicit UnaryOperatorInst(
       const UnaryOperatorInst *src,
-      std::vector<Value *> operands)
+      std::vector<Value *> &operands)
       : SingleOperandInst(src, operands), op_(src->op_) {}
 
   SideEffectKind getSideEffect();
@@ -423,7 +423,7 @@ class BinaryOperatorInst : public Instruction {
   }
   explicit BinaryOperatorInst(
       const BinaryOperatorInst *src,
-      std::vector<Value *> operands)
+      std::vector<Value *> &operands)
       : Instruction(src, operands), op_(src->op_) {}
 
   SideEffectKind getSideEffect() {
@@ -465,7 +465,7 @@ class PhiInst : public Instruction {
   explicit PhiInst(
       const ValueListType &values,
       const BasicBlockListType &blocks);
-  explicit PhiInst(const PhiInst *src, std::vector<Value *> operands)
+  explicit PhiInst(const PhiInst *src, std::vector<Value *> &operands)
       : Instruction(src, operands) {}
 
   SideEffectKind getSideEffect() {
@@ -486,7 +486,7 @@ class MovInst : public SingleOperandInst {
       : SingleOperandInst(ValueKind::MovInstKind, input) {
     setType(input->getType());
   }
-  explicit MovInst(const MovInst *src, std::vector<Value *> operands)
+  explicit MovInst(const MovInst *src, std::vector<Value *> &operands)
       : SingleOperandInst(src, operands) {}
 
   SideEffectKind getSideEffect() {
@@ -495,6 +495,58 @@ class MovInst : public SingleOperandInst {
 
   static bool classof(const Value *V) {
     return kindIsA(V->getKind(), ValueKind::MovInstKind);
+  }
+};
+
+class LoadConstInst : public SingleOperandInst {
+  LoadConstInst(const LoadConstInst &) = delete;
+  void operator=(const LoadConstInst &) = delete;
+
+ public:
+  explicit LoadConstInst(Literal *input)
+      : SingleOperandInst(ValueKind::LoadConstInstKind, input) {
+    setType(input->getType());
+  }
+  explicit LoadConstInst(
+      const LoadConstInst *src,
+      std::vector<Value *> &operands)
+      : SingleOperandInst(src, operands) {}
+
+  Literal *getConst() const {
+    return dynamic_cast<Literal *>(getSingleOperand());
+  }
+
+  SideEffectKind getSideEffect() {
+    return SideEffectKind::None;
+  }
+
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::LoadConstInstKind);
+  }
+};
+
+class LoadParamInst : public SingleOperandInst {
+  LoadParamInst(const LoadParamInst &) = delete;
+  void operator=(const LoadParamInst &) = delete;
+
+ public:
+  explicit LoadParamInst(LiteralNumber *input)
+      : SingleOperandInst(ValueKind::LoadParamInstKind, input) {}
+  explicit LoadParamInst(
+      const LoadParamInst *src,
+      std::vector<Value *> &operands)
+      : SingleOperandInst(src, operands) {}
+
+  LiteralNumber *getIndex() const {
+    return dynamic_cast<LiteralNumber *>(getSingleOperand());
+  }
+
+  SideEffectKind getSideEffect() {
+    return SideEffectKind::None;
+  }
+
+  static bool classof(const Value *V) {
+    return kindIsA(V->getKind(), ValueKind::LoadParamInstKind);
   }
 };
 

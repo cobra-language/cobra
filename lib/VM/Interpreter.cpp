@@ -161,6 +161,16 @@ bool Interpreter::interpretFunction(CodeBlock *codeBlock) {
       DISPATCH;
     }
     
+    CASE(LoadConstUInt8) {
+      
+      DISPATCH;
+    }
+    
+    CASE(LoadConstInt) {
+      
+      DISPATCH;
+    }
+    
     CASE(LoadConstEmpty) {
       
       DISPATCH;

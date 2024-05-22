@@ -12,13 +12,26 @@
 #include "cobra/Optimizer/Pass.h"
 #include "cobra/Optimizer/PassManager.h"
 #include "cobra/IR/Analysis.h"
+#include "cobra/BCGen/BCPasses.h"
 
 #include <algorithm>
 #include <queue>
 
 using namespace cobra;
 
+void lowerIR(Module *M) {
+  PassManager PM;
+  
+  PM.addPass<LoadConstants>();
+  PM.addPass<LoadParameters>();
+  
+  PM.run(M);
+  
+}
+
 std::unique_ptr<BytecodeModule> cobra::generateBytecode(Module *M) {
+  lowerIR(M);
+  
   BytecodeGenerator BCGen{};
   
   for (auto &F : *M) {

@@ -94,7 +94,7 @@ public:
   
   void generateBody();
   
-  void generateBlock(BasicBlock *BB, BasicBlock *next);
+  void generateCodeBlock(BasicBlock *BB, BasicBlock *next);
   
   void generateInst(Instruction *ii, BasicBlock *next);
   

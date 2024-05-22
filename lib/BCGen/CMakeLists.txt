@@ -11,5 +11,6 @@ add_cobra_library(cobraBackend
   BCGen.cpp
   BytecodeRawData.cpp
   BytecodeInstructionSelector.cpp
+  BCPasses.cpp
   LINK_LIBS cobraFrontend cobraOptimizer
 )

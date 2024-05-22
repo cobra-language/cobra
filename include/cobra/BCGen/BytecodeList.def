@@ -173,6 +173,10 @@ DEFINE_OPCODE_1(Ret, Reg8)
 /// Arg1 = Arg2 == 0 ? this : arguments[Arg2 - 1];
 DEFINE_OPCODE_2(LoadParam, Reg8, UInt8)
 
+/// Load a constant integer value.
+DEFINE_OPCODE_2(LoadConstUInt8, Reg8, UInt8)
+DEFINE_OPCODE_2(LoadConstInt, Reg8, Imm32)
+
 /// Load a constant string value by string table index.
 DEFINE_OPCODE_2(LoadConstString, Reg8, UInt16)
 OPERAND_STRING_ID(LoadConstString, 2)

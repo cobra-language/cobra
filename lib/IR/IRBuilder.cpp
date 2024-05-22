@@ -150,3 +150,15 @@ MovInst *IRBuilder::createMovInst(Value *input) {
   insert(MI);
   return MI;
 }
+
+LoadConstInst *IRBuilder::createLoadConstInst(Literal *value) {
+  auto inst = new LoadConstInst(value);
+  insert(inst);
+  return inst;
+}
+
+LoadParamInst *IRBuilder::createLoadParamInst(LiteralNumber *value) {
+  auto inst = new LoadParamInst(value);
+  insert(inst);
+  return inst;
+}

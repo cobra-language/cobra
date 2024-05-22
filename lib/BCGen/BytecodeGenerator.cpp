@@ -134,6 +134,28 @@ void BytecodeFunctionGenerator::generateCondBranchInst(CondBranchInst *Inst, Bas
   addJumpToRelocations(loc, falseBlock);
 }
 
+void BytecodeFunctionGenerator::generateLoadConstInst(LoadConstInst *Inst, BasicBlock *next) {
+  auto output = encodeValue(Inst);
+  Literal *literal = Inst->getConst();
+  switch (literal->getKind()) {
+    case ValueKind::LiteralNumberKind: {
+      auto *litNum = dynamic_cast<LiteralNumber *>(literal);
+      if (litNum->isUInt8Representible()) {
+        this->emitLoadConstUInt8(output, litNum->asUInt8());
+      }
+    }
+    default:
+      COBRA_UNREACHABLE();
+  }
+}
+
+void BytecodeFunctionGenerator::generateLoadParamInst(LoadParamInst *Inst, BasicBlock *next) {
+  auto output = encodeValue(Inst);
+  LiteralNumber *number = Inst->getIndex();
+  auto value = number->asUInt32();
+  this->emitLoadParam(output, value);
+}
+
 void BytecodeFunctionGenerator::generateBody() {
   PostOrderAnalysis PO(F_);
   std::vector<BasicBlock *> order(PO.rbegin(), PO.rend());
@@ -141,13 +163,13 @@ void BytecodeFunctionGenerator::generateBody() {
   for (int i = 0, e = order.size(); i < e; ++i) {
     BasicBlock *BB = order[i];
     BasicBlock *next = ((i + 1) == e) ? nullptr : order[i + 1];
-    generateBlock(BB, next);
+    generateCodeBlock(BB, next);
   }
   
   resolveRelocations();
 }
 
-void BytecodeFunctionGenerator::generateBlock(BasicBlock *BB, BasicBlock *next) {
+void BytecodeFunctionGenerator::generateCodeBlock(BasicBlock *BB, BasicBlock *next) {
   auto begin_loc = this->getCurrentLocation();
   
   relocations_.push_back({begin_loc, Relocation::RelocationType::BasicBlockType, BB});

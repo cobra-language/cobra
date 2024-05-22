@@ -104,6 +104,10 @@ public:
   
   MovInst *createMovInst(Value *input);
   
+  LoadConstInst *createLoadConstInst(Literal *value);
+  
+  LoadParamInst *createLoadParamInst(LiteralNumber *value);
+  
   /// This is an RAII object that destroys instructions when it is destroyed.
   class InstructionDestroyer {
     InstructionDestroyer(const InstructionDestroyer &) = delete;

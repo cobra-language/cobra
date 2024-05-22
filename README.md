@@ -2,9 +2,9 @@
 
 Cobra is a high-level statically typed programming language, it's a variant and subset of [TypeScript ](https://www.typescriptlang.org/), it's mainly used for Mobile App cross-platform dynamic scenarios. It can be run in two ways, one is to interprete and execute bytecode, and the other is to be compiled into machine code through LLVM. Its goal is to be more lightweight and faster than JS/TS.
 
+You can check more about the Syntax here [Guides](./doc/Guides.md)
+
 Cobra references a lot of [hermes](https://github.com/facebook/hermes)
-
-
 
 ## Hello World!
 

@@ -26,6 +26,14 @@ std::unique_ptr<BytecodeModule> cobra::generateBytecode(Module *M) {
     
     PostOrderAnalysis PO(F);
     std::vector<BasicBlock *> order(PO.rbegin(), PO.rend());
+    
+    RA.allocate();
+    
+    F->dump();
+    
+    auto funcGen = BytecodeFunctionGenerator::create(BCGen, F, RA);
+    BCGen.addFunction(F);
+    BCGen.setFunctionGenerator(F, std::move(funcGen));
   }
   
   return BCGen.generate();

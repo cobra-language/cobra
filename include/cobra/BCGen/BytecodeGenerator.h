@@ -18,6 +18,8 @@
 
 namespace cobra {
 
+class BytecodeGenerator;
+
 struct Relocation {
   enum RelocationType {
     // A short jump instruction
@@ -43,9 +45,16 @@ struct Relocation {
 
 class BytecodeFunctionGenerator : public BytecodeInstructionGenerator {
   
+  BytecodeGenerator &BCGen_;
+  
   Function *F_;
   
   VirtualRegisterAllocator &RA_;
+  
+  /// For each Basic Block, we map to its beginning instruction location
+  /// and the next basic block. We need this information to resolve jump
+  /// targets and exception handler table.
+  std::map<BasicBlock *, std::pair<offset_t, BasicBlock *>> basicBlockMap_{};
   
   /// The list of all jump instructions and jump targets that require
   /// relocation and address resolution.
@@ -54,7 +63,19 @@ class BytecodeFunctionGenerator : public BytecodeInstructionGenerator {
   void emitMovIfNeeded(param_t dest, param_t src);
   
 public:
-  BytecodeFunctionGenerator(Function *F, VirtualRegisterAllocator &RA) : F_(F), RA_(RA) {}
+  explicit BytecodeFunctionGenerator(
+      BytecodeGenerator &BCGen,
+      Function *F,
+      VirtualRegisterAllocator &RA)
+      : BCGen_(BCGen), F_(F), RA_(RA) {}
+  
+  static std::unique_ptr<BytecodeFunctionGenerator> create(
+      BytecodeGenerator &BCGen,
+      Function *F,
+      VirtualRegisterAllocator &RA) {
+    return std::unique_ptr<BytecodeFunctionGenerator>(
+        new BytecodeFunctionGenerator(BCGen, F, RA));
+  }
   
   void resolveRelocations();
   
@@ -71,7 +92,11 @@ public:
 #undef MARK_VALUE
 #undef INCLUDE_HBC_INSTRS
   
-  void generate(Instruction *ii, BasicBlock *next);
+  void generateBody();
+  
+  void generateBlock(BasicBlock *BB, BasicBlock *next);
+  
+  void generateInst(Instruction *ii, BasicBlock *next);
   
   std::unique_ptr<BytecodeFunction> generateBytecodeFunction();
   

@@ -7,6 +7,7 @@
 
 #include "cobra/BCGen/BytecodeGenerator.h"
 #include "cobra/Support/Common.h"
+#include "cobra/IR/Analysis.h"
 
 using namespace cobra;
 
@@ -133,14 +134,55 @@ void BytecodeFunctionGenerator::generateCondBranchInst(CondBranchInst *Inst, Bas
   addJumpToRelocations(loc, falseBlock);
 }
 
-void BytecodeFunctionGenerator::generate(Instruction *ii, BasicBlock *next) {
+void BytecodeFunctionGenerator::generateBody() {
+  PostOrderAnalysis PO(F_);
+  std::vector<BasicBlock *> order(PO.rbegin(), PO.rend());
   
+  for (int i = 0, e = order.size(); i < e; ++i) {
+    BasicBlock *BB = order[i];
+    BasicBlock *next = ((i + 1) == e) ? nullptr : order[i + 1];
+    generateBlock(BB, next);
+  }
+  
+  resolveRelocations();
 }
 
+void BytecodeFunctionGenerator::generateBlock(BasicBlock *BB, BasicBlock *next) {
+  auto begin_loc = this->getCurrentLocation();
+  
+  relocations_.push_back({begin_loc, Relocation::RelocationType::BasicBlockType, BB});
+  basicBlockMap_[BB] = std::make_pair(begin_loc, next);
+  
+  for (auto &I : *BB) {
+    generateInst(I, next);
+  }
+  
+  auto end_loc = this->getCurrentLocation();
+  if (!next) {
+    // When next is nullptr, we are hitting the last BB.
+    // We should also register that null BB with it's location.
+    assert(
+        basicBlockMap_.find(nullptr) == basicBlockMap_.end() &&
+        "Multiple nullptr BBs encountered");
+    basicBlockMap_[nullptr] = std::make_pair(end_loc, nullptr);
+  }
+}
+
+void BytecodeFunctionGenerator::generateInst(Instruction *ii, BasicBlock *next) {
+  switch (ii->getKind()) {
+#define DEF_VALUE(CLASS, PARENT) \
+  case ValueKind::CLASS##Kind:   \
+    return generate##CLASS(dynamic_cast<CLASS *>(ii), next);
+#include "cobra/IR/Instrs.def"
+
+    default:
+      COBRA_UNREACHABLE();
+  }
+}
 
 std::unique_ptr<BytecodeFunction>
 BytecodeFunctionGenerator::generateBytecodeFunction() {
-  
+  this->generateBody();
 }
 
 unsigned BytecodeGenerator::addFunction(Function *F) {

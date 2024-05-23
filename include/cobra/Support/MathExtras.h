@@ -144,6 +144,46 @@ template <typename T> T maskTrailingZeros(unsigned N) {
   return maskLeadingOnes<T>(CHAR_BIT * sizeof(T) - N);
 }
 
+/// Returns the next integer (mod 2**64) that is greater than or equal to
+/// \p Value and is a multiple of \p Align. \p Align must be non-zero.
+///
+/// Examples:
+/// \code
+///   alignTo(5, 8) = 8
+///   alignTo(17, 8) = 24
+///   alignTo(~0LL, 8) = 0
+///   alignTo(321, 255) = 510
+/// \endcode
+inline uint64_t alignTo(uint64_t Value, uint64_t Align) {
+  assert(Align != 0u && "Align can't be 0.");
+  return (Value + Align - 1) / Align * Align;
+}
+
+template <typename T, std::size_t SizeOfT> struct PopulationCounter {
+  static unsigned count(T Value) {
+    // Generic version, forward to 32 bits.
+#if __GNUC__ >= 4
+    return __builtin_popcount(Value);
+#else
+    uint32_t v = Value;
+    v = v - ((v >> 1) & 0x55555555);
+    v = (v & 0x33333333) + ((v >> 2) & 0x33333333);
+    return ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+#endif
+  }
+};
+
+/// Count the number of set bits in a value.
+/// Ex. countPopulation(0xF000F000) = 8
+/// Returns 0 if the word is zero.
+template <typename T>
+inline unsigned countPopulation(T Value) {
+  static_assert(std::numeric_limits<T>::is_integer &&
+                    !std::numeric_limits<T>::is_signed,
+                "Only unsigned integral types are allowed.");
+  return PopulationCounter<T, sizeof(T)>::count(Value);
+}
+
 }
 
 

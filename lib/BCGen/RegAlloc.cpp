@@ -44,6 +44,24 @@ VirtualRegister VirtualRegisterManager::allocateRegister() {
   return R;
 }
 
+bool VirtualRegisterAllocator::hasInstructionNumber(Instruction *I) {
+  return instructionNumbers_.count(I);
+}
+
+unsigned VirtualRegisterAllocator::getInstructionNumber(Instruction *I) {
+  auto it = instructionNumbers_.find(I);
+  if (it != instructionNumbers_.end()) {
+    return it->second;
+  }
+  
+  instructionsByNumbers_.push_back(I);
+  instructionInterval_.push_back(LiveInterval());
+  
+  unsigned newIdx = instructionsByNumbers_.size() - 1;
+  instructionNumbers_[I] = newIdx;
+  return newIdx;
+}
+
 static bool phiReadWrite(PhiInst *P) {
   bool localPhiUse = false;
   bool externalUse = false;
@@ -71,7 +89,7 @@ static bool phiReadWrite(PhiInst *P) {
   return terminatorUse || localPhiUse || externalUse;
 }
 
-void VirtualRegisterAllocator::resolvePhis(std::vector<BasicBlock *> order) {
+void VirtualRegisterAllocator::resolvePhis(std::vector<BasicBlock *> &order) {
   std::vector<PhiInst *> PHIs;
   IRBuilder builder(F);
   
@@ -141,15 +159,15 @@ void VirtualRegisterAllocator::resolvePhis(std::vector<BasicBlock *> order) {
   }
 }
 
-void calculateLocalLiveness() {
+void VirtualRegisterAllocator::calculateLocalLiveness(BlockLifetimeInfo &livenessInfo, BasicBlock *BB) {
   
 }
 
-void calculateGlobalLiveness() {
+void VirtualRegisterAllocator::calculateGlobalLiveness(std::vector<BasicBlock *> order) {
   
 }
 
-void coalesce(std::vector<BasicBlock *> order) {
+void VirtualRegisterAllocator::coalesce(std::vector<BasicBlock *> order) {
   
 }
 
@@ -158,6 +176,30 @@ void VirtualRegisterAllocator::allocate() {
   std::vector<BasicBlock *> order(PO.rbegin(), PO.rend());
   
   resolvePhis(order);
+  
+  for (auto *BB : order) {
+    for (auto &it : *BB) {
+      Instruction *I = it;
+      auto idx = getInstructionNumber(I);
+      (void)idx;
+      assert(idx == getInstructionNumber(I) && "Invalid numbering");
+    }
+  }
+  
+  F->dump();
+
+  // Init the basic block liveness data structure and calculate the local
+  // liveness for each basic block.
+  unsigned maxIdx = getMaxInstrIndex();
+  for (auto *BB : order) {
+    blockLiveness_[BB].init(maxIdx);
+  }
+  
+  for (auto *BB : order) {
+    calculateLocalLiveness(blockLiveness_[BB], BB);
+  }
+  
+  
 }
 
 VirtualRegister VirtualRegisterAllocator::getRegister(Value *I) {

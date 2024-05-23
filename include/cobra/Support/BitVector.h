@@ -13,28 +13,18 @@
 namespace cobra {
 
 class BitVector {
-  
-  typedef unsigned long BitWord;
+  typedef uintptr_t BitWord;
 
   enum { BITWORD_SIZE = (unsigned)sizeof(BitWord) * CHAR_BIT };
+
+  static_assert(BITWORD_SIZE == 64 || BITWORD_SIZE == 32,
+                "Unsupported word size");
   
   std::vector<BitWord> Bits;
   unsigned Size;
   
 private:
-  void init_words(std::vector<BitWord> &B, bool t) {
-    if (B.size() > 0)
-      memset(B.data(), 0 - (int)t, B.size() * sizeof(BitWord));
-  }
   
-  void init_words_from(std::vector<BitWord> &B, unsigned words, bool t) {
-    for (size_t i = words * sizeof(BitWord); i < Bits.size() * sizeof(BitWord); i++)
-      Bits.data()[i] = 0 - (int)t;
-  }
-  
-  unsigned NumBitWords(unsigned S) const {
-    return (S + BITWORD_SIZE - 1) / BITWORD_SIZE;
-  }
   
 public:
   typedef unsigned size_type;
@@ -80,7 +70,7 @@ public:
   explicit BitVector(unsigned s, bool t = false) : Size(s) {
     size_t Capacity = NumBitWords(s);
     Bits.resize(Capacity, 0 - BitWord(t));
-    init_words(Bits, t);
+    init_words(t);
     if (t)
       clear_unused_bits();
   }
@@ -88,6 +78,14 @@ public:
   bool empty() const { return Size == 0; }
   
   size_type size() const { return Size; }
+  
+  /// count - Returns the number of bits which are set.
+  size_type count() const {
+    unsigned NumBits = 0;
+    for (unsigned i = 0; i < NumBitWords(size()); ++i)
+      NumBits += countPopulation(Bits[i]);
+    return NumBits;
+  }
   
   /// any - Returns true if any bit is set.
   bool any() const {
@@ -109,7 +107,7 @@ public:
 
     return true;
   }
-  
+
   /// none - Returns true if none of the bits are set.
   bool none() const {
     return !any();
@@ -275,98 +273,204 @@ public:
   int find_prev_unset(unsigned PriorTo) {
     return find_last_unset_in(0, PriorTo);
   }
-
-  bool at(uint32_t idx) const {
-    assert(idx < Size && "Index must be within the bitset");
-    return Bits[idx / BITWORD_SIZE] & BitWord(1) << (idx % BITWORD_SIZE);
-  }
   
-  /// clear - Removes all bits from the bitvector. Does not change capacity.
+  /// clear - Removes all bits from the bitvector.
   void clear() {
     Size = 0;
+    Bits.clear();
   }
   
   /// resize - Grow or shrink the bitvector.
   void resize(unsigned N, bool t = false) {
-    if (N > getBitCapacity()) {
-      unsigned OldCapacity = Bits.size();
-      Bits.resize(NumBitWords(N), 0 - BitWord(t));
-      init_words_from(Bits, OldCapacity, t);
-    }
-    
-    // Set any old unused bits that are now included in the BitVector. This
-    // may set bits that are not included in the new vector, but we will clear
-    // them back out below.
-    if (N > Size)
-      set_unused_bits(t);
-    
-    // Update the size, and clear out any bits that are now unused
-    unsigned OldSize = Size;
+    set_unused_bits(t);
     Size = N;
-    if (t || N < OldSize)
-      clear_unused_bits();
+    Bits.resize(NumBitWords(N), 0 - BitWord(t));
+    clear_unused_bits();
   }
   
-  void reserve(unsigned N) {
-    if (N > getBitCapacity())
-      Bits.resize(NumBitWords(N), 0 - BitWord(false));
-  }
-  
+  void reserve(unsigned N) { Bits.reserve(NumBitWords(N)); }
+
+  // Set, reset, flip
   BitVector &set() {
-    init_words(Bits, true);
+    init_words(true);
+    clear_unused_bits();
     return *this;
   }
 
-  BitVector &set(uint32_t idx) {
-    Bits[idx / BITWORD_SIZE] |= BitWord(1) << (idx % BITWORD_SIZE);
+  BitVector &set(unsigned Idx) {
+    assert(Idx < Size && "access in bound");
+    Bits[Idx / BITWORD_SIZE] |= BitWord(1) << (Idx % BITWORD_SIZE);
+    return *this;
+  }
+
+  /// set - Efficiently set a range of bits in [I, E)
+  BitVector &set(unsigned I, unsigned E) {
+    assert(I <= E && "Attempted to set backwards range!");
+    assert(E <= size() && "Attempted to set out-of-bounds range!");
+
+    if (I == E) return *this;
+
+    if (I / BITWORD_SIZE == E / BITWORD_SIZE) {
+      BitWord EMask = BitWord(1) << (E % BITWORD_SIZE);
+      BitWord IMask = BitWord(1) << (I % BITWORD_SIZE);
+      BitWord Mask = EMask - IMask;
+      Bits[I / BITWORD_SIZE] |= Mask;
+      return *this;
+    }
+
+    BitWord PrefixMask = ~BitWord(0) << (I % BITWORD_SIZE);
+    Bits[I / BITWORD_SIZE] |= PrefixMask;
+    I = alignTo(I, BITWORD_SIZE);
+
+    for (; I + BITWORD_SIZE <= E; I += BITWORD_SIZE)
+      Bits[I / BITWORD_SIZE] = ~BitWord(0);
+
+    BitWord PostfixMask = (BitWord(1) << (E % BITWORD_SIZE)) - 1;
+    if (I < E)
+      Bits[I / BITWORD_SIZE] |= PostfixMask;
+
     return *this;
   }
   
   BitVector &reset() {
-    init_words(Bits, false);
+    init_words(false);
     return *this;
-  }
-  
-  BitVector &reset(unsigned idx) {
-    Bits[idx / BITWORD_SIZE] &= ~(BitWord(1) << (idx % BITWORD_SIZE));
-    return *this;
-  }
-  
-  BitVector &flip(unsigned idx) {
-    Bits[idx / BITWORD_SIZE] ^= BitWord(1) << (idx % BITWORD_SIZE);
-    return *this;
-  }
-  
-  reference operator[](unsigned idx) {
-    assert (idx < Size && "Out-of-bounds Bit access.");
-    return reference(*this, idx);
   }
 
-  bool operator[](unsigned idx) const {
-    assert (idx < Size && "Out-of-bounds Bit access.");
-    BitWord Mask = BitWord(1) << (idx % BITWORD_SIZE);
-    return (Bits[idx / BITWORD_SIZE] & Mask) != 0;
+  BitVector &reset(unsigned Idx) {
+    Bits[Idx / BITWORD_SIZE] &= ~(BitWord(1) << (Idx % BITWORD_SIZE));
+    return *this;
+  }
+
+  /// reset - Efficiently reset a range of bits in [I, E)
+  BitVector &reset(unsigned I, unsigned E) {
+    assert(I <= E && "Attempted to reset backwards range!");
+    assert(E <= size() && "Attempted to reset out-of-bounds range!");
+
+    if (I == E) return *this;
+
+    if (I / BITWORD_SIZE == E / BITWORD_SIZE) {
+      BitWord EMask = BitWord(1) << (E % BITWORD_SIZE);
+      BitWord IMask = BitWord(1) << (I % BITWORD_SIZE);
+      BitWord Mask = EMask - IMask;
+      Bits[I / BITWORD_SIZE] &= ~Mask;
+      return *this;
+    }
+
+    BitWord PrefixMask = ~BitWord(0) << (I % BITWORD_SIZE);
+    Bits[I / BITWORD_SIZE] &= ~PrefixMask;
+    I = alignTo(I, BITWORD_SIZE);
+
+    for (; I + BITWORD_SIZE <= E; I += BITWORD_SIZE)
+      Bits[I / BITWORD_SIZE] = BitWord(0);
+
+    BitWord PostfixMask = (BitWord(1) << (E % BITWORD_SIZE)) - 1;
+    if (I < E)
+      Bits[I / BITWORD_SIZE] &= ~PostfixMask;
+
+    return *this;
+  }
+  
+  BitVector &flip() {
+    for (auto &Bit : Bits)
+      Bit = ~Bit;
+    clear_unused_bits();
+    return *this;
+  }
+
+  BitVector &flip(unsigned Idx) {
+    Bits[Idx / BITWORD_SIZE] ^= BitWord(1) << (Idx % BITWORD_SIZE);
+    return *this;
+  }
+
+  // Indexing.
+  reference operator[](unsigned Idx) {
+    assert (Idx < Size && "Out-of-bounds Bit access.");
+    return reference(*this, Idx);
+  }
+
+  bool operator[](unsigned Idx) const {
+    assert (Idx < Size && "Out-of-bounds Bit access.");
+    BitWord Mask = BitWord(1) << (Idx % BITWORD_SIZE);
+    return (Bits[Idx / BITWORD_SIZE] & Mask) != 0;
+  }
+  
+  /// Return the last element in the vector.
+  bool back() const {
+    assert(!empty() && "Getting last element of empty vector.");
+    return (*this)[size() - 1];
   }
   
   bool test(unsigned idx) const {
     return (*this)[idx];
   }
+  
+  // Push single bit to end of vector.
+  void push_back(bool Val) {
+    unsigned OldSize = Size;
+    unsigned NewSize = Size + 1;
+
+    // Resize, which will insert zeros.
+    // If we already fit then the unused bits will be already zero.
+    if (NewSize > getBitCapacity())
+      resize(NewSize, false);
+    else
+      Size = NewSize;
+
+    // If true, set single bit.
+    if (Val)
+      set(OldSize);
+  }
+
+  /// Pop one bit from the end of the vector.
+  void pop_back() {
+    assert(!empty() && "Empty vector has no element to pop.");
+    resize(size() - 1);
+  }
+  
+  /// Test if any common bits are set.
+  bool anyCommon(const BitVector &RHS) const {
+    unsigned ThisWords = Bits.size();
+    unsigned RHSWords = RHS.Bits.size();
+    for (unsigned i = 0, e = std::min(ThisWords, RHSWords); i != e; ++i)
+      if (Bits[i] & RHS.Bits[i])
+        return true;
+    return false;
+  }
+  
+  // Comparison operators.
+  bool operator==(const BitVector &RHS) const {
+    if (size() != RHS.size())
+      return false;
+    unsigned NumWords = Bits.size();
+    return std::equal(Bits.begin(), Bits.begin() + NumWords, RHS.Bits.begin());
+  }
+  
+  void swap(BitVector &RHS) {
+    std::swap(Bits, RHS.Bits);
+    std::swap(Size, RHS.Size);
+  }
+
+  void invalid() {
+    assert(!Size && Bits.empty());
+    Size = (unsigned)-1;
+  }
+  bool isInvalid() const { return Size == (unsigned)-1; }
+  
+private:
+  unsigned NumBitWords(unsigned S) const {
+    return (S + BITWORD_SIZE - 1) / BITWORD_SIZE;
+  }
 
   // Set the unused bits in the high words.
   void set_unused_bits(bool t = true) {
-    //  Set high words first.
-    unsigned UsedWords = NumBitWords(Size);
-    if (Bits.size() > UsedWords)
-      init_words_from(Bits, UsedWords, t);
-
     //  Then set any stray high bits of the last used word.
-    unsigned ExtraBits = Size % BITWORD_SIZE;
-    if (ExtraBits) {
-      BitWord ExtraBitMask = ~0UL << ExtraBits;
+    if (unsigned ExtraBits = Size % BITWORD_SIZE) {
+      BitWord ExtraBitMask = ~BitWord(0) << ExtraBits;
       if (t)
-        Bits[UsedWords-1] |= ExtraBitMask;
+        Bits.back() |= ExtraBitMask;
       else
-        Bits[UsedWords-1] &= ~ExtraBitMask;
+        Bits.back() &= ~ExtraBitMask;
     }
   }
 
@@ -375,6 +479,10 @@ public:
     set_unused_bits(false);
   }
   
+  void init_words(bool t) {
+    std::fill(Bits.begin(), Bits.end(), 0 - (BitWord)t);
+  }
+    
 public:
   /// Return the size (in bytes) of the bit vector.
   size_t getMemorySize() const { return Bits.size() * sizeof(BitWord); }

@@ -15,7 +15,6 @@
 
 namespace cobra {
 
-
 static const unsigned DEFAULT_REGISTER_COUNT = 30;
 //using VirtualRegister = unsigned;
 
@@ -124,16 +123,61 @@ struct LiveInterval {
 };
 
 class VirtualRegisterAllocator {
+  /// Represents the liveness info for one block.
+  struct BlockLifetimeInfo {
+    BlockLifetimeInfo() = default;
+    void init(unsigned size) {
+      gen_.resize(size);
+      kill_.resize(size);
+      liveIn_.resize(size);
+      liveOut_.resize(size);
+      maskIn_.resize(size);
+    }
+    /// Which live values are used in this block.
+    BitVector gen_;
+    /// Which live values are defined in this block.
+    BitVector kill_;
+    /// Which values are marked as live-in, coming into this basic block.
+    BitVector liveIn_;
+    /// Which values are marked as live-in, coming out of this basic block.
+    BitVector liveOut_;
+    /// Which values are *masked* as live-in, coming into this basic block. The
+    /// mask-in bit vector is used for blocking the flow in specific blocks.
+    /// We use this to block the flow of phi values and enforce flow-sensitive
+    /// liveness.
+    BitVector maskIn_;
+  };
+  
+  /// Maps active slots (per bit) for each basic block.
+  std::map<BasicBlock *, BlockLifetimeInfo> blockLiveness_;
+  
+  /// Maps index numbers to instructions.
+  std::map<Instruction *, unsigned> instructionNumbers_;
+  /// Maps instructions to a index numbers.
+  std::vector<Instruction *> instructionsByNumbers_;
+  /// Holds the live interval of each instruction.
+  std::vector<LiveInterval> instructionInterval_;
   
   std::map<Value *, VirtualRegister> allocatedReg;
   
   Function *F;
   
-  void resolvePhis(std::vector<BasicBlock *> order);
+  /// Returns the last index allocated.
+  unsigned getMaxInstrIndex() {
+    return instructionsByNumbers_.size();
+  }
   
-  void calculateLocalLiveness();
+  /// \returns the index of instruction \p I.
+  unsigned getInstructionNumber(Instruction *I);
+
+  /// \returns true if the instruction \p already has a number.
+  bool hasInstructionNumber(Instruction *I);
   
-  void calculateGlobalLiveness();
+  void resolvePhis(std::vector<BasicBlock *> &order);
+  
+  void calculateLocalLiveness(BlockLifetimeInfo &livenessInfo, BasicBlock *BB);
+  
+  void calculateGlobalLiveness(std::vector<BasicBlock *> order);
   
   void coalesce(std::vector<BasicBlock *> order);
   

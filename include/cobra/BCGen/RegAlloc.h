@@ -45,6 +45,8 @@ public:
   bool isFree(VirtualRegister r);
   
   VirtualRegister allocateRegister();
+  
+  void killRegister(VirtualRegister reg);
 };
 
 struct LiveRange {
@@ -94,6 +96,10 @@ struct LiveInterval {
   
   explicit LiveInterval() = default;
   
+  explicit LiveInterval(size_t start, size_t end) {
+    add(LiveRange(start, end));
+  }
+  
   void add(LiveRange other) {
     for (auto &r : ranges_) {
       if (r.touches(other)) {
@@ -101,6 +107,23 @@ struct LiveInterval {
       }
     }
     ranges_.push_back(other);
+  }
+  
+  /// \returns a new compressed interval.
+  LiveInterval compress() const {
+    LiveInterval t;
+    for (auto &r : ranges_) {
+      t.add(r);
+    }
+    return t;
+  }
+
+  /// \returns the size represented by the interval.
+  size_t size() const {
+    if (ranges_.size())
+      return end() - start();
+
+    return 0;
   }
   
   size_t start() const {
@@ -162,6 +185,8 @@ class VirtualRegisterAllocator {
   
   Function *F;
   
+  VirtualRegisterManager registerManager{};
+  
   /// Returns the last index allocated.
   unsigned getMaxInstrIndex() {
     return instructionsByNumbers_.size();
@@ -177,9 +202,13 @@ class VirtualRegisterAllocator {
   
   void calculateLocalLiveness(BlockLifetimeInfo &livenessInfo, BasicBlock *BB);
   
-  void calculateGlobalLiveness(std::vector<BasicBlock *> order);
+  void calculateGlobalLiveness(std::vector<BasicBlock *> &order);
   
-  void coalesce(std::vector<BasicBlock *> order);
+  void calculateLiveIntervals(std::vector<BasicBlock *> &order);
+  
+  void coalesce(std::map<Instruction *, Instruction *> &map, std::vector<BasicBlock *> &order);
+  
+  void handleInstruction(Instruction *I);
   
 public:
   explicit VirtualRegisterAllocator(Function *func) : F(func) {}
@@ -189,6 +218,8 @@ public:
   void allocate();
   
   VirtualRegister getRegister(Value *I);
+  
+  void updateRegister(Value *I, VirtualRegister R);
   
   bool isAllocated(Value *I);
   

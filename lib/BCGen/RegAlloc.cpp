@@ -44,6 +44,12 @@ VirtualRegister VirtualRegisterManager::allocateRegister() {
   return R;
 }
 
+void VirtualRegisterManager::killRegister(VirtualRegister reg) {
+  assert(isUsed(reg) && "Killing an unused register!");
+  registers.set(reg.getIndex());
+  assert(isFree(reg) && "Error freeing register!");
+}
+
 bool VirtualRegisterAllocator::hasInstructionNumber(Instruction *I) {
   return instructionNumbers_.count(I);
 }
@@ -159,16 +165,216 @@ void VirtualRegisterAllocator::resolvePhis(std::vector<BasicBlock *> &order) {
   }
 }
 
-void VirtualRegisterAllocator::calculateLocalLiveness(BlockLifetimeInfo &livenessInfo, BasicBlock *BB) {
+void VirtualRegisterAllocator::calculateLocalLiveness(
+    BlockLifetimeInfo &livenessInfo,
+    BasicBlock *BB) {
+  for (auto &it : *BB) {
+    Instruction *I = it;
+
+    unsigned idx = getInstructionNumber(I);
+    livenessInfo.kill_.set(idx);
+
+    // PHI nodes require special handling because they are flow sensitive. Mask
+    // out flow that does not go in the direction of the phi edge.
+    if (auto *P = dynamic_cast<PhiInst *>(I)) {
+      std::vector<unsigned> incomingValueNum;
+
+      // Collect all incoming value numbers.
+      for (int i = 0, e = P->getNumEntries(); i < e; i++) {
+        auto E = P->getEntry(i);
+        // Skip unreachable predecessors.
+        if (!blockLiveness_.count(E.second))
+          continue;
+        if (auto *II = dynamic_cast<Instruction *>(E.first)) {
+          incomingValueNum.push_back(getInstructionNumber(II));
+        }
+      }
+
+      // Block the incoming values from flowing into the predecessors.
+      for (int i = 0, e = P->getNumEntries(); i < e; i++) {
+        auto E = P->getEntry(i);
+        // Skip unreachable predecessors.
+        if (!blockLiveness_.count(E.second))
+          continue;
+        for (auto num : incomingValueNum) {
+          blockLiveness_[E.second].maskIn_.set(num);
+        }
+      }
+
+      // Allow the flow of incoming values in specific directions:
+      for (int i = 0, e = P->getNumEntries(); i < e; i++) {
+        auto E = P->getEntry(i);
+        // Skip unreachable predecessors.
+        if (!blockLiveness_.count(E.second))
+          continue;
+        if (auto *II = dynamic_cast<Instruction *>(E.first)) {
+          unsigned idxII = getInstructionNumber(II);
+          blockLiveness_[E.second].maskIn_.reset(idxII);
+        }
+      }
+    }
+
+    // For each one of the operands that are also instructions:
+    for (unsigned opIdx = 0, e = I->getNumOperands(); opIdx != e; ++opIdx) {
+      auto *opInst = dynamic_cast<Instruction *>(I->getOperand(opIdx));
+      if (!opInst)
+        continue;
+      // Skip instructions from unreachable blocks.
+      if (!blockLiveness_.count(opInst->getParent()))
+        continue;
+
+      // Get the index of the operand.
+      auto opInstIdx = getInstructionNumber(opInst);
+      livenessInfo.gen_.set(opInstIdx);
+    }
+  }
   
 }
 
-void VirtualRegisterAllocator::calculateGlobalLiveness(std::vector<BasicBlock *> order) {
+void VirtualRegisterAllocator::calculateGlobalLiveness(std::vector<BasicBlock *> &order) {
+  unsigned iterations = 0;
+  bool changed = false;
+
+  // Init the live-in vector to be GEN-KILL.
+  for (auto &it : blockLiveness_) {
+    BlockLifetimeInfo &livenessInfo = it.second;
+    livenessInfo.liveIn_ |= livenessInfo.gen_;
+    livenessInfo.liveIn_.reset(livenessInfo.kill_);
+    livenessInfo.liveIn_.reset(livenessInfo.maskIn_);
+  }
+
+  do {
+    iterations++;
+    changed = false;
+
+    for (auto it = order.rbegin(), e = order.rend(); it != e; it++) {
+      BasicBlock *BB = *it;
+      BlockLifetimeInfo &livenessInfo = blockLiveness_[BB];
+
+      // Rule:  OUT = SUCC0_in  + SUCC1_in ...
+      for (auto *succ : successors(BB)) {
+        BlockLifetimeInfo &succInfo = blockLiveness_[succ];
+        // Check if we are about to change bits in the live-out vector.
+        if (succInfo.liveIn_.test(livenessInfo.liveOut_)) {
+          changed = true;
+        }
+
+        livenessInfo.liveOut_ |= succInfo.liveIn_;
+      }
+
+      // Rule: In = gen + (OUT - KILL)
+      // After initializing 'in' to 'gen' - 'kill', the only way for the result
+      // to change is for 'out' to change, and we check if 'out' changes above.
+      livenessInfo.liveIn_ = livenessInfo.liveOut_;
+      livenessInfo.liveIn_ |= livenessInfo.gen_;
+      livenessInfo.liveIn_.reset(livenessInfo.kill_);
+      livenessInfo.liveIn_.reset(livenessInfo.maskIn_);
+    }
+  } while (changed);
+
+  // Suppress -Wunused-but-set-variable warning with new compilers.
+  (void)iterations;
+}
+
+void VirtualRegisterAllocator::calculateLiveIntervals(std::vector<BasicBlock *> &order) {
+  /// Calculate the live intervals for each instruction. Start with a list of
+  /// intervals that only contain the instruction itself.
+  for (int i = 0, e = instructionsByNumbers_.size(); i < e; ++i) {
+    // The instructions are ordered consecutively. The start offset of the
+    // instruction is the index in the array plus one because the value starts
+    // to live on the next instruction.
+    instructionInterval_[i] = LiveInterval(i + 1, i + 1);
+  }
+
+  // For each basic block in the liveness map:
+  for (BasicBlock *BB : order) {
+    BlockLifetimeInfo &liveness = blockLiveness_[BB];
+
+    auto startOffset = getInstructionNumber(*BB->begin());
+    auto endOffset = getInstructionNumber(BB->getTerminator());
+
+    // Register fly-through basic blocks (basic blocks where the value enters)
+    // and leavs without doing anything to any of the operands.
+    for (int i = 0, e = liveness.liveOut_.size(); i < e; i++) {
+      bool leavs = liveness.liveOut_.test(i);
+      bool enters = liveness.liveIn_.test(i);
+      if (leavs && enters) {
+        instructionInterval_[i].add(LiveRange(startOffset, endOffset + 1));
+      }
+    }
+
+    // For each instruction in the block:
+    for (auto &it : *BB) {
+      auto instOffset = getInstructionNumber(it);
+      // The instruction is defined in this basic block. Check if it is leaving
+      // the basic block extend the interval until the end of the block.
+      if (liveness.liveOut_.test(instOffset)) {
+        instructionInterval_[instOffset].add(
+            LiveRange(instOffset + 1, endOffset + 1));
+        assert(
+            !liveness.liveIn_.test(instOffset) &&
+            "Livein but also killed in this block?");
+      }
+
+      // Extend the lifetime of the operands.
+      for (int i = 0, e = it->getNumOperands(); i < e; i++) {
+        auto instOp = dynamic_cast<Instruction *>(it->getOperand(i));
+        if (!instOp)
+          continue;
+
+        if (!hasInstructionNumber(instOp)) {
+          continue;
+        }
+
+        auto operandIdx = getInstructionNumber(instOp);
+        // Extend the lifetime of the interval to reach this instruction.
+        // Include this instruction in the interval in order to make sure that
+        // the register is not freed before the use.
+
+        auto start = operandIdx + 1;
+        auto end = instOffset + 1;
+        if (start < end) {
+          auto r = LiveRange(operandIdx + 1, instOffset + 1);
+          instructionInterval_[operandIdx].add(r);
+        }
+      }
+
+      // Extend the lifetime of the PHI to include the source basic blocks.
+      if (auto *P = dynamic_cast<PhiInst *>(it)) {
+        for (int i = 0, e = P->getNumEntries(); i < e; i++) {
+          auto E = P->getEntry(i);
+          // PhiInsts may reference instructions from dead code blocks
+          // (which will be unnumbered and unallocated). Since the edge
+          // is necessarily also dead, we can just skip it.
+          if (!hasInstructionNumber(E.second->getTerminator()))
+            continue;
+
+          unsigned termIdx = getInstructionNumber(E.second->getTerminator());
+          LiveRange R(termIdx, termIdx + 1);
+          instructionInterval_[instOffset].add(R);
+
+          // Extend the lifetime of the predecessor to the end of the BB.
+          if (auto *instOp = dynamic_cast<Instruction *>(E.first)) {
+            auto predIdx = getInstructionNumber(instOp);
+            auto R2 = LiveRange(predIdx + 1, termIdx);
+            instructionInterval_[predIdx].add(R2);
+          }
+        } // each pred.
+      }
+
+    } // for each instruction in the block.
+  } // for each block.
+}
+
+void VirtualRegisterAllocator::coalesce(
+    std::map<Instruction *,
+    Instruction *> &map,
+    std::vector<BasicBlock *> &order) {
   
 }
 
-void VirtualRegisterAllocator::coalesce(std::vector<BasicBlock *> order) {
-  
+void VirtualRegisterAllocator::handleInstruction(Instruction *I) {
+  // TODO
 }
 
 void VirtualRegisterAllocator::allocate() {
@@ -199,12 +405,121 @@ void VirtualRegisterAllocator::allocate() {
     calculateLocalLiveness(blockLiveness_[BB], BB);
   }
   
+  // Propagate the local liveness information across the whole function.
+  calculateGlobalLiveness(order);
+
+  // Calculate the live intervals for each instruction.
+  calculateLiveIntervals(order);
+
+  // Free the memory used for liveness.
+  blockLiveness_.clear();
+  
+  // Maps coalesced instructions. First uses the register allocated for Second.
+  std::map<Instruction *, Instruction *> coalesced;
+  
+  coalesce(coalesced, order);
+  
+  // Compare two intervals and return the one that starts first.
+  auto startsFirst = [&](unsigned a, unsigned b) {
+    LiveInterval &IA = instructionInterval_[a];
+    LiveInterval &IB = instructionInterval_[b];
+    return IA.start() < IB.start() || (IA.start() == IB.start() && a < b);
+  };
+  
+  auto endsFirst = [&](unsigned a, unsigned b) {
+    auto &aInterval = instructionInterval_[a];
+    auto &bInterval = instructionInterval_[b];
+    if (bInterval.end() == aInterval.end()) {
+      return bInterval.start() > aInterval.start() ||
+          (bInterval.start() == aInterval.start() && b > a);
+    }
+    return bInterval.end() > aInterval.end();
+  };
+  
+  using InstList = std::vector<unsigned>;
+  
+  std::priority_queue<unsigned, InstList, decltype(endsFirst)> intervals(
+      endsFirst);
+  
+  for (int i = 0, e = getMaxInstrIndex(); i < e; i++) {
+    intervals.push(i);
+  }
+  
+  std::priority_queue<unsigned, InstList, decltype(startsFirst)>
+      liveIntervalsQueue(startsFirst);
+  
+  // Perform the register allocation:
+    while (!intervals.empty()) {
+      unsigned instIdx = intervals.top();
+      intervals.pop();
+      Instruction *inst = instructionsByNumbers_[instIdx];
+      LiveInterval &instInterval = instructionInterval_[instIdx];
+      unsigned currentIndex = instInterval.end();
+
+
+      // Free all of the intervals that start after the current index.
+      while (!liveIntervalsQueue.empty()) {
+
+        unsigned topIdx = liveIntervalsQueue.top();
+        LiveInterval &range = instructionInterval_[topIdx];
+
+        // Flush empty intervals and intervals that finished after our index.
+        bool nonEmptyInterval = range.size();
+        if (range.start() < currentIndex && nonEmptyInterval) {
+          break;
+        }
+
+        liveIntervalsQueue.pop();
+
+        Instruction *I = instructionsByNumbers_[topIdx];
+        VirtualRegister R = getRegister(I);
+
+        registerManager.killRegister(R);
+
+        handleInstruction(I);
+      }
+
+      // Don't try to allocate registers that were merged into other live
+      // intervals.
+      if (coalesced.count(inst)) {
+        continue;
+      }
+
+      // Allocate a register for the live interval that we are currently handling.
+      if (!isAllocated(inst)) {
+        VirtualRegister R = registerManager.allocateRegister();
+        updateRegister(inst, R);
+      }
+
+      // Mark the current instruction as live and remember to perform target
+      // specific calls when we are done with the bundle.
+      liveIntervalsQueue.push(instIdx);
+    } // For each instruction in the function.
+
+    // Free the remaining intervals.
+    while (!liveIntervalsQueue.empty()) {
+      Instruction *I = instructionsByNumbers_[liveIntervalsQueue.top()];
+      registerManager.killRegister(getRegister(I));
+      handleInstruction(I);
+      liveIntervalsQueue.pop();
+    }
+
+    // Allocate registers for the coalesced registers.
+    for (auto &RP : coalesced) {
+      assert(!isAllocated(RP.first) && "Register should not be allocated");
+      Instruction *dest = RP.second;
+      updateRegister(RP.first, getRegister(dest));
+    }
   
 }
 
 VirtualRegister VirtualRegisterAllocator::getRegister(Value *I) {
   assert(isAllocated(I) && "Instruction is not allocated!");
   return allocatedReg[I];
+}
+
+void VirtualRegisterAllocator::updateRegister(Value *I, VirtualRegister R) {
+  allocatedReg[I] = R;
 }
 
 bool VirtualRegisterAllocator::isAllocated(Value *I) {

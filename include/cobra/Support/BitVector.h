@@ -446,6 +446,59 @@ public:
     return std::equal(Bits.begin(), Bits.begin() + NumWords, RHS.Bits.begin());
   }
   
+  bool operator!=(const BitVector &RHS) const { return !(*this == RHS); }
+
+  /// Intersection, union, disjoint union.
+  BitVector &operator&=(const BitVector &RHS) {
+    unsigned ThisWords = Bits.size();
+    unsigned RHSWords = RHS.Bits.size();
+    unsigned i;
+    for (i = 0; i != std::min(ThisWords, RHSWords); ++i)
+      Bits[i] &= RHS.Bits[i];
+
+    // Any bits that are just in this bitvector become zero, because they aren't
+    // in the RHS bit vector.  Any words only in RHS are ignored because they
+    // are already zero in the LHS.
+    for (; i != ThisWords; ++i)
+      Bits[i] = 0;
+
+    return *this;
+  }
+  
+  /// reset - Reset bits that are set in RHS. Same as *this &= ~RHS.
+  BitVector &reset(const BitVector &RHS) {
+    unsigned ThisWords = Bits.size();
+    unsigned RHSWords = RHS.Bits.size();
+    for (unsigned i = 0; i != std::min(ThisWords, RHSWords); ++i)
+      Bits[i] &= ~RHS.Bits[i];
+    return *this;
+  }
+  
+  /// test - Check if (This - RHS) is zero.
+  /// This is the same as reset(RHS) and any().
+  bool test(const BitVector &RHS) const {
+    unsigned ThisWords = Bits.size();
+    unsigned RHSWords = RHS.Bits.size();
+    unsigned i;
+    for (i = 0; i != std::min(ThisWords, RHSWords); ++i)
+      if ((Bits[i] & ~RHS.Bits[i]) != 0)
+        return true;
+
+    for (; i != ThisWords ; ++i)
+      if (Bits[i] != 0)
+        return true;
+
+    return false;
+  }
+  
+  BitVector &operator|=(const BitVector &RHS) {
+    if (size() < RHS.size())
+      resize(RHS.size());
+    for (size_type I = 0, E = RHS.Bits.size(); I != E; ++I)
+      Bits[I] |= RHS.Bits[I];
+    return *this;
+  }
+  
   void swap(BitVector &RHS) {
     std::swap(Bits, RHS.Bits);
     std::swap(Size, RHS.Size);

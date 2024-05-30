@@ -140,7 +140,9 @@ void BytecodeFunctionGenerator::generateLoadConstInst(LoadConstInst *Inst, Basic
   switch (literal->getKind()) {
     case ValueKind::LiteralNumberKind: {
       auto *litNum = dynamic_cast<LiteralNumber *>(literal);
-      if (litNum->isUInt8Representible()) {
+      if (litNum->isPositiveZero()) {
+        this->emitLoadConstZero(output);
+      } else if (litNum->isUInt8Representible()) {
         this->emitLoadConstUInt8(output, litNum->asUInt8());
       }
       break;

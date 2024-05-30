@@ -196,6 +196,11 @@ bool Interpreter::interpretFunction(CodeBlock *codeBlock) {
       DISPATCH;
     }
     
+    CASE(LoadConstZero) {
+      
+      DISPATCH;
+    }
+    
     CASE(LoadParam) {
       
       DISPATCH;

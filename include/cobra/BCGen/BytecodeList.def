@@ -187,6 +187,7 @@ DEFINE_OPCODE_1(LoadConstUndefined, Reg8)
 DEFINE_OPCODE_1(LoadConstNull, Reg8)
 DEFINE_OPCODE_1(LoadConstTrue, Reg8)
 DEFINE_OPCODE_1(LoadConstFalse, Reg8)
+DEFINE_OPCODE_1(LoadConstZero, Reg8)
 
 /// Convert a value to a number.
 /// Arg1 = Arg2 - 0

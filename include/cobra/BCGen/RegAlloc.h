@@ -34,7 +34,7 @@ struct VirtualRegister {
 };
 
 class VirtualRegisterManager {
-  BitVector registers{DEFAULT_REGISTER_COUNT};
+  BitVector registers;
   
 public:
   VirtualRegisterManager() = default;
@@ -98,6 +98,30 @@ struct LiveInterval {
   
   explicit LiveInterval(size_t start, size_t end) {
     add(LiveRange(start, end));
+  }
+  
+  /// \return true if this interval intersects \p other.
+  bool intersects(LiveRange other) const {
+    for (auto &r : ranges_) {
+      if (r.intersects(other))
+        return true;
+    }
+    return false;
+  }
+
+  /// \return true if this interval intersects \p other.
+  bool intersects(const LiveInterval &other) const {
+    for (auto &r : ranges_) {
+      if (other.intersects(r))
+        return true;
+    }
+    return false;
+  }
+  
+  void add(const LiveInterval &other) {
+    for (auto &R : other.ranges_) {
+      add(R);
+    }
   }
   
   void add(LiveRange other) {

@@ -45,6 +45,8 @@ std::unique_ptr<BytecodeModule> cobra::generateBytecode(Module *M) {
     F->dump();
     
     auto funcGen = BytecodeFunctionGenerator::create(BCGen, F, RA);
+    funcGen->generateBody();
+    
     BCGen.addFunction(F);
     BCGen.setFunctionGenerator(F, std::move(funcGen));
   }

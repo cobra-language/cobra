@@ -25,6 +25,10 @@ class BytecodeFunction {
   
   const std::vector<opcode_t> opcodesAndJumpTables_;
   
+public:
+  explicit BytecodeFunction(std::vector<opcode_t> &&opcodesAndJumpTables)
+      : opcodesAndJumpTables_(std::move(opcodesAndJumpTables)) {}
+  
 };
 
 class BytecodeModule {
@@ -33,7 +37,9 @@ class BytecodeModule {
   FunctionList functions_{};
   
 public:
-  explicit BytecodeModule() = default;
+  explicit BytecodeModule(uint32_t functionCount) {
+    functions_.resize(functionCount);
+  }
   
   uint32_t getNumFunctions() const {
     return functions_.size();

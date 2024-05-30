@@ -143,6 +143,7 @@ void BytecodeFunctionGenerator::generateLoadConstInst(LoadConstInst *Inst, Basic
       if (litNum->isUInt8Representible()) {
         this->emitLoadConstUInt8(output, litNum->asUInt8());
       }
+      break;
     }
     default:
       COBRA_UNREACHABLE();
@@ -204,7 +205,7 @@ void BytecodeFunctionGenerator::generateInst(Instruction *ii, BasicBlock *next) 
 
 std::unique_ptr<BytecodeFunction>
 BytecodeFunctionGenerator::generateBytecodeFunction() {
-  this->generateBody();
+  return std::make_unique<BytecodeFunction>(std::move(opcodes_));
 }
 
 unsigned BytecodeGenerator::addFunction(Function *F) {
@@ -226,7 +227,7 @@ void BytecodeGenerator::setFunctionGenerator(
 }
 
 std::unique_ptr<BytecodeModule> BytecodeGenerator::generate() {
-  std::unique_ptr<BytecodeModule> BM{new BytecodeModule()};
+  std::unique_ptr<BytecodeModule> BM{new BytecodeModule(functionGenerators_.size())};
   
   for (unsigned i = 0, e = functions.size(); i < e; ++i) {
     auto *F = functions[i];

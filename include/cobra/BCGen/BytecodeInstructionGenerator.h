@@ -40,8 +40,6 @@ class BytecodeInstructionGenerator {
 protected:
   std::vector<opcode_t> opcodes_{};
   
-  uint32_t bytecodeSize_{0};
-  
   bool encodingError_{};
   
 public:

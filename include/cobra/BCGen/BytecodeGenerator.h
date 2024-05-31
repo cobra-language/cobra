@@ -77,10 +77,12 @@ public:
         new BytecodeFunctionGenerator(BCGen, F, RA));
   }
   
-  void resolveRelocations();
-  
   /// Add long jump instruction to the relocation list.
   void addJumpToRelocations(offset_t loc, BasicBlock *target);
+  
+  void generateJumpTable();
+  
+  void resolveRelocations();
   
   unsigned encodeValue(Value *value);
   
@@ -99,6 +101,23 @@ public:
   void generateInst(Instruction *ii, BasicBlock *next);
   
   std::unique_ptr<BytecodeFunction> generateBytecodeFunction();
+  
+  void shrinkJump(offset_t loc);
+  
+  void updateJumpTarget(offset_t loc, int newVal, int bytes);
+  
+  /// Change the opcode of a long jump instruction into a short jump.
+  inline void longToShortJump(offset_t loc) {
+    switch (opcodes_[loc]) {
+#define DEFINE_JUMP_LONG_VARIANT(shortName, longName) \
+  case longName##Op:                                  \
+    opcodes_[loc] = shortName##Op;                    \
+    break;
+#include "cobra/BCGen/BytecodeList.def"
+      default:
+        COBRA_UNREACHABLE();
+    }
+  }
   
 };
 

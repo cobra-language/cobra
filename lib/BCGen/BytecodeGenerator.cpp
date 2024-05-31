@@ -17,8 +17,51 @@ void BytecodeFunctionGenerator::addJumpToRelocations(offset_t loc, BasicBlock *t
   relocations_.push_back({loc, Relocation::RelocationType::LongJumpType, target});
 }
 
+void BytecodeFunctionGenerator::generateJumpTable() {
+  // TODO
+}
+
 void BytecodeFunctionGenerator::resolveRelocations() {
-  
+  bool changed;
+  do {
+    int totalShift = 0;
+    changed = false;
+    for (auto &relocation : relocations_) {
+      auto loc = relocation.loc;
+      auto *pointer = relocation.pointer;
+      auto type = relocation.type;
+      loc -= totalShift;
+      relocation.loc = loc;
+      switch (type) {
+        case Relocation::LongJumpType: {
+          int targetLoc = basicBlockMap_[dynamic_cast<BasicBlock *>(pointer)].first;
+          int jumpOffset = targetLoc - loc;
+          if (-128 <= jumpOffset && jumpOffset < 128) {
+            // The jump offset can fit into one byte.
+            totalShift += 3;
+            this->shrinkJump(loc + 1);
+            this->updateJumpTarget(loc + 1, jumpOffset, 1);
+            relocation.type = Relocation::JumpType;
+            changed = true;
+          } else {
+            this->updateJumpTarget(loc + 1, jumpOffset, 4);
+          }
+          break;
+        }
+        case Relocation::BasicBlockType:
+          basicBlockMap_[dynamic_cast<BasicBlock *>(pointer)].first = loc;
+          break;
+        case Relocation::JumpType: {
+          int targetLoc = basicBlockMap_[dynamic_cast<BasicBlock *>(pointer)].first;
+          int jumpOffset = targetLoc - loc;
+          this->updateJumpTarget(loc + 1, jumpOffset, 1);
+          break;
+        }
+        default:
+          break;
+      }
+    }
+  } while (changed);
 }
 
 unsigned BytecodeFunctionGenerator::encodeValue(Value *value) {
@@ -178,6 +221,8 @@ void BytecodeFunctionGenerator::generateCodeBlock(BasicBlock *BB, BasicBlock *ne
   relocations_.push_back({begin_loc, Relocation::RelocationType::BasicBlockType, BB});
   basicBlockMap_[BB] = std::make_pair(begin_loc, next);
   
+  BB->dump();
+  
   for (auto &I : *BB) {
     generateInst(I, next);
   }
@@ -215,6 +260,27 @@ unsigned BytecodeGenerator::addFunction(Function *F) {
   unsigned index = functions.size();
   functionIDMap[F] = index;
   return index;
+}
+
+void BytecodeFunctionGenerator::shrinkJump(offset_t loc) {
+  // We are shrinking a long jump into a short jump.
+  // The size of operand reduces from 4 bytes to 1 byte, a delta of 3.
+  opcodes_.erase(opcodes_.begin() + loc, opcodes_.begin() + loc + 3);
+
+  // Change this instruction from long jump to short jump.
+  longToShortJump(loc - 1);
+}
+
+void BytecodeFunctionGenerator::updateJumpTarget(
+    offset_t loc,
+    int newVal,
+    int bytes) {
+  // The jump target is encoded in little-endian. Update it correctly
+  // regardless of host byte order.
+  for (; bytes; --bytes, ++loc) {
+    opcodes_[loc] = (opcode_t)(newVal);
+    newVal >>= 8;
+  }
 }
 
 void BytecodeGenerator::setFunctionGenerator(

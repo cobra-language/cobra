@@ -13,6 +13,7 @@
 #include "cobra/Optimizer/PassManager.h"
 #include "cobra/IR/Analysis.h"
 #include "cobra/BCGen/BCPasses.h"
+#include "cobra/BCGen/MovElimination.h"
 
 #include <algorithm>
 #include <queue>
@@ -41,6 +42,12 @@ std::unique_ptr<BytecodeModule> cobra::generateBytecode(Module *M) {
     std::vector<BasicBlock *> order(PO.rbegin(), PO.rend());
     
     RA.allocate();
+    
+    F->dump();
+    
+    PassManager PM;
+    PM.addPass<MovElimination>(RA);
+    PM.run(F);
     
     F->dump();
     

@@ -31,6 +31,12 @@ struct VirtualRegister {
   bool operator!=(VirtualRegister RHS) const {
     return !(*this == RHS);
   }
+  
+  struct Hash {
+    size_t operator()(const VirtualRegister& pos) const {
+     return pos.value;
+    }
+  };
 };
 
 class VirtualRegisterManager {

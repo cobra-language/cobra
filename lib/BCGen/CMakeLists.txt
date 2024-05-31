@@ -12,5 +12,6 @@ add_cobra_library(cobraBackend
   BytecodeRawData.cpp
   BytecodeInstructionSelector.cpp
   BCPasses.cpp
+  MovElimination.cpp
   LINK_LIBS cobraFrontend cobraOptimizer
 )

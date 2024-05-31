@@ -40,12 +40,13 @@ This project is under active development; expect things to break and APIs to cha
 
 The compiler pipeline is organized as below. Incidentally, early stages of this pipeline are more stable than later ones. (Note: completion percentages are very rough estimations.)
 
-* Parsing (10%)
+* Parsing (20%)
 * Type checking (0%)
-* IR lowering (10%)
+* IR lowering (40%)
 * IR analysis and transformations (20%)
-* Bytecode generation (10%)
+* Bytecode generation (40%)
 * Bytecode Interpreter (5%)
+* Debug info(0%)
 * GC (5%)
 * Machine code generation (0%)
 

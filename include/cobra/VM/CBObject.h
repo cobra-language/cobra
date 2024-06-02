@@ -14,7 +14,7 @@
 namespace cobra {
 namespace vm {
 
-class CBFunction;
+class CBMethod;
 class CBClasObject;
 
 class CBObject : public GCCell {
@@ -29,7 +29,7 @@ class CBClasObject : public CBObject {
   
   /// virtual methods defined in this class; invoked through vtable
   int virtualMethodCount;
-  CBFunction* virtualMethods;
+  CBMethod* virtualMethods;
   
 };
 

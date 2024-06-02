@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 add_cobra_library(cobraVMRuntime
-  CBFunction.cpp
+  CBMethod.cpp
   CBObject.cpp
   CBString.cpp
   CBValue.cpp
@@ -14,10 +14,12 @@ add_cobra_library(cobraVMRuntime
   Interpreter.cpp
   Primitive.cpp
   Runtime.cpp
+  RuntimeModule.cpp
   String.cpp
   VM.cpp
   CardTable.cpp
   HeapRegion.cpp
+  Handle.cpp
   LINK_LIBS cobraSupport
 )
 

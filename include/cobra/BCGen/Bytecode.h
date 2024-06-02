@@ -23,11 +23,15 @@ struct FunctionHeader {
 // This class represents the in-memory representation of the bytecode function.
 class BytecodeFunction {
   
-  const std::vector<opcode_t> opcodesAndJumpTables_;
+  std::vector<opcode_t> opcodesAndJumpTables_;
   
 public:
   explicit BytecodeFunction(std::vector<opcode_t> &&opcodesAndJumpTables)
       : opcodesAndJumpTables_(std::move(opcodesAndJumpTables)) {}
+  
+  std::vector<opcode_t> &getOpcodes() {
+    return opcodesAndJumpTables_;
+  }
   
 };
 

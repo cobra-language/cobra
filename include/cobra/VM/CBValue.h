@@ -206,7 +206,7 @@ typedef enum {
   CBMapKind,
   CBListKind,
   CBUpvalueKind,
-  CBFunctionKind,
+  CBMethodKind,
   CBClosureKind,
   CBClassKind,
   CBFiberKind,

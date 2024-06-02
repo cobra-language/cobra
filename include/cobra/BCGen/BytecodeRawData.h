@@ -26,6 +26,9 @@ public:
         new BytecodeRawData(std::move(byteCodeModule)));
   }
   
+  const uint8_t *getBytecode(uint32_t functionID) const {
+    return byteCodeModule_->getFunction(functionID).getOpcodes().data();
+  }
   
 };
 

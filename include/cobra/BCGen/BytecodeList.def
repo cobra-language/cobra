@@ -78,6 +78,10 @@ DEFINE_OPERAND_TYPE(Double, double)
 /// value zero.
 DEFINE_OPCODE_0(Unreachable)
 
+/// Create a class
+/// Arg1 = {}
+DEFINE_OPCODE_1(Class, Reg8)
+
 /// Create a new, empty Object using the built-in constructor (regardless of
 /// whether it was overridden).
 /// Arg1 = {}

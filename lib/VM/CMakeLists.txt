@@ -20,6 +20,7 @@ add_cobra_library(cobraVMRuntime
   CardTable.cpp
   HeapRegion.cpp
   Handle.cpp
+  Offset.cpp
   LINK_LIBS cobraSupport
 )
 

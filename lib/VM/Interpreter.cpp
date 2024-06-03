@@ -49,6 +49,11 @@ bool Interpreter::interpretFunction(CodeBlock *codeBlock) {
       DISPATCH;
     }
     
+    CASE(Class) {
+      
+      DISPATCH;
+    }
+    
     CASE(NewObject) {
       
       DISPATCH;

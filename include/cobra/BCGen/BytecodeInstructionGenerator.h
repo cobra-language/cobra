@@ -9,6 +9,7 @@
 #define BytecodeInstructionGenerator_h
 
 #include <vector>
+#include <string>
 #pragma GCC diagnostic push
 
 #ifdef HERMES_COMPILER_SUPPORTS_WSHORTEN_64_TO_32
@@ -52,12 +53,14 @@ public:
   }
   
   offset_t emitOpcode(Operator op) {
+    std::cout << "param_t Operator " << op << std::endl;
     auto loc = getCurrentLocation();
     emitUInt8(op);
     return loc;
   }
   
   void emitOperand(param_t t, int size) {
+    std::cout << "param_t " << t  << " -> " << size << std::endl;
     while (size--) {
       opcodes_.push_back((opcode_t)t);
       t >>= 8;

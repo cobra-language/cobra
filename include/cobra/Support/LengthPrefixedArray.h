@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *  * Copyright (c) the Cobra project authors.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,7 +11,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "cobra/Support/MathExtras.h"
+#include "cobra/Support/StdLibExtras.h"
 #include "cobra/Support/StrideIterator.h"
 
 namespace cobra {

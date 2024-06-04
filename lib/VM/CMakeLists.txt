@@ -21,6 +21,7 @@ add_cobra_library(cobraVMRuntime
   HeapRegion.cpp
   Handle.cpp
   Offset.cpp
+  GCPointer.cpp
   LINK_LIBS cobraSupport
 )
 

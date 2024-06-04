@@ -5,4 +5,16 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/GCPointer.h"
+#ifndef Runtime_h
+#define Runtime_h
+
+#include <string>
+
+namespace cobra {
+namespace vm {
+
+
+}
+}
+
+#endif /* Runtime_h */

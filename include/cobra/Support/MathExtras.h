@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *  * Copyright (c) the Cobra project authors.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -9,11 +9,6 @@
 #define MathExtras_h
 
 namespace cobra {
-
-template <typename T>
-struct Identity {
-  using type = T;
-};
 
 /// The behavior an operation has on an input of 0.
 enum ZeroBehavior {
@@ -187,24 +182,6 @@ inline unsigned countPopulation(T Value) {
                     !std::numeric_limits<T>::is_signed,
                 "Only unsigned integral types are allowed.");
   return PopulationCounter<T, sizeof(T)>::count(Value);
-}
-
-template<typename T>
-constexpr bool isPowerOfTwo(T x) {
-  static_assert(std::is_integral_v<T>, "T must be integral");
-  // TODO: assert unsigned. There is currently many uses with signed values.
-  return (x & (x - 1)) == 0;
-}
-
-template<typename T>
-constexpr T roundDown(T x, typename Identity<T>::type n) {
-  assert(isPowerOfTwo(n));
-  return (x & -n);
-}
-
-template<typename T>
-constexpr T roundUp(T x, std::remove_reference_t<T> n) {
-  return roundDown(x + n - 1, n);
 }
 
 }

@@ -6,6 +6,7 @@
  */
 
 #include "cobra/VM/Runtime.h"
+#include "cobra/VM/GCPointer.h"
 
 using namespace cobra;
 using namespace vm;

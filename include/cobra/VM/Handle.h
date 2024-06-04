@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include "cobra/VM/CBValue.h"
+
 namespace cobra {
 namespace vm {
 

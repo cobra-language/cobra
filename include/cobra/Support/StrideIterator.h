@@ -87,7 +87,7 @@ class StrideIterator {
   }
 
   T& operator*() const {
-    return *reinterpret_cast<T*>(ptr_);
+    return *reinterpret_cast<T *>(ptr_);
   }
 
   T* operator->() const {

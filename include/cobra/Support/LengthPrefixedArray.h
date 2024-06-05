@@ -23,12 +23,12 @@ private:
   uint8_t data_[0];
   
   T &atUnchecked(size_t index, size_t elementSize, size_t alignment) {
-    return *reinterpret_cast<T*>(
+    return *reinterpret_cast<T *>(
       reinterpret_cast<uintptr_t>(this) + offsetOfElement(index, elementSize, alignment));
   }
 
   const T &atUnchecked(size_t index, size_t elementSize, size_t alignment) const {
-    return *reinterpret_cast<T*>(
+    return *reinterpret_cast<T *>(
       reinterpret_cast<uintptr_t>(this) + offsetOfElement(index, elementSize, alignment));
   }
   

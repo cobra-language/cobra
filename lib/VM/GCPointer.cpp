@@ -64,3 +64,17 @@ inline ObjPtr<T> ObjPtr<T>::downCast(SourceType *ptr) {
   return static_cast<T*>(ptr);
 }
 
+template<class T>
+inline uint32_t PtrCompression<T>::compress(ObjPtr<T> ptr) {
+  return compress(ptr.ptr());
+}
+
+template<class T>
+inline void ObjectReference<T>::assign(ObjPtr<T> ptr) {
+  assign(ptr.ptr());
+}
+
+template <typename T>
+inline void HeapReference<T>::assign(ObjPtr<T> ptr) {
+  assign(ptr.ptr());
+}

@@ -35,10 +35,10 @@ template<typename T> constexpr T mask(T value, uintptr_t mask) {
 }
 
 template<typename T> inline T* mask(T* value, uintptr_t mask) {
-  return reinterpret_cast<T*>(reinterpret_cast<uintptr_t>(value) & mask);
+  return reinterpret_cast<T *>(reinterpret_cast<uintptr_t>(value) & mask);
 }
 
-template<typename To, typename From>     // use like this: down_cast<T*>(foo);
+template<typename To, typename From>     // use like this: down_cast<T *>(foo);
 inline To down_cast(From *f) {                   // so we only accept pointers
   static_assert(std::is_base_of_v<From, std::remove_pointer_t<To>>,
                 "down_cast unsafe as To is not a subtype of From");
@@ -57,7 +57,7 @@ inline To down_cast(From &f) {           // so we only accept references
 template <class To, class From>
 inline To bit_cast(const From &from) {
   To to;
-  std::memcpy(&to, &from, sizeof(To));
+  memcpy(&to, &from, sizeof(To));
   return to;
 }
 

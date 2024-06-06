@@ -10,19 +10,19 @@
 using namespace cobra;
 using namespace vm;
 
-inline LengthPrefixedArray<CBField> *CBClassObject::getiFieldsPtrUnchecked() {
-  return getFieldPtr<LengthPrefixedArray<CBField> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, ifields_));
+inline Array<CBField> *CBClassObject::getiFieldsPtrUnchecked() {
+  return getFieldPtr<Array<CBField> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, ifields_));
 }
 
-inline LengthPrefixedArray<CBField> *CBClassObject::getSFieldsPtrUnchecked() {
-  return getFieldPtr<LengthPrefixedArray<CBField> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, sfields_));
+inline Array<CBField> *CBClassObject::getSFieldsPtrUnchecked() {
+  return getFieldPtr<Array<CBField> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, sfields_));
 }
 
-inline LengthPrefixedArray<CBField>* CBClassObject::getFieldsPtr() {
+inline Array<CBField>* CBClassObject::getFieldsPtr() {
   return getiFieldsPtrUnchecked();
 }
 
-inline LengthPrefixedArray<CBField>* CBClassObject::getStaticFieldsPtr() {
+inline Array<CBField>* CBClassObject::getStaticFieldsPtr() {
   return getSFieldsPtrUnchecked();
 }
 

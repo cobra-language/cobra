@@ -57,3 +57,7 @@
     fprintf(stderr, "Exit due to TODO in %s:%d:%s()\n", __FILE__, __LINE__, __func__); \
     abort(); \
     } while (0)
+
+# define LLVM_PACKED(d) d __attribute__((packed))
+# define LLVM_PACKED_START _Pragma("pack(push, 1)")
+# define LLVM_PACKED_END   _Pragma("pack(pop)")

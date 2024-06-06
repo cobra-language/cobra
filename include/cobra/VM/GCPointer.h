@@ -88,7 +88,7 @@ public:
   static uint32_t compress(ObjPtr<T> ptr);
 };
 
-/// Value type representing a reference to a mirror::Object of type T.
+/// Value type representing a reference to a Object of type T.
 template<class T>
 class ObjectReference {
 private:
@@ -192,6 +192,9 @@ public:
     return this->reference_;
   }
 };
+
+template<class T>
+class StackReference : public CompressedReference<T> {};
 
 }
 }

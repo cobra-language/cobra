@@ -9,10 +9,7 @@
 #define Inst_h
 
 #include "cobra/Support/StringRef.h"
-
-# define LLVM_PACKED(d) d __attribute__((packed))
-# define LLVM_PACKED_START _Pragma("pack(push, 1)")
-# define LLVM_PACKED_END   _Pragma("pack(pop)")
+#include "cobra/Support/Common.h"
 
 namespace cobra {
 namespace inst {

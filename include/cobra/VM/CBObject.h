@@ -11,7 +11,7 @@
 #include "cobra/VM/CBValue.h"
 #include "cobra/VM/GCCell.h"
 #include "cobra/VM/Offset.h"
-#include "cobra/Support/LengthPrefixedArray.h"
+#include "cobra/Support/Array.h"
 
 namespace cobra {
 namespace vm {
@@ -100,9 +100,9 @@ class CBClassObject : public CBObject {
   /// See also class_size_.
   size_t objectSize;
   
-  LengthPrefixedArray<CBField> *getiFieldsPtrUnchecked();
+  Array<CBField> *getiFieldsPtrUnchecked();
   
-  LengthPrefixedArray<CBField> *getSFieldsPtrUnchecked();
+  Array<CBField> *getSFieldsPtrUnchecked();
   
 protected:
   template<class T, bool kIsVolatile = false>
@@ -140,9 +140,9 @@ public:
     return getFieldPrimitive<int64_t, kIsVolatile>(fieldOffset);
   }
   
-  LengthPrefixedArray<CBField>* getFieldsPtr();
+  Array<CBField>* getFieldsPtr();
   
-  LengthPrefixedArray<CBField>* getStaticFieldsPtr();
+  Array<CBField>* getStaticFieldsPtr();
   
   CBField *getField(uint32_t idx);
   

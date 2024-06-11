@@ -12,16 +12,21 @@
 
 #include "cobra/VM/Interpreter.h"
 #include "cobra/BCGen/BytecodeRawData.h"
+#include "cobra/VM/Handle.h"
 
 namespace cobra {
 namespace vm {
 
 class Runtime {
   
+  HandleScope *topScope_{};
+  
 public:
  static std::shared_ptr<Runtime> create();
 
  ~Runtime();
+  
+  HandleScope *getTopScope();
   
   bool runBytecode(std::shared_ptr<BytecodeRawData> &&bytecode);
   

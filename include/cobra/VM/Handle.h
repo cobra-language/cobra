@@ -19,38 +19,52 @@ namespace vm {
 
 using Address = uintptr_t;
 
+/// A Handle provides a reference to an object that survives relocation by
+/// the garbage collector.
+/// This is a very lightweight class: copies are very cheap (just copying a
+/// register); construction is also relatively cheap (in the common case a
+/// comparison and increment).
 class HandleBase {
   
-  Address* handle_;
-  
-protected:
-  
-  const Address *handleRef() const {
-    return handle_;
-  }
+  Address location_;
   
 public:
-  explicit HandleBase(const Address *valueAddr)
-      : handle_(const_cast<Address *>(valueAddr)) {
-  }
+  explicit HandleBase(Address location) : location_(location) {}
+  
+  template <typename T>
+  explicit HandleBase(T value);
   
   ~HandleBase() = default;
   
-  bool isNull() const { return handle_ == nullptr; }
+  bool isNull() const {
+    return location_ == reinterpret_cast<uintptr_t>(location_);
+  }
   
+  Address address() const {
+    return location_;
+  }
 };
 
 template <typename T>
 class Handle final : public HandleBase {
   
 public:
-  explicit Handle(const Address *valueAddr, bool)
-      : HandleBase(const_cast<Address *>(valueAddr)) {}
+  explicit Handle(Address *location) : HandleBase(location) {}
   
   Handle(const Handle<T>& handle) = default;
   Handle(Handle<T> &&) = default;
   
+  T *get() const {
+    
+  }
   
+  T operator*() const {
+    return get();
+  }
+  
+  T *operator->() const {
+    
+  }
   
 };
 
@@ -64,25 +78,25 @@ class HandleScope {
 private:
   uint32_t size_ = 0;
   
-  HandleScope* const link_;
+  HandleScope *const prev_;
   
   const int32_t capacity_;
   
-  static constexpr size_t CapacityOffset(PointerSize pointer_size) {
+  static constexpr size_t capacityOffset(PointerSize pointer_size) {
     return static_cast<size_t>(pointer_size);
   }
   
-  static constexpr size_t ReferencesOffset(PointerSize pointer_size) {
-    return CapacityOffset(pointer_size) + sizeof(capacity_) + sizeof(size_);
+  static constexpr size_t referencesOffset(PointerSize pointer_size) {
+    return capacityOffset(pointer_size) + sizeof(capacity_) + sizeof(size_);
   }
   
-  StackReference<CBObject>* getReferences() const {
-    uintptr_t address = reinterpret_cast<uintptr_t>(this) + ReferencesOffset(kRuntimePointerSize);
+  StackReference<CBObject> *getReferences() const {
+    uintptr_t address = reinterpret_cast<uintptr_t>(this) + referencesOffset(kRuntimePointerSize);
     return reinterpret_cast<StackReference<CBObject>*>(address);
   }
   
 public:
-  explicit HandleScope(HandleScope* link, uint32_t capacity) : link_(link), capacity_(capacity) {}
+  explicit HandleScope(HandleScope* prev, uint32_t capacity) : prev_(prev), capacity_(capacity) {}
   
   ~HandleScope() {}
   

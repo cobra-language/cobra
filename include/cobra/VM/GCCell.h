@@ -23,7 +23,7 @@ public:
   void operator=(const GCCell &) = delete;
   
   CBValueKind getKind() const {
-    return CBValueKind::CBNullKind;
+    return CBValueKind::NullKind;
   }
   
 };

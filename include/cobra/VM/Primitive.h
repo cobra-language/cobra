@@ -14,17 +14,17 @@
 namespace cobra {
 namespace vm {
 
-class CBString final : public Object {
+class String final : public Object {
 public:
   using Super = Object;
   
-  explicit CBString(std::string value) : value_(std::move(value)) {}
+  explicit String(std::string value) : value_(std::move(value)) {}
   
   static constexpr CBValueKind getCellKind() {
-    return CBValueKind::CBStringKind;
+    return CBValueKind::StringKind;
   }
   static bool classof(const GCCell *cell) {
-    return cell->getKind() == CBValueKind::CBStringKind;
+    return cell->getKind() == CBValueKind::StringKind;
   }
   
   std::string &value() { return value_; }

@@ -5,7 +5,19 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/String.h"
+#ifndef String_h
+#define String_h
 
-using namespace cobra;
-using namespace vm;
+#include "cobra/VM/Object.h"
+
+namespace cobra {
+namespace vm {
+
+class String : Object {
+  
+};
+
+}
+}
+
+#endif /* String_h */

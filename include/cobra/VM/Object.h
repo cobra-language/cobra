@@ -12,6 +12,7 @@
 #include "cobra/VM/GCCell.h"
 #include "cobra/VM/Offset.h"
 #include "cobra/Support/FixedArray.h"
+#include "cobra/VM/GCPointer.h"
 
 namespace cobra {
 namespace vm {
@@ -25,18 +26,18 @@ static constexpr PointerSize kRuntimePointerSize = sizeof(void*) == 8U
                                                        ? PointerSize::k64
                                                        : PointerSize::k32;
 
-class CBMethod;
-class CBClassObject;
+class Method;
+class Class;
 
 #define OFFSETOF_MEMBER(t, f) offsetof(t, f)
 
 #define OFFSET_OF_OBJECT_MEMBER(type, field) \
     MemberOffset(OFFSETOF_MEMBER(type, field))
 
-struct Field final {
+class Field final {
   
   /// Class in which the field is declared
-  CBClassObject *clazz;
+  HeapReference<Class> clazz;
   
   const char *name;
   
@@ -47,14 +48,14 @@ struct Field final {
 
 class Object : public GCCell {
   /// The Class representing the type of the object.
-  CBClassObject* clazz;
+  HeapReference<Class> clazz;
   
 };
 
-class CBClassObject : public Object {
+class Class : public Object {
   
   /// The superclass, or null if this is cobra.Object or a primitive type.
-  CBClassObject *super;
+  HeapReference<Class> super;
   
   /// The lower 16 bits contains a Primitive::Type value. The upper 16
   /// bits contains the size shift of the primitive type.
@@ -83,17 +84,17 @@ class CBClassObject : public Object {
   
   /// static, private, and <init> methods
   int directMethodCount;
-  CBMethod *directMethods;
+  Method *directMethods;
   
   /// virtual methods defined in this class; invoked through vtable
   int virtualMethodCount;
-  CBMethod* virtualMethods;
+  Method* virtualMethods;
   
   /// Virtual method table (vtable), for use by "invoke-virtual".  The
   /// vtable from the superclass is copied in, and virtual methods from
   /// our class either replace those from the super or are appended.
   int vtableCount;
-  CBMethod **vtable;
+  Method **vtable;
   
   /// Total object size; used when allocating storage on gc heap.
   /// (For interfaces and abstract classes this will be zero.)
@@ -148,27 +149,27 @@ public:
   
   Field *getStaticField(uint32_t idx);
   
-  static Field *findField(const CBClassObject* clazz, const char* fieldName) {
+  static Field *findField(const Class* clazz, const char* fieldName) {
     Field *pField = clazz->fields;
-    for (int i = 0; i < clazz->fieldCount; i++, pField++) {
-      if (strcmp(fieldName, pField->name) == 0) {
-        return pField;
-      }
-    }
+//    for (int i = 0; i < clazz->fieldCount; i++, pField++) {
+//      if (strcmp(fieldName, pField->name) == 0) {
+//        return pField;
+//      }
+//    }
     return NULL;
   }
   
-  static Field *findFieldHier(const CBClassObject* clazz, const char* fieldName) {
-    Field *pField;
-    
-    pField = findField(clazz, fieldName);
-    if (pField != NULL)
-      return pField;
-    
-    if (clazz->super != NULL)
-      return findFieldHier(clazz->super, fieldName);
-    else
-      return NULL;
+  static Field *findFieldHier(const Class* clazz, const char* fieldName) {
+//    Field *pField;
+//
+//    pField = findField(clazz, fieldName);
+//    if (pField != NULL)
+//      return pField;
+//
+//    if (clazz->super != NULL)
+//      return findFieldHier(clazz->super, fieldName);
+//    else
+//      return NULL;
   }
   
   

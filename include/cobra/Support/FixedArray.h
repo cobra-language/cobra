@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Array_h
-#define Array_h
+#ifndef FixedArray_h
+#define FixedArray_h
 
 #include <stddef.h>
 #include <string.h>
@@ -90,4 +90,4 @@ public:
 }
 
 
-#endif /* Array_h */
+#endif /* FixedArray_h */

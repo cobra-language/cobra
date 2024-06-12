@@ -5,4 +5,19 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/CBMethod.h"
+#ifndef Array_h
+#define Array_h
+
+#include "cobra/VM/Object.h"
+
+namespace cobra {
+namespace vm {
+
+class Array : Object {
+  
+};
+
+}
+}
+
+#endif /* Array_h */

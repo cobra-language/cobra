@@ -8,15 +8,15 @@
 #ifndef Primitive_h
 #define Primitive_h
 
-#include "cobra/VM/CBObject.h"
+#include "cobra/VM/Object.h"
 #include <string>
 
 namespace cobra {
 namespace vm {
 
-class CBString final : public CBObject {
+class CBString final : public Object {
 public:
-  using Super = CBObject;
+  using Super = Object;
   
   explicit CBString(std::string value) : value_(std::move(value)) {}
   
@@ -34,14 +34,14 @@ private:
   
 };
 
-class CBNumber final : public CBObject {
+class CBNumber final : public Object {
 public:
   
   
   
 };
 
-class CBBoolean final : public CBObject {
+class CBBoolean final : public Object {
 public:
   
   

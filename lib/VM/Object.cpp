@@ -5,24 +5,24 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/CBObject.h"
+#include "cobra/VM/Object.h"
 
 using namespace cobra;
 using namespace vm;
 
-inline Array<CBField> *CBClassObject::getiFieldsPtrUnchecked() {
-  return getFieldPtr<Array<CBField> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, ifields_));
+inline FixedArray<CBField> *CBClassObject::getiFieldsPtrUnchecked() {
+  return getFieldPtr<FixedArray<CBField> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, ifields_));
 }
 
-inline Array<CBField> *CBClassObject::getSFieldsPtrUnchecked() {
-  return getFieldPtr<Array<CBField> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, sfields_));
+inline FixedArray<CBField> *CBClassObject::getSFieldsPtrUnchecked() {
+  return getFieldPtr<FixedArray<CBField> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, sfields_));
 }
 
-inline Array<CBField>* CBClassObject::getFieldsPtr() {
+inline FixedArray<CBField>* CBClassObject::getFieldsPtr() {
   return getiFieldsPtrUnchecked();
 }
 
-inline Array<CBField>* CBClassObject::getStaticFieldsPtr() {
+inline FixedArray<CBField>* CBClassObject::getStaticFieldsPtr() {
   return getSFieldsPtrUnchecked();
 }
 

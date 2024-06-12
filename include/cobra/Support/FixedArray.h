@@ -17,7 +17,7 @@
 namespace cobra {
 
 template<typename T>
-class Array {
+class FixedArray {
 private:
   uint32_t size_;
   uint8_t data_[0];
@@ -33,7 +33,7 @@ private:
   }
   
 public:
-  explicit Array(size_t length) : size_(static_cast<uint32_t>(length)) {}
+  explicit FixedArray(size_t length) : size_(static_cast<uint32_t>(length)) {}
   
   size_t size() const {
     return size_;
@@ -76,12 +76,12 @@ public:
       size_t index,
       size_t elementSize = sizeof(T),
       size_t alignment = alignof(T)) {
-    return roundUp(offsetof(Array<T>, data_), alignment) + index * elementSize;
+    return roundUp(offsetof(FixedArray<T>, data_), alignment) + index * elementSize;
   }
   
   /// Clear the potentially uninitialized padding between the size_ and actual data.
   void clearPadding(size_t elementSize = sizeof(T), size_t alignment = alignof(T)) {
-    size_t gapOffset = offsetof(Array<T>, data_);
+    size_t gapOffset = offsetof(FixedArray<T>, data_);
     size_t gapSize = offsetOfElement(0, elementSize, alignment) - gapOffset;
     memset(reinterpret_cast<uint8_t*>(this) + gapOffset, 0, gapSize);
   }

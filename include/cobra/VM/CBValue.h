@@ -202,7 +202,7 @@ typedef enum {
   CBBooleanKind,
   CBNumberKind,
   CBStringKind,
-  CBObjectKind,
+  ObjectKind,
   CBMapKind,
   CBListKind,
   CBUpvalueKind,

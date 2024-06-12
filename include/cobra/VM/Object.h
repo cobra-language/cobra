@@ -5,13 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef CBObject_h
-#define CBObject_h
+#ifndef Object_h
+#define Object_h
 
 #include "cobra/VM/CBValue.h"
 #include "cobra/VM/GCCell.h"
 #include "cobra/VM/Offset.h"
-#include "cobra/Support/Array.h"
+#include "cobra/Support/FixedArray.h"
 
 namespace cobra {
 namespace vm {
@@ -45,13 +45,13 @@ struct CBField final {
   
 };
 
-class CBObject : public GCCell {
+class Object : public GCCell {
   /// The Class representing the type of the object.
   CBClassObject* clazz;
   
 };
 
-class CBClassObject : public CBObject {
+class CBClassObject : public Object {
   
   /// The superclass, or null if this is cobra.Object or a primitive type.
   CBClassObject *super;
@@ -100,9 +100,9 @@ class CBClassObject : public CBObject {
   /// See also class_size_.
   size_t objectSize;
   
-  Array<CBField> *getiFieldsPtrUnchecked();
+  FixedArray<CBField> *getiFieldsPtrUnchecked();
   
-  Array<CBField> *getSFieldsPtrUnchecked();
+  FixedArray<CBField> *getSFieldsPtrUnchecked();
   
 protected:
   template<class T, bool kIsVolatile = false>
@@ -140,9 +140,9 @@ public:
     return getFieldPrimitive<int64_t, kIsVolatile>(fieldOffset);
   }
   
-  Array<CBField>* getFieldsPtr();
+  FixedArray<CBField>* getFieldsPtr();
   
-  Array<CBField>* getStaticFieldsPtr();
+  FixedArray<CBField>* getStaticFieldsPtr();
   
   CBField *getField(uint32_t idx);
   
@@ -177,4 +177,4 @@ public:
 }
 }
 
-#endif /* CBObject_h */
+#endif /* Object_h */

@@ -8,7 +8,7 @@
 #ifndef CBMethod_h
 #define CBMethod_h
 
-#include "cobra/VM/CBObject.h"
+#include "cobra/VM/Object.h"
 
 namespace cobra {
 namespace vm {

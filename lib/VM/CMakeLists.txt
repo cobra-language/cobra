@@ -5,7 +5,7 @@
 
 add_cobra_library(cobraVMRuntime
   CBMethod.cpp
-  CBObject.cpp
+  Object.cpp
   CBString.cpp
   CBValue.cpp
   CodeBlock.cpp

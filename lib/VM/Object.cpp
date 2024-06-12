@@ -10,26 +10,26 @@
 using namespace cobra;
 using namespace vm;
 
-inline FixedArray<CBField> *CBClassObject::getiFieldsPtrUnchecked() {
-  return getFieldPtr<FixedArray<CBField> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, ifields_));
+inline FixedArray<Field> *CBClassObject::getiFieldsPtrUnchecked() {
+  return getFieldPtr<FixedArray<Field> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, ifields_));
 }
 
-inline FixedArray<CBField> *CBClassObject::getSFieldsPtrUnchecked() {
-  return getFieldPtr<FixedArray<CBField> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, sfields_));
+inline FixedArray<Field> *CBClassObject::getSFieldsPtrUnchecked() {
+  return getFieldPtr<FixedArray<Field> *>(OFFSET_OF_OBJECT_MEMBER(CBClassObject, sfields_));
 }
 
-inline FixedArray<CBField>* CBClassObject::getFieldsPtr() {
+inline FixedArray<Field>* CBClassObject::getFieldsPtr() {
   return getiFieldsPtrUnchecked();
 }
 
-inline FixedArray<CBField>* CBClassObject::getStaticFieldsPtr() {
+inline FixedArray<Field>* CBClassObject::getStaticFieldsPtr() {
   return getSFieldsPtrUnchecked();
 }
 
-inline CBField *CBClassObject::getField(uint32_t idx) {
+inline Field *CBClassObject::getField(uint32_t idx) {
   return &getFieldsPtr()->at(idx);
 }
 
-inline CBField *CBClassObject::getStaticField(uint32_t idx) {
+inline Field *CBClassObject::getStaticField(uint32_t idx) {
   return &getStaticFieldsPtr()->at(idx);
 }

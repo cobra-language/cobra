@@ -33,7 +33,7 @@ class CBClassObject;
 #define OFFSET_OF_OBJECT_MEMBER(type, field) \
     MemberOffset(OFFSETOF_MEMBER(type, field))
 
-struct CBField final {
+struct Field final {
   
   /// Class in which the field is declared
   CBClassObject *clazz;
@@ -70,7 +70,7 @@ class CBClassObject : public Object {
   /// CobraFields are allocated as a length prefixed CobraField array, and not an array of pointers to
   /// CobraFields.
   int fieldCount;
-  CBField *fields;
+  Field *fields;
   
   uint64_t ifields_;
   
@@ -100,9 +100,9 @@ class CBClassObject : public Object {
   /// See also class_size_.
   size_t objectSize;
   
-  FixedArray<CBField> *getiFieldsPtrUnchecked();
+  FixedArray<Field> *getiFieldsPtrUnchecked();
   
-  FixedArray<CBField> *getSFieldsPtrUnchecked();
+  FixedArray<Field> *getSFieldsPtrUnchecked();
   
 protected:
   template<class T, bool kIsVolatile = false>
@@ -140,16 +140,16 @@ public:
     return getFieldPrimitive<int64_t, kIsVolatile>(fieldOffset);
   }
   
-  FixedArray<CBField>* getFieldsPtr();
+  FixedArray<Field>* getFieldsPtr();
   
-  FixedArray<CBField>* getStaticFieldsPtr();
+  FixedArray<Field>* getStaticFieldsPtr();
   
-  CBField *getField(uint32_t idx);
+  Field *getField(uint32_t idx);
   
-  CBField *getStaticField(uint32_t idx);
+  Field *getStaticField(uint32_t idx);
   
-  static CBField *findField(const CBClassObject* clazz, const char* fieldName) {
-    CBField *pField = clazz->fields;
+  static Field *findField(const CBClassObject* clazz, const char* fieldName) {
+    Field *pField = clazz->fields;
     for (int i = 0; i < clazz->fieldCount; i++, pField++) {
       if (strcmp(fieldName, pField->name) == 0) {
         return pField;
@@ -158,8 +158,8 @@ public:
     return NULL;
   }
   
-  static CBField *findFieldHier(const CBClassObject* clazz, const char* fieldName) {
-    CBField *pField;
+  static Field *findFieldHier(const CBClassObject* clazz, const char* fieldName) {
+    Field *pField;
     
     pField = findField(clazz, fieldName);
     if (pField != NULL)

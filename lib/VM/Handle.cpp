@@ -10,8 +10,8 @@
 using namespace cobra;
 using namespace vm;
 
-ObjPtr<CBObject> HandleScope::getReference(size_t i) const {
-  return getReferences()[i].asPtr();
+ObjPtr<Object> HandleScope::getReference(size_t i) const {
+  return getReferences()[i].getPtr();
 }
 
 template<class T>
@@ -24,7 +24,7 @@ MutableHandle<T> HandleScope::getMutableHandle(size_t i) {
   return MutableHandle<T>(&getReferences()[i]);
 }
 
-void HandleScope::setReference(size_t i, ObjPtr<CBObject> object) {
+void HandleScope::setReference(size_t i, ObjPtr<Object> object) {
   getReferences()[i].assign(object);
 }
 

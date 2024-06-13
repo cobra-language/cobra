@@ -109,7 +109,7 @@ public:
    * therefor cannot be a Object) as a mirror pointer. Instead, this
    * returns a pointer to the mirror of the managed object this refers to.
    */
-  T* asPtr() const {
+  T *getPtr() const {
     return Compression::decompress(reference_);
   }
 
@@ -146,7 +146,7 @@ private:
 public:
   HeapReference() : HeapReference(nullptr) {}
 
-  T* asPtr() const  {
+  T *getPtr() const  {
     return Compression::decompress(reference_.load(std::memory_order_relaxed));
   }
 
@@ -168,33 +168,6 @@ public:
     return HeapReference<T>(ptr);
   }
 };
-
-/// Standard compressed reference used in the runtime. Used for StackReference and GC roots.
-template<class T>
-class CompressedReference : public ObjectReference<T> {
-private:
-  explicit CompressedReference(T* ptr) : ObjectReference<T>(ptr) {}
-  
-public:
-  CompressedReference<T>() : ObjectReference<T>() {}
-
-  static CompressedReference<T> fromPtr(T *ptr) {
-    return CompressedReference<T>(ptr);
-  }
-
-  static CompressedReference<T> fromVRegValue(uint32_t vRegValue) {
-    CompressedReference<T> result;
-    result.reference_ = vRegValue;
-    return result;
-  }
-
-  uint32_t asVRegValue() const {
-    return this->reference_;
-  }
-};
-
-template<class T>
-class StackReference : public CompressedReference<T> {};
 
 }
 }

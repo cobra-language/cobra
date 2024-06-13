@@ -12,12 +12,14 @@
 
 #include "cobra/VM/CBValue.h"
 #include "cobra/VM/GCPointer.h"
-#include "cobra/VM/CBObject.h"
+#include "cobra/VM/Object.h"
 
 namespace cobra {
 namespace vm {
 
 using Address = uintptr_t;
+
+// https://thlorenz.com/v8-dox/build/v8-3.14.5/html/d3/dd5/classv8_1_1_handle.html
 
 /// A Handle provides a reference to an object that survives relocation by
 /// the garbage collector.
@@ -90,9 +92,9 @@ private:
     return capacityOffset(pointer_size) + sizeof(capacity_) + sizeof(size_);
   }
   
-  StackReference<CBObject> *getReferences() const {
+  ObjectReference<Object> *getReferences() const {
     uintptr_t address = reinterpret_cast<uintptr_t>(this) + referencesOffset(kRuntimePointerSize);
-    return reinterpret_cast<StackReference<CBObject>*>(address);
+    return reinterpret_cast<ObjectReference<Object>*>(address);
   }
   
 public:
@@ -100,7 +102,7 @@ public:
   
   ~HandleScope() {}
   
-  ObjPtr<CBObject> getReference(size_t i) const;
+  ObjPtr<Object> getReference(size_t i) const;
   
   template<class T>
   Handle<T> getHandle(size_t i);
@@ -108,7 +110,7 @@ public:
   template<class T>
   MutableHandle<T> getMutableHandle(size_t i);
   
-  void setReference(size_t i, ObjPtr<CBObject> object);
+  void setReference(size_t i, ObjPtr<Object> object);
   
   template<class T>
   Handle<T> makeHandle(T *object);

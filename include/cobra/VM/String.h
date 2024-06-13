@@ -5,19 +5,19 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef CBMethod_h
-#define CBMethod_h
+#ifndef String_h
+#define String_h
 
-#include "cobra/VM/CBObject.h"
+#include "cobra/VM/Object.h"
 
 namespace cobra {
 namespace vm {
 
-class CBMethod {
+class String : Object {
   
 };
 
 }
 }
 
-#endif /* CBMethod_h */
+#endif /* String_h */

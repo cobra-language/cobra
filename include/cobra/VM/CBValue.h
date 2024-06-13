@@ -198,18 +198,16 @@ private:
 };
 
 typedef enum {
-  CBNullKind,
-  CBBooleanKind,
-  CBNumberKind,
-  CBStringKind,
-  CBObjectKind,
-  CBMapKind,
-  CBListKind,
-  CBUpvalueKind,
-  CBMethodKind,
-  CBClosureKind,
-  CBClassKind,
-  CBFiberKind,
+  NullKind,
+  BooleanKind,
+  NumberKind,
+  StringKind,
+  ObjectKind,
+  MapKind,
+  ArrayKind,
+  MethodKind,
+  ClosureKind,
+  ClassKind,
 } CBValueKind;
 
 

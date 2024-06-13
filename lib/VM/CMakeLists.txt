@@ -4,9 +4,10 @@
 # LICENSE file in the root directory of this source tree.
 
 add_cobra_library(cobraVMRuntime
-  CBMethod.cpp
-  CBObject.cpp
-  CBString.cpp
+  Method.cpp
+  Object.cpp
+  String.cpp
+  Array.cpp
   CBValue.cpp
   CodeBlock.cpp
   GC.cpp

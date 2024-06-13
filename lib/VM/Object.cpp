@@ -10,6 +10,14 @@
 using namespace cobra;
 using namespace vm;
 
+inline ObjPtr<Class> Field::getClass() {
+  
+}
+
+inline void setClass(ObjPtr<Class> cls) {
+  
+}
+
 inline FixedArray<Field> *Class::getiFieldsPtrUnchecked() {
   return getFieldPtr<FixedArray<Field> *>(OFFSET_OF_OBJECT_MEMBER(Class, ifields_));
 }

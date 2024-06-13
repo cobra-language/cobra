@@ -13,6 +13,8 @@
 #include "cobra/VM/Offset.h"
 #include "cobra/Support/FixedArray.h"
 #include "cobra/VM/GCPointer.h"
+#include "cobra/VM/Modifiers.h"
+#include "cobra/Support/StringRef.h"
 
 namespace cobra {
 namespace vm {
@@ -25,16 +27,22 @@ enum class PointerSize : size_t {
 static constexpr PointerSize kRuntimePointerSize = sizeof(void*) == 8U
                                                        ? PointerSize::k64
                                                        : PointerSize::k32;
-
+class Object;
 class Method;
 class Class;
 
-#define OFFSETOF_MEMBER(t, f) offsetof(t, f)
+#define MEMBER_OFFSET(t, f) offsetof(t, f)
 
 #define OFFSET_OF_OBJECT_MEMBER(type, field) \
-    MemberOffset(OFFSETOF_MEMBER(type, field))
+    MemberOffset(MEMBER_OFFSET(type, field))
 
-class Field final {
+class Object : public GCCell {
+  /// The Class representing the type of the object.
+  HeapReference<Class> clazz;
+  
+};
+
+class Field : public Object {
   
   /// Class in which the field is declared
   HeapReference<Class> clazz;
@@ -42,13 +50,62 @@ class Field final {
   const char *name;
   
   /// Offset of field within an instance or in the Class' static fields
-  uint32_t offset = 0;
+  uint32_t offset_ = 0;
   
-};
-
-class Object : public GCCell {
-  /// The Class representing the type of the object.
-  HeapReference<Class> clazz;
+  uint32_t accessFlags_;
+  
+public:
+  
+  ~Field() = default;
+  
+  bool isPublic() const {
+    return (accessFlags_ & kAccPublic) != 0;
+  }
+  
+  bool isPrivate() const {
+    return (accessFlags_ & kAccPrivate) != 0;
+  }
+  
+  bool isProtected() const {
+    return (accessFlags_ & kAccProtected) != 0;
+  }
+  
+  bool isStatic() const {
+    return (accessFlags_ & kAccStatic) != 0;
+  }
+  
+  bool isFinal() const {
+    return (accessFlags_ & kAccFinal) != 0;
+  }
+  
+  uint32_t getAccessFlags() const {
+    return accessFlags_;
+  }
+  
+  ObjPtr<Class> getClass();
+  
+  void setClass(ObjPtr<Class> cls);
+  
+  uint32_t getOffset() const {
+    return offset_;
+  }
+  
+  void setOffset(uint32_t offset) {
+    offset_ = offset;
+  }
+  
+  static constexpr uint32_t getOffsetOffset() {
+    return MEMBER_OFFSET(Field, offset_);
+  }
+  
+  static constexpr uint32_t getAccessFlagsOffset() {
+    return MEMBER_OFFSET(Field, accessFlags_);
+  }
+  
+  static constexpr uint32_t getClassOffset() {
+    return MEMBER_OFFSET(Field, accessFlags_);
+  }
+  
   
 };
 
@@ -98,7 +155,7 @@ class Class : public Object {
   
   /// Total object size; used when allocating storage on gc heap.
   /// (For interfaces and abstract classes this will be zero.)
-  /// See also class_size_.
+  /// See also \p class_size_.
   size_t objectSize;
   
   FixedArray<Field> *getiFieldsPtrUnchecked();

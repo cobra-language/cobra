@@ -16,7 +16,7 @@ namespace vm {
 
 class Method : Object {
   
-  HeapReference<Class> clazz;
+  GCPointer<Class> clazz;
   
   /// Access flags; low 16 bits are defined by spec.
   /// Getting and setting this flag needs to be atomic when concurrency is

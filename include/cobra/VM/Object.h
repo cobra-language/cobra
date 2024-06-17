@@ -12,9 +12,11 @@
 #include "cobra/VM/GCCell.h"
 #include "cobra/VM/Offset.h"
 #include "cobra/Support/FixedArray.h"
+#include "cobra/Support/ArraySlice.h"
 #include "cobra/VM/GCPointer.h"
 #include "cobra/VM/Modifiers.h"
 #include "cobra/Support/StringRef.h"
+#include "cobra/Support/Common.h"
 
 namespace cobra {
 namespace vm {
@@ -31,21 +33,39 @@ class Object;
 class Method;
 class Class;
 
-#define MEMBER_OFFSET(t, f) offsetof(t, f)
-
 #define OFFSET_OF_OBJECT_MEMBER(type, field) \
     MemberOffset(MEMBER_OFFSET(type, field))
 
 class Object : public GCCell {
   /// The Class representing the type of the object.
-  HeapReference<Class> clazz;
+  GCPointer<Class> clazz;
+  
+public:
+  
+  /// Ref to https://android.googlesource.com/platform/art/+/refs/heads/main/runtime/mirror/object.h#373
+  /// and https://gitee.com/openharmony/arkcompiler_runtime_core/blob/master/static_core/runtime/include/object_accessor-inl.h#L111
+  template<class T, bool IsVolatile = false>
+  inline T getFieldPrimitive(size_t offset) {
+    auto *addr = reinterpret_cast<T *>(reinterpret_cast<uintptr_t>(this) + offset);
+    if (IsVolatile) {
+        // Atomic with seq_cst order reason: required for volatile
+        return reinterpret_cast<const std::atomic<T> *>(addr)->load(std::memory_order_seq_cst);
+    }
+    // Atomic with relaxed order reason: to be compatible with other vms
+    return reinterpret_cast<const std::atomic<T> *>(addr)->load(std::memory_order_relaxed);
+  }
+  
+  template<class T>
+  T getField(size_t offset) {
+    return getFieldPrimitive<T>(offset);
+  }
   
 };
 
 class Field : public Object {
   
   /// Class in which the field is declared
-  HeapReference<Class> clazz;
+  GCPointer<Class> clazz;
   
   const char *name;
   
@@ -105,14 +125,12 @@ public:
   static constexpr uint32_t getClassOffset() {
     return MEMBER_OFFSET(Field, accessFlags_);
   }
-  
-  
 };
 
 class Class : public Object {
   
   /// The superclass, or null if this is cobra.Object or a primitive type.
-  HeapReference<Class> super;
+  GCPointer<Class> super;
   
   /// The lower 16 bits contains a Primitive::Type value. The upper 16
   /// bits contains the size shift of the primitive type.
@@ -127,107 +145,114 @@ class Class : public Object {
   ///
   /// CobraFields are allocated as a length prefixed CobraField array, and not an array of pointers to
   /// CobraFields.
-  int fieldCount;
-  Field *fields;
-  
-  uint64_t ifields_;
+  uint64_t fields_;
   
   /// Static fields length-prefixed array.
-  int staticFieldCount;
-  uint64_t staticFields;
-  
-  /// Static fields length-prefixed array.
-  uint64_t sfields_;
+  uint64_t staticFields_;
   
   /// static, private, and <init> methods
-  int directMethodCount;
-  Method *directMethods;
+  uint64_t directMethods;
   
   /// virtual methods defined in this class; invoked through vtable
-  int virtualMethodCount;
-  Method* virtualMethods;
+  uint64_t virtualMethods;
   
-  /// Virtual method table (vtable), for use by "invoke-virtual".  The
-  /// vtable from the superclass is copied in, and virtual methods from
-  /// our class either replace those from the super or are appended.
-  int vtableCount;
-  Method **vtable;
+  /// Access flags; low 16 bits are defined by VM spec.
+  uint32_t accessFlags_;
   
   /// Total object size; used when allocating storage on gc heap.
   /// (For interfaces and abstract classes this will be zero.)
   /// See also \p class_size_.
   size_t objectSize;
   
-  FixedArray<Field> *getiFieldsPtrUnchecked();
+  /// Total size of the Class instance; used when allocating storage on gc heap.
+  /// See also object_size_.
+  uint32_t classSize_;
   
-  FixedArray<Field> *getSFieldsPtrUnchecked();
+  Method *methods_ {nullptr};
+  uint32_t num_methods_ {0};
   
-protected:
-  template<class T, bool kIsVolatile = false>
-  T getFieldPtr(MemberOffset fieldOffset) {
-    return getFieldPtrWithSize<T, kIsVolatile>(fieldOffset, kRuntimePointerSize);
-  }
-  
-  template<class T, bool kIsVolatile = false>
-  T getFieldPtrWithSize(MemberOffset fieldOffset, PointerSize pointer_size) {
-    if (pointer_size == PointerSize::k32) {
-      int32_t v = getField_32<kIsVolatile>(fieldOffset);
-      return reinterpret_cast<T>(static_cast<uintptr_t>(static_cast<uint32_t>(v)));
-    } else {
-      int64_t v = getField_64< kIsVolatile>(fieldOffset);
-      return reinterpret_cast<T>(static_cast<uintptr_t>(v));
-    }
-  }
   
 public:
   
-  template<typename kType, bool kIsVolatile>
-  inline kType getFieldPrimitive(MemberOffset fieldOffset) {
-   const uint8_t* raw_addr = reinterpret_cast<const uint8_t*>(this) + fieldOffset.int32Value();
-   const kType* addr = reinterpret_cast<const kType*>(raw_addr);
-   // TODO
+  Class *getSuperClass() const {
+    return super.get<Class>();
   }
   
-  template<bool kIsVolatile = false>
-  inline int32_t getField_32(MemberOffset fieldOffset) {
-    return getFieldPrimitive<int32_t, kIsVolatile>(fieldOffset);
+  bool isPublic() const {
+    return (accessFlags_ & kAccPublic) != 0;
   }
   
-  template< bool kIsVolatile = false>
-  inline int64_t getField_64(MemberOffset fieldOffset) {
-    return getFieldPrimitive<int64_t, kIsVolatile>(fieldOffset);
+  bool isPrivate() const {
+    return (accessFlags_ & kAccPrivate) != 0;
   }
   
-  FixedArray<Field>* getFieldsPtr();
+  bool isProtected() const {
+    return (accessFlags_ & kAccProtected) != 0;
+  }
   
-  FixedArray<Field>* getStaticFieldsPtr();
+  bool isStatic() const {
+    return (accessFlags_ & kAccStatic) != 0;
+  }
   
-  Field *getField(uint32_t idx);
+  bool isFinal() const {
+    return (accessFlags_ & kAccFinal) != 0;
+  }
+  
+  bool isAnnotation() {
+    return (accessFlags_ & kAccAnnotation) != 0;
+  }
+  
+  bool isEnum() const {
+    return (accessFlags_ & kAccEnum) != 0;
+  }
+  
+  bool isAbstract() const {
+    return (accessFlags_ & kAccAbstract) != 0;
+  }
+  
+  bool isInterface() const {
+    return (accessFlags_ & kAccInterface) != 0;
+  }
+  
+  bool isPrimitive() const {
+    // TODO
+    return true;
+  }
+  
+  bool isObjectClass() const {
+    return !isPrimitive() && getSuperClass();
+  }
+  
+  uint32_t getAccessFlags() const {
+    return accessFlags_;
+  }
+  
+  uint32_t getClassSize() const {
+    return classSize_;
+  }
+
+  Field *getInstanceField(uint32_t idx);
   
   Field *getStaticField(uint32_t idx);
   
-  static Field *findField(const Class* clazz, const char* fieldName) {
-    Field *pField = clazz->fields;
-//    for (int i = 0; i < clazz->fieldCount; i++, pField++) {
-//      if (strcmp(fieldName, pField->name) == 0) {
-//        return pField;
-//      }
-//    }
-    return NULL;
-  }
+  FixedArray<Field>* getInstanceFields();
   
-  static Field *findFieldHier(const Class* clazz, const char* fieldName) {
-//    Field *pField;
+  FixedArray<Field>* getStaticFields();
+  
+  FixedArray<Method>* getDirectMethods();
+  
+  FixedArray<Method>* getVirtualMethods();
+  
+//  ArraySlice<Method> GetMethodss() const {
 //
-//    pField = findField(clazz, fieldName);
-//    if (pField != NULL)
-//      return pField;
-//
-//    if (clazz->super != NULL)
-//      return findFieldHier(clazz->super, fieldName);
-//    else
-//      return NULL;
-  }
+//    return {methods_, num_methods_};
+//  }
+  
+  
+  
+  
+public:
+
   
   
 };

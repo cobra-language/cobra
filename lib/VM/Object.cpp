@@ -18,26 +18,27 @@ inline void setClass(ObjPtr<Class> cls) {
   
 }
 
-inline FixedArray<Field> *Class::getiFieldsPtrUnchecked() {
-  return getFieldPtr<FixedArray<Field> *>(OFFSET_OF_OBJECT_MEMBER(Class, ifields_));
+
+Field *Class::getInstanceField(uint32_t idx) {
+  return &getInstanceFields()->at(idx);
 }
 
-inline FixedArray<Field> *Class::getSFieldsPtrUnchecked() {
-  return getFieldPtr<FixedArray<Field> *>(OFFSET_OF_OBJECT_MEMBER(Class, sfields_));
+Field *Class::getStaticField(uint32_t idx) {
+  return &getStaticFields()->at(idx);
 }
 
-inline FixedArray<Field>* Class::getFieldsPtr() {
-  return getiFieldsPtrUnchecked();
+FixedArray<Field>* Class::getInstanceFields() {
+  return getField<FixedArray<Field> *>(MEMBER_OFFSET(Class, fields_));
 }
 
-inline FixedArray<Field>* Class::getStaticFieldsPtr() {
-  return getSFieldsPtrUnchecked();
+FixedArray<Field>* Class::getStaticFields() {
+  return getField<FixedArray<Field> *>(MEMBER_OFFSET(Class, staticFields_));
 }
 
-inline Field *Class::getField(uint32_t idx) {
-  return &getFieldsPtr()->at(idx);
+FixedArray<Method>* Class::getDirectMethods() {
+  return getField<FixedArray<Method> *>(MEMBER_OFFSET(Class, directMethods));
 }
 
-inline Field *Class::getStaticField(uint32_t idx) {
-  return &getStaticFieldsPtr()->at(idx);
+FixedArray<Method>* Class::getVirtualMethods() {
+  return getField<FixedArray<Method> *>(MEMBER_OFFSET(Class, virtualMethods));
 }

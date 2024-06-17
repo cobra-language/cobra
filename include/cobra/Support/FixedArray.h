@@ -40,7 +40,7 @@ public:
   }
 
   /// Update the length but does not reallocate storage.
-  void SetSize(size_t length) {
+  void setSize(size_t length) {
     size_ = static_cast<uint32_t>(length);
   }
   

@@ -5,15 +5,24 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#ifndef InterfaceTableh
+#define InterfaceTable_h
+
+#include <atomic>
 #include "cobra/VM/Object.h"
 
-using namespace cobra;
-using namespace vm;
+namespace cobra {
+namespace vm {
 
-inline ObjPtr<Class> Field::getClass() {
+class InterfaceTable {
   
+  
+  
+  
+  
+};
+
+}
 }
 
-inline void setClass(ObjPtr<Class> cls) {
-  
-}
+#endif /* InterfaceTable_h */

@@ -8,6 +8,7 @@ add_cobra_library(cobraVMRuntime
   Object.cpp
   String.cpp
   Array.cpp
+  InterfaceTable.cpp
   CBValue.cpp
   CodeBlock.cpp
   GC.cpp

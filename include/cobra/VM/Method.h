@@ -16,13 +16,13 @@ namespace vm {
 
 class Method : Object {
   
-  GCPointer<Class> clazz;
+  GCPointer<Class> clazz{nullptr};
   
   /// Access flags; low 16 bits are defined by spec.
   /// Getting and setting this flag needs to be atomic when concurrency is
   /// possible, e.g. after this method's class is linked. Such as when setting
   /// verifier flags and single-implementation flag.
-  std::atomic<uint32_t> accessFlags_;
+  std::atomic<uint32_t> accessFlags_ {0};
   
 public:
   

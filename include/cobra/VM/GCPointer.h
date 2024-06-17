@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <string.h>
 #include <atomic>
+#include <type_traits>
 
 #include "cobra/Support/StdLibExtras.h"
 
@@ -168,6 +169,86 @@ public:
     return HeapReference<T>(ptr);
   }
 };
+
+class CompressedPointer {
+public:
+  using StorageType = uint32_t;
+  
+  explicit CompressedPointer() = default;
+  constexpr explicit CompressedPointer(std::nullptr_t) : ptr_(0u) {}
+  
+  explicit CompressedPointer(StorageType s) : ptr_(s) {}
+  
+  CompressedPointer(const CompressedPointer &) = default;
+  
+  template <typename T>
+  static CompressedPointer encode(T *ptr) {
+    CompressedPointer(compress(ptr));
+  }
+  
+  template <typename T>
+  static StorageType compress(T *ptr) {
+    return reinterpret_cast32<uint32_t>(ptr);
+  }
+  
+  template <typename T>
+  static T *decompress(StorageType ptr) {
+    return reinterpret_cast32<T *>(ptr);
+  }
+  
+  template <typename T>
+  T *get() const {
+    return reinterpret_cast<T *>(ptr_);
+  }
+  
+  template <typename T>
+  void set(T *ptr) {
+    ptr_ = CompressedPointer::encode(ptr).ptr_;
+  }
+  
+  StorageType getRaw() const {
+    return ptr_;
+  }
+  
+  void clear() { ptr_ = 0u; }
+  bool isCleared() const { return !ptr_; }
+  
+  bool operator==(const CompressedPointer &other) const {
+    return ptr_ == other.ptr_;
+  }
+
+  bool operator!=(const CompressedPointer &other) const {
+    return !(*this == other);
+  }
+  
+protected:
+ void setNoBarrier(CompressedPointer cp) {
+   ptr_ = cp.ptr_;
+ }
+  
+private:
+  StorageType ptr_;
+  
+};
+
+template <typename T>
+class GCPointer : public CompressedPointer{
+public:
+  GCPointer() : CompressedPointer(nullptr) {}
+  GCPointer(std::nullptr_t) : CompressedPointer(nullptr) {}
+  
+  GCPointer(T *ptr) : CompressedPointer(CompressedPointer::compress<T>(ptr)) {};
+  
+  /// We are not allowed to copy-construct or assign GCPointers.
+  GCPointer(const GCPointer<T> &) = delete;
+  GCPointer &operator=(const GCPointer<T> &) = delete;
+  
+  void set(T *ptr) {
+    setNoBarrier(CompressedPointer::encode<T>(ptr));
+  }
+  
+};
+
 
 }
 }

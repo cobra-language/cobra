@@ -5,15 +5,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/Object.h"
+#ifndef ObjectAccessor_h
+#define ObjectAccessor_h
 
-using namespace cobra;
-using namespace vm;
+#include <cstddef>
 
-inline ObjPtr<Class> Field::getClass() {
+namespace cobra {
+namespace vm {
+
+class ObjectAccessor {
   
+  
+  
+};
+
+}
 }
 
-inline void setClass(ObjPtr<Class> cls) {
-  
-}
+#endif /* ObjectAccessor_h */

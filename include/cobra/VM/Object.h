@@ -10,8 +10,6 @@
 
 #include "cobra/VM/CBValue.h"
 #include "cobra/VM/GCCell.h"
-#include "cobra/VM/Offset.h"
-#include "cobra/Support/FixedArray.h"
 #include "cobra/Support/ArraySlice.h"
 #include "cobra/VM/GCPointer.h"
 #include "cobra/VM/Modifiers.h"
@@ -30,8 +28,8 @@ static constexpr PointerSize kRuntimePointerSize = sizeof(void*) == 8U
                                                        ? PointerSize::k64
                                                        : PointerSize::k32;
 class Object;
-class Method;
 class Class;
+class Method;
 
 #define OFFSET_OF_OBJECT_MEMBER(type, field) \
     MemberOffset(MEMBER_OFFSET(type, field))
@@ -41,6 +39,18 @@ class Object : public GCCell {
   GCPointer<Class> clazz;
   
 public:
+  
+  static constexpr uint32_t instanceSize() {
+    return sizeof(Object);
+  }
+  
+  static constexpr uint32_t classOffset() {
+    return MEMBER_OFFSET(Object, clazz);
+  }
+  
+  inline Class *getClass() {
+    
+  }
   
   /// Ref to https://android.googlesource.com/platform/art/+/refs/heads/main/runtime/mirror/object.h#373
   /// and https://gitee.com/openharmony/arkcompiler_runtime_core/blob/master/static_core/runtime/include/object_accessor-inl.h#L111
@@ -130,11 +140,13 @@ public:
 class Class : public Object {
   
   /// The superclass, or null if this is cobra.Object or a primitive type.
-  GCPointer<Class> super;
+  GCPointer<Class> super{nullptr};
   
   /// The lower 16 bits contains a Primitive::Type value. The upper 16
   /// bits contains the size shift of the primitive type.
   uint32_t primitiveType;
+  
+  Field *fields_ {nullptr};
   
   /// instance fields
   ///
@@ -145,16 +157,21 @@ class Class : public Object {
   ///
   /// CobraFields are allocated as a length prefixed CobraField array, and not an array of pointers to
   /// CobraFields.
-  uint64_t fields_;
+  uint32_t fieldCount_ {0};
   
   /// Static fields length-prefixed array.
-  uint64_t staticFields_;
+  uint32_t staticFieldCount_ {0};
   
-  /// static, private, and <init> methods
-  uint64_t directMethods;
+  Class **interfaces_ {nullptr};
+  uint32_t interfaceCount_ {0};
+  
+  Method *methods_ {nullptr};
+  uint32_t methodCount_ {0};
   
   /// virtual methods defined in this class; invoked through vtable
-  uint64_t virtualMethods;
+  uint32_t virtualMethodCount_ {0};
+  
+  uint32_t copiedMethodCount_ {0};
   
   /// Access flags; low 16 bits are defined by VM spec.
   uint32_t accessFlags_;
@@ -168,12 +185,8 @@ class Class : public Object {
   /// See also object_size_.
   uint32_t classSize_;
   
-  Method *methods_ {nullptr};
-  uint32_t num_methods_ {0};
-  
   
 public:
-  
   Class *getSuperClass() const {
     return super.get<Class>();
   }
@@ -223,6 +236,12 @@ public:
     return !isPrimitive() && getSuperClass();
   }
   
+  /// Check if the object is Class instance
+  /// @return true if the object is Class instance
+  bool isClassClass() const {
+    
+  }
+  
   uint32_t getAccessFlags() const {
     return accessFlags_;
   }
@@ -230,29 +249,47 @@ public:
   uint32_t getClassSize() const {
     return classSize_;
   }
+  
+  ArraySlice<Field> getFields() const {
+    return {fields_, fieldCount_};
+  }
+  
+  ArraySlice<Field> getInstanceFields() const {
+    return getFields().subArraySlice(staticFieldCount_);
+  }
+  
+  ArraySlice<Field> getStaticFields() const {
+    return {fields_, staticFieldCount_};
+  }
 
-  Field *getInstanceField(uint32_t idx);
+  Field *getInstanceField(uint32_t idx) {
+    return &getInstanceFields()[idx];
+  }
   
-  Field *getStaticField(uint32_t idx);
+  Field *getStaticField(uint32_t idx) {
+    return &getStaticFields()[idx];
+  }
   
-  FixedArray<Field>* getInstanceFields();
+  ArraySlice<Method> getMethods() const {
+    return {methods_, methodCount_};
+  }
   
-  FixedArray<Field>* getStaticFields();
+  ArraySlice<Method> getStaticMethods() const {
+    return getMethods().subArraySlice(virtualMethodCount_);
+  }
   
-  FixedArray<Method>* getDirectMethods();
+  ArraySlice<Method> GetVirtualMethods() const {
+    return {methods_, virtualMethodCount_};
+  }
   
-  FixedArray<Method>* getVirtualMethods();
+  ArraySlice<Method> getCopiedMethods() const {
+    ArraySlice<Method> res {methods_, methodCount_ + copiedMethodCount_};
+    return res.subArraySlice(methodCount_);;
+  }
   
-//  ArraySlice<Method> GetMethodss() const {
-//
-//    return {methods_, num_methods_};
-//  }
-  
-  
-  
-  
-public:
-
+  ArraySlice<Class *> getInterfaces() const {
+    return {interfaces_, interfaceCount_};
+  }
   
   
 };

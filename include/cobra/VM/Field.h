@@ -25,8 +25,13 @@ class Field : public Object {
   uint32_t accessFlags_;
   
 public:
-  
   ~Field() = default;
+  
+  Field() = delete;
+  Field(const Field &) = delete;
+  Field(Field &&) = delete;
+  Field &operator=(const Field &) = delete;
+  Field &operator=(Field &&) = delete;
   
   bool isPublic() const {
     return (accessFlags_ & kAccPublic) != 0;

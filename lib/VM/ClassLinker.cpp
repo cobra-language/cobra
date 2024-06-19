@@ -5,11 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/Method.h"
+#include "cobra/VM/ClassLinker.h"
 
 using namespace cobra;
 using namespace vm;
-
-void Method::invoke(uint32_t* args, uint32_t argCount) {
-  
-}

@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include "cobra/VM/VM.h"
+#include "cobra/VM/CobraVM.h"
 #include "cobra/Driver/Driver.h"
 
 using namespace cobra;

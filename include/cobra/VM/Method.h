@@ -23,7 +23,19 @@ class Method : public Object {
   /// verifier flags and single-implementation flag.
   std::atomic<uint32_t> accessFlags_ {0};
   
+  uint32_t argsCount_ {0};
+  
+  uint16_t methodIndex_;
+  
 public:
+  
+  ~Method() = default;
+  
+  Method() = delete;
+  Method(const Method &) = delete;
+  Method(Method &&) = delete;
+  Method &operator=(const Method &) = delete;
+  Method &operator=(Method &&) = delete;
   
   bool isPublic() const {
     return (getAccessFlags() & kAccPublic) != 0;
@@ -65,6 +77,10 @@ public:
     return isConstructor() && isStatic();
   }
   
+  bool isObsolete() const {
+    return (getAccessFlags() & kAccObsoleteMethod) != 0;
+  }
+  
   uint32_t getAccessFlags() const {
     return accessFlags_.load(std::memory_order_relaxed);
   }
@@ -74,6 +90,25 @@ public:
     /// which should become visible acquire
     accessFlags_.store(accessFlags, std::memory_order_release);
   }
+  
+  uint16_t getMethodIndex() {
+    return methodIndex_;
+  }
+  
+  void setMethodIndex(uint16_t idx) {
+    /// Not called within a transaction.
+    methodIndex_ = idx;
+  }
+  
+  static constexpr uint32_t getArgCountOffset() {
+    return MEMBER_OFFSET(Method, argsCount_);
+  }
+  
+  static constexpr uint32_t getmethodIndexOffset() {
+    return MEMBER_OFFSET(Method, methodIndex_);
+  }
+  
+  void invoke(uint32_t* args, uint32_t argCount);
   
   
   

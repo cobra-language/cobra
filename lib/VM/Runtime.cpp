@@ -9,7 +9,8 @@
 #include "cobra/VM/GCPointer.h"
 
 using namespace cobra;
-using namespace vm;
+
+Runtime *Runtime::instance_ = nullptr;
 
 Runtime::~Runtime() {
   
@@ -17,6 +18,18 @@ Runtime::~Runtime() {
 
 std::shared_ptr<Runtime> Runtime::create() {
   return std::shared_ptr<Runtime>{new Runtime()};
+}
+
+bool Runtime::destroy() {
+  if (instance_ == nullptr) {
+    return false;
+  }
+  
+  
+}
+
+Runtime *Runtime::getCurrent() {
+  return instance_;
 }
 
 inline HandleScope *Runtime::getTopScope() {

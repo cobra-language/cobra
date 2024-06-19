@@ -31,7 +31,7 @@ bool driver::compile(std::string source) {
   
   auto BM = generateBytecode(&M);
   
-  auto runtime = vm::Runtime::create();
+  auto runtime = Runtime::create();
   auto BR = cobra::BytecodeRawData::create(std::move(BM));
   runtime->runBytecode(std::move(BR));
 }

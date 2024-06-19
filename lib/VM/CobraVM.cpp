@@ -5,4 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/GCPointer.h"
+#include "cobra/VM/CobraVM.h"
+
+using namespace cobra;
+
+CobraVM *CobraVM::create(Runtime *runtime, const RuntimeOptions &options) {
+  
+}

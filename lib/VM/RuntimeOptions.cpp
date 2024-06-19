@@ -5,11 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef VM_h
-#define VM_h
+#include "cobra/VM/RuntimeOptions.h"
 
-class VM {
-    
-};
+using namespace cobra;
 
-#endif /* VM_h */
+bool RuntimeOptions::create(const RuntimeRawOptions& rawOptions) {
+  
+}

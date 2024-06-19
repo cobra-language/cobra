@@ -14,6 +14,7 @@
 #include "cobra/Support/ArraySlice.h"
 #include "cobra/VM/GCPointer.h"
 #include "cobra/VM/Modifiers.h"
+#include "cobra/VM/ObjectAccessor.h"
 #include "cobra/Support/StringRef.h"
 #include "cobra/Support/Common.h"
 

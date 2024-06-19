@@ -34,6 +34,11 @@ static constexpr uint32_t kAccAnnotation =   0x2000;  // class, ic (1.5)
 static constexpr uint32_t kAccEnum =         0x4000;  // class, field, ic (1.5)
 
 static constexpr uint32_t kAccConstructor =           0x00010000;  // method <(cl)init>
+
+// Set to indicate that the Method is obsolete.
+// This flag may only be applied to methods.
+static constexpr uint32_t kAccObsoleteMethod =        0x00040000;  // method (runtime)
+
 }
 }
 

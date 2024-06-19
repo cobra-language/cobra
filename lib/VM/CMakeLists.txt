@@ -20,12 +20,15 @@ add_cobra_library(cobraVMRuntime
   Runtime.cpp
   RuntimeModule.cpp
   String.cpp
-  VM.cpp
   CardTable.cpp
   HeapRegion.cpp
   Handle.cpp
   Offset.cpp
   GCPointer.cpp
+  ClassLinker.cpp
+  RuntimeOptions.cpp
+  CobraVM.cpp
+  File.cpp
   LINK_LIBS cobraSupport
 )
 

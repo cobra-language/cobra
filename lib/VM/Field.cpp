@@ -5,8 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/Object.h"
+#include "cobra/VM/Field.h"
 
 using namespace cobra;
 using namespace vm;
-

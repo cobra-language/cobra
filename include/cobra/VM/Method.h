@@ -8,16 +8,15 @@
 #ifndef Method_h
 #define Method_h
 
-#include <atomic>
 #include "cobra/VM/Object.h"
 
 namespace cobra {
 namespace vm {
 
-class Method : Object {
-  
-  GCPointer<Class> clazz{nullptr};
-  
+class Class;
+
+class Method : public Object {
+    
   /// Access flags; low 16 bits are defined by spec.
   /// Getting and setting this flag needs to be atomic when concurrency is
   /// possible, e.g. after this method's class is linked. Such as when setting
@@ -58,11 +57,11 @@ public:
     return (getAccessFlags() & kAccConstructor) != 0;
   }
   
-  bool IsInstanceConstructor() const {
+  bool isInstanceConstructor() const {
     return isConstructor() && !isStatic();
   }
   
-  bool IsStaticConstructor() const {
+  bool isStaticConstructor() const {
     return isConstructor() && isStatic();
   }
   

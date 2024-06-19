@@ -13,7 +13,10 @@
 namespace cobra {
 namespace vm {
 
-class String : Object {
+class String : public Object {
+  
+public:
+  String() = default;
   
 };
 

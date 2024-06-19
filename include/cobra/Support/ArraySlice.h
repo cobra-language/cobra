@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <iterator>
+#include <assert.h>
 
 #include "cobra/Support/Common.h"
 

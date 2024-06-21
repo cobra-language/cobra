@@ -16,32 +16,37 @@
 #include "cobra/VM/ClassLinker.h"
 #include "cobra/VM/RuntimeOptions.h"
 #include "cobra/VM/File.h"
+#include "cobra/VM/StackFrame.h"
 
 namespace cobra {
-
-using namespace vm;
+namespace vm {
 
 class Runtime {
   
   static Runtime* instance_;
   static RuntimeOptions options_;
   
-  ClassLinker *classLinker_;
+  ClassLinker *classLinker_{};
   HandleScope *topScope_{};
   
   /// The package of the app running in this process.
-  std::string processPackageName_;
+  std::string processPackageName_{};
   
   /// The data directory of the app running in this process.
-  std::string processDataDirectory_;
+  std::string processDataDirectory_{};
   
   /// For saving class path.
-  std::string pathString_;
+  std::string pathString_{};
+  
+  StackFrame *currentFrame_{nullptr};
   
 public:
- static std::shared_ptr<Runtime> create();
-
- ~Runtime();
+  
+  Runtime();
+  
+  static bool create(const RuntimeOptions &options);
+  
+  ~Runtime();
   
   static bool destroy();
   
@@ -49,9 +54,19 @@ public:
   
   HandleScope *getTopScope();
   
+  StackFrame *getCurrentFrame() {
+    return currentFrame_;
+  }
+  
   bool runBytecode(std::shared_ptr<BytecodeRawData> &&bytecode);
   
+private:
+  
+  bool init(const RuntimeOptions &options);
+  
 };
+
+}
 
 }
 

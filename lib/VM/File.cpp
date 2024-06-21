@@ -9,3 +9,8 @@
 
 using namespace cobra;
 
+uint32_t File::Header::getVersion() const {
+  const char* version = reinterpret_cast<const char*>(&magic_[kMagicSize]);
+  return atoi(version);
+}
+

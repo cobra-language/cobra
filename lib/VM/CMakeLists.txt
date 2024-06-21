@@ -29,6 +29,7 @@ add_cobra_library(cobraVMRuntime
   RuntimeOptions.cpp
   CobraVM.cpp
   File.cpp
+  StackFrame.cpp
   LINK_LIBS cobraSupport
 )
 

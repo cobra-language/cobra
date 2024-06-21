@@ -11,6 +11,7 @@
 #include "cobra/VM/Runtime.h"
 
 namespace cobra {
+namespace vm {
 
 class CobraVM {
   
@@ -18,6 +19,7 @@ class CobraVM {
   
 };
 
+}
 }
 
 #endif /* CobraVM_h */

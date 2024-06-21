@@ -5,11 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/CobraVM.h"
+#include "cobra/VM/StackFrame.h"
 
 using namespace cobra;
 using namespace vm;
 
-CobraVM *CobraVM::create(Runtime *runtime, const RuntimeOptions &options) {
-  
-}

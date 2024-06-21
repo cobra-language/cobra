@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef InterfaceTableh
+#ifndef InterfaceTable_h
 #define InterfaceTable_h
 
 #include <atomic>

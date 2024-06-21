@@ -110,8 +110,7 @@ public:
   
   void invoke(uint32_t* args, uint32_t argCount);
   
-  
-  
+  void invokeCompiledCode(uint32_t* args, uint32_t argCount);
   
 };
 

@@ -14,6 +14,7 @@
 using namespace cobra;
 using namespace driver;
 using namespace Lowering;
+using namespace vm;
 
 bool driver::compile(std::string source) {
   auto context = std::make_shared<Context>();
@@ -31,8 +32,10 @@ bool driver::compile(std::string source) {
   
   auto BM = generateBytecode(&M);
   
-  auto runtime = Runtime::create();
+  auto result = Runtime::create(RuntimeOptions());
   auto BR = cobra::BytecodeRawData::create(std::move(BM));
-  runtime->runBytecode(std::move(BR));
+  Runtime::getCurrent()->runBytecode(std::move(BR));
+  
+  return true;
 }
 

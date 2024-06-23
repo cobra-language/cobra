@@ -9,6 +9,7 @@
 #define Array_h
 
 #include "cobra/VM/Object.h"
+#include "cobra/Support/Common.h"
 
 namespace cobra {
 namespace vm {
@@ -16,6 +17,16 @@ namespace vm {
 class Array : Object {
 public:
   static Array *create(Class arrayClass, uint32_t length);
+  
+  static size_t computeSize(size_t elementSize, uint32_t length) {
+      assert(elementSize != 0);
+      size_t size = sizeof(Array) + elementSize * length;
+      size_t size_limit = (std::numeric_limits<size_t>::max() - sizeof(Array)) / elementSize;
+      if (COBRA_UNLIKELY(size_limit < static_cast<size_t>(length))) {
+          return 0;
+      }
+      return size;
+  }
   
   uint32_t getLength() const {
     // Atomic with relaxed order reason: data race with length_ with no synchronization or ordering constraints
@@ -37,13 +48,20 @@ public:
   template <class T, bool IsVolatile = false>
   void setPrimitive(size_t offset, T value);
   
-  template <bool IsVolatile = false>
+  template <bool IsVolatile = false, bool needReadBarrier = true>
   Object *getObject(int offset) const;
 
-  template <bool IsVolatile = false>
+  template <bool IsVolatile = false, bool needWriteBarrier = true>
   void setObject(size_t offset, Object *value);
   
-  static constexpr uint32_t lengthOffset() {
+  template <class T>
+  static constexpr size_t getElementSize();
+  
+  size_t objectSize(uint32_t componentSize) const {
+    return computeSize(componentSize, length_);
+  }
+  
+  static constexpr uint32_t getLengthOffset() {
     return MEMBER_OFFSET(Array, length_);
   }
   

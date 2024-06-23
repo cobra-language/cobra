@@ -30,6 +30,7 @@ add_cobra_library(cobraVMRuntime
   CobraVM.cpp
   File.cpp
   StackFrame.cpp
+  ObjectAccessor.cpp
   LINK_LIBS cobraSupport
 )
 

@@ -31,6 +31,18 @@ public:
     return data_;
   }
   
+  template <class T, bool IsVolatile = false>
+  T getPrimitive(size_t offset) const;
+
+  template <class T, bool IsVolatile = false>
+  void setPrimitive(size_t offset, T value);
+  
+  template <bool IsVolatile = false>
+  Object *getObject(int offset) const;
+
+  template <bool IsVolatile = false>
+  void setObject(size_t offset, Object *value);
+  
   static constexpr uint32_t lengthOffset() {
     return MEMBER_OFFSET(Array, length_);
   }
@@ -39,10 +51,11 @@ public:
     return MEMBER_OFFSET(Array, data_);
   }
   
-  template <class T>
-  inline void set(uint32_t idx, T value) {
-    
-  }
+  template <class T, bool needWriteBarrier = true>
+  void set(uint32_t idx, T value);
+  
+  template <class T, bool needReadBarrier = true>
+  T get(uint32_t idx) const;
   
   
 private:

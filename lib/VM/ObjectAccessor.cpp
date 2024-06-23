@@ -5,7 +5,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/Method.h"
+#include "cobra/VM/ObjectAccessor.h"
 
 using namespace cobra;
 using namespace vm;
+
+template <bool IsVolatile /* = false */, bool needReadBarrier /* = true */>
+Object *ObjectAccessor::getObject(const void *obj, size_t offset) {
+  return get<Object *, IsVolatile>(obj, offset);
+}
+
+template <bool IsVolatile /* = false */, bool needWriterBarrier /* = true */>
+void ObjectAccessor::setObject(void *obj, size_t offset, Object *value) {
+  if (needWriterBarrier) {
+    // TODO: record obj to BarrierSet
+  }
+  
+  set<Object *, IsVolatile>(obj, offset, value);
+}

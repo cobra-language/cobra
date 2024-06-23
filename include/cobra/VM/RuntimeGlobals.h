@@ -5,16 +5,21 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef Runtime_h
-#define Runtime_h
+#ifndef RuntimeGlobals_h
+#define RuntimeGlobals_h
 
 #include <string>
 
-namespace cobra {
-namespace vm {
+using ObjectPointerType = uint32_t;
+static constexpr size_t ObjectPointerSize = sizeof(ObjectPointerType);
 
+enum class PointerSize : size_t {
+  k32 = 4,
+  k64 = 8
+};
 
-}
-}
+static constexpr PointerSize kRuntimePointerSize = sizeof(void*) == 8U
+                                                       ? PointerSize::k64
+                                                       : PointerSize::k32;
 
-#endif /* Runtime_h */
+#endif /* RuntimeGlobals_h */

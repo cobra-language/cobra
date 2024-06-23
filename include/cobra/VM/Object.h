@@ -15,20 +15,13 @@
 #include "cobra/VM/GCPointer.h"
 #include "cobra/VM/Modifiers.h"
 #include "cobra/VM/ObjectAccessor.h"
+#include "cobra/VM/RuntimeGlobals.h"
 #include "cobra/Support/StringRef.h"
 #include "cobra/Support/Common.h"
 
 namespace cobra {
 namespace vm {
 
-enum class PointerSize : size_t {
-  k32 = 4,
-  k64 = 8
-};
-
-static constexpr PointerSize kRuntimePointerSize = sizeof(void*) == 8U
-                                                       ? PointerSize::k64
-                                                       : PointerSize::k32;
 class Class;
 
 class Object : public GCCell {

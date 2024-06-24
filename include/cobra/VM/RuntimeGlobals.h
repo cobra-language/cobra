@@ -9,6 +9,34 @@
 #define RuntimeGlobals_h
 
 #include <string>
+#include "cobra/Support/MathExtras.h"
+#pragma GCC diagnostic push
+
+#ifdef HERMES_COMPILER_SUPPORTS_WSHORTEN_64_TO_32
+#pragma GCC diagnostic ignored "-Wshorten-64-to-32"
+#endif
+
+namespace cobra {
+
+/// A type big enough to accomodate the entire allocated address space.
+/// Individual allocations are always 'uint32_t', but on a 64-bit machine we
+/// might want to accommodate a larger total heap (or not, in which case we keep
+/// it 32-bit).
+using gcheapsize_t = uint32_t;
+
+static const uint32_t LogHeapAlign = 3;
+static const uint32_t HeapAlign = 1 << LogHeapAlign;
+
+/// Align requested size according to the alignment requirement of the GC.
+constexpr inline uint32_t heapAlignSize(gcheapsize_t size) {
+  return alignTo<HeapAlign>(size);
+}
+
+/// Return true if the requested size is properly aligned according to the
+/// alignment requirement of the GC.
+constexpr inline bool isSizeHeapAligned(gcheapsize_t size) {
+  return (size & (HeapAlign - 1)) == 0;
+}
 
 using ObjectPointerType = uint32_t;
 static constexpr size_t ObjectPointerSize = sizeof(ObjectPointerType);
@@ -19,7 +47,9 @@ enum class PointerSize : size_t {
 };
 
 static constexpr PointerSize kRuntimePointerSize = sizeof(void*) == 8U
-                                                       ? PointerSize::k64
-                                                       : PointerSize::k32;
+? PointerSize::k64
+: PointerSize::k32;
+
+}
 
 #endif /* RuntimeGlobals_h */

@@ -159,6 +159,13 @@ inline uint64_t alignTo(uint64_t Value, uint64_t Align) {
   return (Value + Align - 1) / Align * Align;
 }
 
+/// Returns the next integer (mod 2**64) that is greater than or equal to
+/// \p Value and is a multiple of \c Align. \c Align must be non-zero.
+template <uint64_t Align> constexpr inline uint64_t alignTo(uint64_t Value) {
+  static_assert(Align != 0u, "Align must be non-zero");
+  return (Value + Align - 1) / Align * Align;
+}
+
 template <typename T, std::size_t SizeOfT> struct PopulationCounter {
   static unsigned count(T Value) {
     // Generic version, forward to 32 bits.

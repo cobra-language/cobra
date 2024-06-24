@@ -5,15 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/HeapRegion.h"
+#include "cobra/VM/HeapRegionSpace.h"
 
 using namespace cobra;
 using namespace vm;
-
-void *HeapRegion::alloc(uint32_t size) {
-  assert(isSizeHeapAligned(size) && "size must be heap aligned");
-  
-  char *objPtr;
-  
-  return objPtr;
-}

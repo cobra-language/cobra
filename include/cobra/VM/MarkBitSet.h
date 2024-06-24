@@ -9,11 +9,10 @@
 #define MarkBitSet_h
 
 #include "cobra/VM/BitSet.h"
+#include "cobra/VM/RuntimeGlobals.h"
 
 namespace cobra {
 namespace vm {
-
-static const uint32_t LogHeapAlign = 3;
 
 class MarkBitSet {
   MarkBitSet() = default;

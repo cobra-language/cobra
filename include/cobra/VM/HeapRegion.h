@@ -12,6 +12,7 @@
 
 #include "cobra/VM/GCCell.h"
 #include "cobra/VM/MarkBitSet.h"
+#include "cobra/VM/RuntimeGlobals.h"
 
 namespace cobra {
 namespace vm {
@@ -25,6 +26,10 @@ public:
   static constexpr size_t kMask = ~(KSize - 1);
   
   HeapRegion() = default;
+  HeapRegion(HeapRegion &&) = default;
+  HeapRegion &operator=(HeapRegion &&) = default;
+
+  ~HeapRegion();
   
   class Header {
     friend class HeapRegion;
@@ -44,7 +49,7 @@ public:
   
   inline static void setCellMarkBit(const GCCell *cell);
   
-  inline bool alloc(uint32_t size);
+  inline void *alloc(uint32_t size);
   
   void beginMarking();
   

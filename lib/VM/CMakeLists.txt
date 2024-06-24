@@ -31,6 +31,9 @@ add_cobra_library(cobraVMRuntime
   File.cpp
   StackFrame.cpp
   ObjectAccessor.cpp
+  FreeList.cpp
+  MemMapAllocator.cpp
+  HeapRegionSpace.cpp
   LINK_LIBS cobraSupport
 )
 

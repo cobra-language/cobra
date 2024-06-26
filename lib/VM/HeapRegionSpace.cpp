@@ -9,3 +9,8 @@
 
 using namespace cobra;
 using namespace vm;
+
+HeapRegion *HeapRegionSpace::allocRegion() {
+  
+  return nullptr;
+}

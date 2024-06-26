@@ -13,6 +13,7 @@
 #include "cobra/VM/GCCell.h"
 #include "cobra/VM/MarkBitSet.h"
 #include "cobra/VM/RuntimeGlobals.h"
+#include "cobra/VM/Object.h"
 
 namespace cobra {
 namespace vm {
@@ -49,14 +50,46 @@ public:
   
   inline static void setCellMarkBit(const GCCell *cell);
   
-  inline void *alloc(uint32_t size);
+  uint8_t* begin() const {
+    return begin_;
+  }
+  
+  uint8_t* top() const {
+    return top_.load(std::memory_order_relaxed);
+  }
+
+  void setTop(uint8_t* newTop) {
+    top_.store(newTop, std::memory_order_relaxed);
+  }
+  
+  uint8_t* end() const {
+    return end_;
+  }
+  
+  bool contains(Object* obj) const {
+    return begin_ <= reinterpret_cast<uint8_t*>(obj) && reinterpret_cast<uint8_t*>(obj) < end_;
+  }
+  
+  inline void *alloc(size_t size);
   
   void beginMarking();
   
   void endMarking();
   
 private:
+  /// The begin address of the region.
+  uint8_t* begin_;
+  /// Note that `top_` can be higher than `end_` in the case of a
+  /// large region, where an allocated object spans multiple regions
+  /// (large region + one or more large tail regions).
+  /// The current position of the allocation.
+  std::atomic<uint8_t*> top_;
   
+  /// The end address of the region.
+  uint8_t* end_;
+  
+  /// The number of objects allocated.
+  std::atomic<size_t> objectsAllocated_;
   
 };
 

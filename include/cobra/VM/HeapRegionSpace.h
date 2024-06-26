@@ -9,7 +9,7 @@
 #define HeapRegionSpace_h
 
 #include <stdint.h>
-
+#include <list>
 #include "cobra/VM/HeapRegion.h"
 
 namespace cobra {
@@ -17,7 +17,36 @@ namespace vm {
 
 class HeapRegionSpace {
   
+public:
+  static HeapRegionSpace* create(const std::string& name);
   
+  /// Ref arkcompiler HeapRegionAllocator::AllocateAlignedRegion
+  /// and art RegionSpace::AllocateRegion
+  /// and hermes HadesGC::createSegment
+  HeapRegion *allocRegion();
+  
+  HeapRegion *getCurrentRegion() const {
+      return regions_.back();
+  }
+
+  HeapRegion *getFirstRegion() const {
+     return regions_.front();
+  }
+  
+  uint32_t getRegionCount() {
+    return regions_.size();
+  }
+  
+  std::list<HeapRegion *> &getRegions() {
+    return regions_;
+  }
+
+  const std::list<HeapRegion *> &getRegions() const {
+    return regions_;
+  }
+  
+private:
+  std::list<HeapRegion *> regions_;
 };
 
 }

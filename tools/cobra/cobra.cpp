@@ -11,6 +11,8 @@
 #include "cobra/VM/CobraVM.h"
 #include "cobra/Driver/Driver.h"
 
+#include "cobra/Support/OSCompat.h"
+
 using namespace cobra;
 using namespace driver;
 

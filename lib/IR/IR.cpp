@@ -8,6 +8,7 @@
 #include "cobra/IR/IR.h"
 #include "cobra/Utils/IRPrinter.h"
 #include "cobra/Support/Common.h"
+#include "cobra/Support/OSCompat.h"
 
 using namespace cobra;
 

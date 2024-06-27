@@ -17,8 +17,8 @@ using namespace vm;
 void *HeapRegion::alloc(size_t size) {
   assert(isSizeHeapAligned(size) && "size must be heap aligned");
   
-  uint8_t* oldTop;
-  uint8_t* newTop;
+  uint8_t *oldTop;
+  uint8_t *newTop;
   do {
     oldTop = top_.load(std::memory_order_relaxed);
     newTop = oldTop + size;

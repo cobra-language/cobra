@@ -18,7 +18,7 @@ namespace vm {
 class HeapRegionSpace {
   
 public:
-  static HeapRegionSpace* create(const std::string& name);
+  static HeapRegionSpace *create(const std::string& name);
   
   /// Ref arkcompiler HeapRegionAllocator::AllocateAlignedRegion
   /// and art RegionSpace::AllocateRegion

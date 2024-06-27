@@ -50,11 +50,11 @@ public:
   
   inline static void setCellMarkBit(const GCCell *cell);
   
-  uint8_t* begin() const {
+  uint8_t *begin() const {
     return begin_;
   }
   
-  uint8_t* top() const {
+  uint8_t *top() const {
     return top_.load(std::memory_order_relaxed);
   }
 
@@ -62,7 +62,7 @@ public:
     top_.store(newTop, std::memory_order_relaxed);
   }
   
-  uint8_t* end() const {
+  uint8_t *end() const {
     return end_;
   }
   
@@ -78,7 +78,7 @@ public:
   
 private:
   /// The begin address of the region.
-  uint8_t* begin_;
+  uint8_t *begin_;
   /// Note that `top_` can be higher than `end_` in the case of a
   /// large region, where an allocated object spans multiple regions
   /// (large region + one or more large tail regions).
@@ -86,7 +86,7 @@ private:
   std::atomic<uint8_t*> top_;
   
   /// The end address of the region.
-  uint8_t* end_;
+  uint8_t *end_;
   
   /// The number of objects allocated.
   std::atomic<size_t> objectsAllocated_;

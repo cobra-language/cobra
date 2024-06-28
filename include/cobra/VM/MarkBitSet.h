@@ -15,6 +15,7 @@ namespace cobra {
 namespace vm {
 
 class MarkBitSet {
+public:
   MarkBitSet() = default;
 
   /// MarkBitSet is not copyable or movable: It must be constructed

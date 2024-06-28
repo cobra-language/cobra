@@ -27,6 +27,7 @@
 #include <vector>
 
 namespace cobra {
+namespace oscompat {
 
 /// Returns the current page size.
 size_t page_size();
@@ -116,6 +117,7 @@ bool set_env(const char *name, const char *value);
 /// \return true if successful, false on error.
 bool unset_env(const char *name);
 
+}
 }
 
 #endif /* OSCompat_h */

@@ -50,6 +50,21 @@ static constexpr PointerSize kRuntimePointerSize = sizeof(void*) == 8U
 ? PointerSize::k64
 : PointerSize::k32;
 
+/// A constexpr value that is highly likely (but not absolutely
+/// guaranteed) to be at least as large, and a multiple of,
+/// oscompat::page_size().  Thus, this value can be used to compute
+/// page-aligned sizes statically.  However, operations that require
+/// actual page_size()-alignment for correctness (e.g., ensuring that
+/// mprotect only protects what is intended) should verify the
+/// correctness of this value, using the function below.
+constexpr size_t kExpectedPageSize =
+#if defined(__APPLE__)
+    16 * 1024
+#else
+    4 * 1024
+#endif
+    ;
+
 }
 
 #endif /* RuntimeGlobals_h */

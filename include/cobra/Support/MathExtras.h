@@ -166,6 +166,25 @@ template <uint64_t Align> constexpr inline uint64_t alignTo(uint64_t Value) {
   return (Value + Align - 1) / Align * Align;
 }
 
+template<typename T>
+constexpr inline bool isAligned(T Value, size_t Align) {
+  return (Value & (Align - 1U)) == 0;
+}
+
+template<typename T>
+inline T alignDown(T Value, size_t Align) {
+  assert(std::is_integral<T>::value);
+  // alignment must be a power of two.
+  assert(Align != 0 && ((Align & (Align - 1U)) == 0));
+  return Value & ~(Align - 1U);
+}
+
+template<typename T>
+inline T alignUp(T Value, size_t Align) {
+  assert(std::is_integral<T>::value);
+  return alignDown<T>(static_cast<T>(Value + Align - 1U), Align);
+}
+
 template <typename T, std::size_t SizeOfT> struct PopulationCounter {
   static unsigned count(T Value) {
     // Generic version, forward to 32 bits.

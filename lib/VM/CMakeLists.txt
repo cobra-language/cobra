@@ -14,6 +14,7 @@ add_cobra_library(cobraVMRuntime
   CBValue.cpp
   CodeBlock.cpp
   GC.cpp
+  GCRoot.cpp
   GCCell.cpp
   Interpreter.cpp
   Primitive.cpp

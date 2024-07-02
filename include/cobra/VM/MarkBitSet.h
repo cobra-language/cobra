@@ -34,7 +34,8 @@ public:
     return kNumBits;
   }
   
-  // 类似JSC candidateAtomNumber 方法
+  /// Refto JSC candidateAtomNumber
+  /// And hermes MarkBitArrayNC::addressToIndex
   inline size_t index(const void *ptr) const {
     return (reinterpret_cast<uintptr_t>(ptr) - reinterpret_cast<uintptr_t>(this)) >> LogHeapAlign;
   }

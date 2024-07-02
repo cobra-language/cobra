@@ -15,6 +15,12 @@
 namespace cobra {
 namespace vm {
 
+enum HeapRegionSpaceType {
+  Young,
+  LargeObject,
+  Old
+};
+
 class HeapRegionSpace {
   
 public:

@@ -116,12 +116,16 @@ public:
     void protectGuardPage(oscompat::ProtectMode mode);
   };
   
-  /// Ref arkcompiler Region::ObjectAddressToRange
-  inline static HeapRegion *getHeapRegion(const void *ptr);
-    
-  inline static MarkBitSet *getMarkBitSet(const void *ptr);
+  /// Attempt an allocation of the given size in the region.  If there is
+  /// sufficent space, cast the space as a Object, and returns an uninitialized
+  /// pointer to that object.  If there is not sufficient
+  /// space, returns nullptr.
+  inline void *alloc(size_t size);
   
-  inline static void setCellMarkBit(const GCCell *cell);
+  /// Given the \p allocateBase_ of some valid memory region, returns
+  /// a pointer to the HeapRegion::Contents laid out in that storage,
+  /// assuming it exists.
+  inline static Contents *contents(void *start);
   
   /// The largest size the allocation region of an aligned heap segment could
   /// be.
@@ -151,9 +155,20 @@ public:
     return allocateBase_ <= reinterpret_cast<char *>(obj) && reinterpret_cast<char *>(obj) < end();
   }
   
-  inline void *alloc(size_t size);
+  inline CardTable &cardTable() const;
+
+  inline MarkBitSet &markBitSet() const;
   
-  inline static Contents *contents(void *start);
+  /// Ref arkcompiler Region::ObjectAddressToRange
+  inline static HeapRegion *getHeapRegion(const void *ptr);
+    
+  inline static MarkBitSet *getMarkBitSet(const void *ptr);
+  
+  inline static void setCellMarkBit(const Object *cell);
+  
+  inline static bool getCellMarkBit(const Object *cell);
+  
+  inline static CardTable *getCardTable(const void *ptr);
   
 private:
   
@@ -189,9 +204,20 @@ MarkBitSet *HeapRegion::getMarkBitSet(const void *ptr) {
   return &contents(HeapRegion::start(ptr))->markBitSet_;
 }
 
-void HeapRegion::setCellMarkBit(const GCCell *cell) {
-  MarkBitSet *markBits = getMarkBitSet(cell);
-  
+void HeapRegion::setCellMarkBit(const Object *object) {
+  MarkBitSet *markBits = getMarkBitSet(object);
+  size_t ind = markBits->index(object);
+  markBits->mark(ind);
+}
+
+bool HeapRegion::getCellMarkBit(const Object *object) {
+  MarkBitSet *markBits = getMarkBitSet(object);
+  size_t ind = markBits->index(object);
+  return markBits->at(ind);
+}
+
+CardTable *HeapRegion::getCardTable(const void *ptr) {
+  return &contents(HeapRegion::start(ptr))->cardTable_;
 }
 
 constexpr size_t HeapRegion::maxSize() {
@@ -200,6 +226,14 @@ constexpr size_t HeapRegion::maxSize() {
 
 HeapRegion::Contents *HeapRegion::contents() const {
   return contents(allocateBase_);
+}
+
+CardTable &HeapRegion::cardTable() const {
+  return contents()->cardTable_;
+}
+
+MarkBitSet &HeapRegion::markBitSet() const {
+  return contents()->markBitSet_;
 }
 
 }

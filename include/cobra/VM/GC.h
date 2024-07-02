@@ -12,24 +12,10 @@
 
 #include "cobra/VM/HeapRegion.h"
 #include "cobra/VM/CardTable.h"
+#include "cobra/VM/GCRoot.h"
 
 namespace cobra {
 namespace vm {
-
-// ArkCompiler
-enum class GCPhase {
-    GC_PHASE_IDLE,  // GC waits for trigger event
-    GC_PHASE_RUNNING,
-    GC_PHASE_COLLECT_ROOTS,
-    GC_PHASE_INITIAL_MARK,
-    GC_PHASE_MARK,
-    GC_PHASE_MARK_YOUNG,
-    GC_PHASE_REMARK,
-    GC_PHASE_COLLECT_YOUNG_AND_MOVE,
-    GC_PHASE_SWEEP,
-    GC_PHASE_CLEANUP,
-    GC_PHASE_LAST
-};
 
 // The CellState of a cell is a kind of hint about what the state of the cell is.
 enum class CellState : uint8_t {
@@ -50,7 +36,7 @@ enum class CellState : uint8_t {
 class GC {
   
   enum class Phase : uint8_t {
-    None,
+    Idle,
     Mark,
     CompleteMarking,
     Sweep,
@@ -59,10 +45,11 @@ class GC {
 public:
   GC() = default;
   
-  void writeBarrier(const GCCell *value);
+  void writeBarrier(const Object *obj, const Object *value);
   
 private:
-  std::unique_ptr<CardTable> cardTable;
+  
+  
 };
 
 }

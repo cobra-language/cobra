@@ -6,3 +6,10 @@
  */
 
 #include "cobra/VM/GC.h"
+
+using namespace cobra;
+using namespace vm;
+
+void GC::writeBarrier(const Object *obj, const Object *value) {
+  HeapRegion::getCardTable(obj)->markCard(obj);
+}

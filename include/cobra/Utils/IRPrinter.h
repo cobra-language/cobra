@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef HERMES_UTILS_DUMPER_H
-#define HERMES_UTILS_DUMPER_H
+#ifndef IRPrinter_h
+#define IRPrinter_h
 
 #include <map>
 #include <ostream>
@@ -93,6 +93,6 @@ struct IRPrinter {
   void visitModule(Module &M);
 };
 
-} // namespace hermes
+} // namespace cobra
 
-#endif
+#endif /* IRPrinter_h */

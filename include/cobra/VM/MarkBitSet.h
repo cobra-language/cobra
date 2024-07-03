@@ -8,7 +8,7 @@
 #ifndef MarkBitSet_h
 #define MarkBitSet_h
 
-#include "cobra/VM/BitSet.h"
+#include "cobra/Support/BitSet.h"
 #include "cobra/VM/RuntimeGlobals.h"
 
 namespace cobra {
@@ -43,7 +43,7 @@ public:
   inline bool at(size_t idx) const {
     assert(idx < kNumBits && "precondition: ind must be within the index range");
     return true;
-    return bitSet.contains(idx);
+    return bitSet.at(idx);
   }
   
   inline void mark(size_t idx) {

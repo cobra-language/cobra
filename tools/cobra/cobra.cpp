@@ -10,6 +10,7 @@
 #include <fstream>
 #include "cobra/VM/CobraVM.h"
 #include "cobra/Driver/Driver.h"
+#include "cobra/Support/BitSet.h"
 
 #include "cobra/Support/OSCompat.h"
 

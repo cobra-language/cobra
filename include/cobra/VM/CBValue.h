@@ -187,8 +187,8 @@ private:
       : raw_(val | ((uint64_t)etag << (kNumDataBits - 1))) {}
 
   /// Default move assignment operator used by friends
-  /// (PseudoHandle<HermesValue>) in order to allow for move assignment in those
-  /// friends. We cannot use SFINAE in PseudoHandle<HermesValue> as that would
+  /// (PseudoHandle<CBValue>) in order to allow for move assignment in those
+  /// friends. We cannot use SFINAE in PseudoHandle<CBValue> as that would
   /// require making PseudoHandle<T> not TriviallyCopyable (because we would
   /// have to template or handwrite the move assignment operator).
   CBValue &operator=(CBValue &&) = default;

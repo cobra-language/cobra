@@ -44,9 +44,9 @@ endif()
 
 # Has to be set before `project` as per documentation
 # https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_SYSROOT.html
-set(CMAKE_OSX_SYSROOT ${HERMES_APPLE_TARGET_PLATFORM})
+set(CMAKE_OSX_SYSROOT ${COBRA_APPLE_TARGET_PLATFORM})
 
-if(HERMES_APPLE_TARGET_PLATFORM MATCHES "catalyst")
+if(COBRA_APPLE_TARGET_PLATFORM MATCHES "catalyst")
   set(CMAKE_OSX_SYSROOT "macosx")
   set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-target arm64-apple-ios14.0-macabi -isystem ${CMAKE_OSX_SYSROOT}/System/iOSSupport/usr/include")
   set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-target arm64-apple-ios14.0-macabi -isystem ${CMAKE_OSX_SYSROOT}/System/iOSSupport/usr/include")
@@ -60,7 +60,7 @@ endif()
 # This must be consistent with the release_version in:
 # - android/build.gradle
 # - npm/package.json
-# - hermes-engine.podspec
+# - cobra-engine.podspec
 project(Cobra
         VERSION 0.12.0
         LANGUAGES C CXX)
@@ -86,7 +86,7 @@ endif()
 set(COBRA_IS_ANDROID OFF CACHE BOOL
   "Building for Android")
 
-set(HERMES_ENABLE_TOOLS ON CACHE BOOL
+set(COBRA_ENABLE_TOOLS ON CACHE BOOL
   "Enable CLI tools")
 
 CHECK_CXX_SOURCE_COMPILES(
@@ -110,7 +110,7 @@ endif()
 set(COBRA_STATIC_LINK OFF CACHE BOOL
   "Link COBRA_STATIC_LINK statically. May only work on GNU/Linux.")
 
-set(HERMES_ENABLE_TEST_SUITE ON CACHE BOOL
+set(COBRA_ENABLE_TEST_SUITE ON CACHE BOOL
   "Enable the test suite")
 
 set(COBRA__BUILD_APPLE_DSYM OFF CACHE BOOL
@@ -128,7 +128,7 @@ endif()
 
 if (COBRA_STATIC_LINK)
   append("-static" CMAKE_EXE_LINKER_FLAGS)
-  set(HERMES_USE_STATIC_ICU ON)
+  set(COBRA_USE_STATIC_ICU ON)
   set(CMAKE_FIND_LIBRARY_SUFFIXES "${CMAKE_STATIC_LIBRARY_SUFFIX}")
 endif()
 
@@ -156,11 +156,11 @@ endif()
 
 # Make the COBRA_RELEASE_VERSION accessible for version printing in C++.
 if(COBRA_RELEASE_VERSION)
-    add_definitions(-DHERMES_RELEASE_VERSION="${HERMES_RELEASE_VERSION}")
+    add_definitions(-DCOBRA_RELEASE_VERSION="${COBRA_RELEASE_VERSION}")
 endif()
 
 if(COBRA_ENABLE_IR_INSTRUMENTATION)
-    add_definitions(-DHERMES_ENABLE_IR_INSTRUMENTATION)
+    add_definitions(-DCOBRA_ENABLE_IR_INSTRUMENTATION)
 endif()
 
 
@@ -181,7 +181,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
   # C4530 C++ exception handler used, but unwind semantics are not enabled
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4530")
   # Parallelize build
-  if (HERMES_MSVC_MP)
+  if (COBRA_MSVC_MP)
     add_definitions( /MP )
   endif()
 endif()
@@ -195,7 +195,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # -Wshorten-64-to-32.
 check_cxx_compiler_flag("-Wshorten-64-to-32" CXX_SUPPORTS_SHORTEN_64_TO_32)
 if (${CXX_SUPPORTS_SHORTEN_64_TO_32})
-  add_definitions(-DHERMES_COMPILER_SUPPORTS_WSHORTEN_64_TO_32)
+  add_definitions(-DCOBRA_COMPILER_SUPPORTS_WSHORTEN_64_TO_32)
 endif()
 
 set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++17")
@@ -212,7 +212,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(lib)
 
-if(HERMES_ENABLE_TOOLS)
+if(COBRA_ENABLE_TOOLS)
   add_subdirectory(tools)
 endif()
 
@@ -220,23 +220,23 @@ endif()
 set(save_CMAKE_POSITION_INDEPENDENT_CODE ${CMAKE_POSITION_INDEPENDENT_CODE})
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(save_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-set(BUILD_SHARED_LIBS ${HERMES_BUILD_SHARED_JSI})
+set(BUILD_SHARED_LIBS ${COBRA_BUILD_SHARED_JSI})
 set(BUILD_SHARED_LIBS ${save_BUILD_SHARED_LIBS})
 set(CMAKE_POSITION_INDEPENDENT_CODE ${save_CMAKE_POSITION_INDEPENDENT_CODE})
 
 # Configure the test suites
 #
-if(HERMES_ENABLE_TEST_SUITE)
-  if(NOT HERMES_ENABLE_TOOLS)
+if(COBRA_ENABLE_TEST_SUITE)
+  if(NOT COBRA_ENABLE_TOOLS)
     message(FATAL_ERROR, "Running the test-suite requires the CLI tools to be built.")
   endif()
 
   list(APPEND COBRA_TEST_DEPS
-    hermes
+    cobra
    )
 
 
-  set(HERMES_LIT_TEST_PARAMS_BASE
-    hermes=${COBRA_TOOLS_OUTPUT_DIR}/hermes
+  set(COBRA_LIT_TEST_PARAMS_BASE
+    cobra=${COBRA_TOOLS_OUTPUT_DIR}/cobra
     )
 endif()

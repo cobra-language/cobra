@@ -11,17 +11,19 @@
 using namespace cobra;
 using namespace vm;
 
-void Method::invoke(uint32_t* args, uint32_t argCount) {
-  Runtime* runtime = Runtime::getCurrent();
-  
+class Interpreter;
+
+void Method::invoke(uint32_t *args, uint32_t argCount) {
+  auto frame = Runtime::getCurrent()->getCurrentFrame();
+  StackFrame *newFrame = StackFrame::create(frame, this, argCount);
   if (!isNative()) {
-    // TODO invoke interpreter
+    Interpreter::execute(this, newFrame);
   }
   
   invokeCompiledCode(args, argCount);
 }
 
-void Method::invokeCompiledCode(uint32_t* args, uint32_t argCount) {
+void Method::invokeCompiledCode(uint32_t *args, uint32_t argCount) {
   auto frame = Runtime::getCurrent()->getCurrentFrame();
   auto newFrame = StackFrame::create(frame, this, argCount);
 }

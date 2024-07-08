@@ -9,6 +9,7 @@
 #define Method_h
 
 #include "cobra/VM/Object.h"
+#include "cobra/VM/CodeDataAccessor.h"
 
 namespace cobra {
 namespace vm {
@@ -26,6 +27,8 @@ class Method : public Object {
   uint32_t argsCount_ {0};
   
   uint16_t methodIndex_;
+  
+  const File *file_;
   
 public:
   
@@ -100,6 +103,10 @@ public:
     methodIndex_ = idx;
   }
   
+  const uint8_t *getInstructions() const {
+    return CodeDataAccessor::getInstructions(*file_);
+  }
+  
   static constexpr uint32_t getArgCountOffset() {
     return MEMBER_OFFSET(Method, argsCount_);
   }
@@ -108,9 +115,9 @@ public:
     return MEMBER_OFFSET(Method, methodIndex_);
   }
   
-  void invoke(uint32_t* args, uint32_t argCount);
+  void invoke(uint32_t *args, uint32_t argCount);
   
-  void invokeCompiledCode(uint32_t* args, uint32_t argCount);
+  void invokeCompiledCode(uint32_t *args, uint32_t argCount);
   
 };
 

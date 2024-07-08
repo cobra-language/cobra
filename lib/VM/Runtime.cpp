@@ -50,8 +50,9 @@ inline HandleScope *Runtime::getTopScope() {
 }
 
 bool Runtime::runBytecode(std::shared_ptr<BytecodeRawData> &&bytecode) {
-  auto code = new CodeBlock(nullptr, 0, 0);
-  return Interpreter::interpretFunction(code);
+//  return Interpreter::interpretFunction(code);
+  
+  return true;
 }
 
 bool Runtime::init(const RuntimeOptions &options) {

@@ -10,7 +10,8 @@
 
 #include <cstdint>
 
-#include "cobra/VM/CodeBlock.h"
+#include "cobra/VM/Method.h"
+#include "cobra/VM/StackFrame.h"
 
 namespace cobra {
 namespace vm {
@@ -24,7 +25,7 @@ struct InterpSaveState {
 class Interpreter {
   
 public:
-  static bool interpretFunction(CodeBlock *codeBlock);
+  static bool execute(Method *method, StackFrame *frame);
 };
 
 }

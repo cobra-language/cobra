@@ -23,7 +23,10 @@ static bool isCallType(OpCode opcode) {
   }
 }
 
-bool Interpreter::interpretFunction(CodeBlock *codeBlock) {
+bool Interpreter::execute(Method *method, StackFrame *frame) {
+  const uint8_t *insts = frame->getMethod()->getInstructions();
+  frame->setInstructions(insts);
+  
   const Inst *ip = nullptr;
   
   return true;

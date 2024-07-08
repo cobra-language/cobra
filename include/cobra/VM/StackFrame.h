@@ -29,7 +29,7 @@ public:
     return method_;
   }
   
-  void SetMethod(Method *method){
+  void setMethod(Method *method){
       method_ = method;
   }
   
@@ -41,6 +41,14 @@ public:
     argCount_ = argCount;
   }
   
+  void setInstructions(const uint8_t *insts) {
+    insts_ = insts;
+  }
+
+  const uint8_t *getInstructions() const {
+    return insts_;
+  }
+  
 private:
   StackFrame(
     StackFrame *prev,
@@ -48,7 +56,8 @@ private:
     uint32_t argCount)
     : prev_(prev),
       method_(method),
-      argCount_(argCount) {}
+      argCount_(argCount),
+      insts_(nullptr){}
   
   ~StackFrame() = default;
   
@@ -61,6 +70,7 @@ private:
   StackFrame *prev_;
   Method *method_;
   uint32_t argCount_;
+  const uint8_t *insts_;
   
 };
 

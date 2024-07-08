@@ -14,3 +14,8 @@ uint32_t File::Header::getVersion() const {
   return atoi(version);
 }
 
+inline const char *File::getStringData(EntityId id) const {
+  auto array = getArrayFromId(id);
+  return reinterpret_cast<const char*>(array.data());
+}
+

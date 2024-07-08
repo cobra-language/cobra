@@ -18,6 +18,7 @@ namespace cobra {
 
 /// An ArraySlice is an abstraction over an array or a part of an array of a particular type. It does
 /// bounds checking and can be made from several common array-like structures in Art.
+/// Ref to ArkCompiler Span, Art ArrayRef and llvm ArrayRef
 template <class T>
 class ArraySlice {
 public:
@@ -115,26 +116,26 @@ public:
 
   ArraySlice first(size_t length) const {
     assert(length <= size_);
-    return subArraySlice(0, length);
+    return subArray(0, length);
   }
 
   ArraySlice last(size_t length) const {
     assert(length <= size_);
-    return subArraySlice(size_ - length, length);
+    return subArray(size_ - length, length);
   }
 
-  ArraySlice subArraySlice(size_t position, size_t length) const {
+  ArraySlice subArray(size_t position, size_t length) const {
     assert((position + length) <= size_);
     return ArraySlice(data_ + position, length);
   }
 
-  ArraySlice subArraySlice(size_t position) const {
+  ArraySlice subArray(size_t position) const {
     assert(position <= size_);
     return ArraySlice(data_ + position, size_ - position);
   }
 
   template <typename SubT>
-  ArraySlice<SubT> subArraySlice(size_t position, size_t length) const {
+  ArraySlice<SubT> subArray(size_t position, size_t length) const {
     assert((position * sizeof(T) + length * sizeof(SubT)) <= (size_ * sizeof(T)));
     assert(((reinterpret_cast<uintptr_t>(data_ + position)) % alignof(SubT)) == 0);
     

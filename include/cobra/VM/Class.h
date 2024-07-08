@@ -133,7 +133,7 @@ public:
   }
   
   ArraySlice<Field> getInstanceFields() const {
-    return getFields().subArraySlice(staticFieldCount_);
+    return getFields().subArray(staticFieldCount_);
   }
   
   ArraySlice<Field> getStaticFields() const {
@@ -153,7 +153,7 @@ public:
   }
   
   ArraySlice<Method> getStaticMethods() const {
-    return getMethods().subArraySlice(virtualMethodCount_);
+    return getMethods().subArray(virtualMethodCount_);
   }
   
   ArraySlice<Method> GetVirtualMethods() const {
@@ -162,7 +162,7 @@ public:
   
   ArraySlice<Method> getCopiedMethods() const {
     ArraySlice<Method> res {methods_, methodCount_ + copiedMethodCount_};
-    return res.subArraySlice(methodCount_);;
+    return res.subArray(methodCount_);;
   }
   
   ArraySlice<Class *> getInterfaces() const {

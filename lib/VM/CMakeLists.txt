@@ -37,6 +37,7 @@ add_cobra_library(cobraVMRuntime
   HeapRegionSpace.cpp
   CodeDataAccessor.cpp
   CobraCache.cpp
+  ClassAccessor.cpp
   LINK_LIBS cobraSupport
 )
 

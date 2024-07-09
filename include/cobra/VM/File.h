@@ -88,40 +88,48 @@ public:
   }
   
   const uint8_t *getBase() const {
-    // TODO
+    return data_.data();
   }
   
   uint32_t getVersion() const {
-    return getHeader().getVersion();
+    return header_->getVersion();
   }
   
   bool isMagicValid() const {
     return ::memcmp(header_->magic_.data(), StandardFileMagic, sizeof(StandardFileMagic)) == 0;
   }
   
-  const uint8_t *dataBegin() const { return data_.data(); }
-
-  size_t dataSize() const { return data_.size(); }
+  size_t size() const { return header_->fileSize; }
   
   const char *getStringData(EntityId id) const;
   
   ArraySlice<const uint8_t> getArrayFromId(EntityId id) const {
-    const Header header = getHeader();
-    ArraySlice array(dataBegin(), header.fileSize);
+    ArraySlice array(getBase(), header_->fileSize);
     return array.last(array.size() - id.getOffset());
   }
+  
+  ArraySlice<const uint32_t> getClasses() const {
+    ArraySlice file(getBase(), header_->fileSize);
+    ArraySlice classIdxData = file.subArray(header_->classIdxOffset, header_->classCount * sizeof(uint32_t));
+    return ArraySlice(reinterpret_cast<const uint32_t *>(classIdxData.data()), header_->classCount);
+  }
+  
+  template <typename T>
+  const T *getSection(const uint32_t offset);
   
 private:
   /// The full absolute path to the dex file.
   const std::string location_;
   
   const Header* const header_;
-  
-  const uint8_t *bufferPtr_;
-  
+    
   ArraySlice<const uint8_t> const data_;
   
+  File(const uint8_t *base, std::string location);
+  
 };
+
+std::unique_ptr<const File> openBytecodeFile(std::string_view location);
 
 }
 

@@ -4,7 +4,7 @@ Cobra is a high-level statically typed programming language, it's a variant and 
 
 You can check more about the Syntax here [Guides](./doc/Guides.md)
 
-Cobra references a lot of [hermes](https://github.com/facebook/hermes)
+Cobra references a lot of [hermes](https://github.com/facebook/hermes), [art](https://android.googlesource.com/platform/art) and [arkcompiler](https://gitee.com/openharmony/arkcompiler_runtime_core)
 
 ## Hello World!
 
@@ -47,6 +47,7 @@ The compiler pipeline is organized as below. Incidentally, early stages of this 
 * Bytecode generation (40%)
 * Bytecode Interpreter (5%)
 * Debug info(0%)
+* Runtime (10%)
 * GC (5%)
 * Machine code generation (0%)
 

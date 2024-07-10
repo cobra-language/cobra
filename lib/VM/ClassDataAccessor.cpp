@@ -5,13 +5,16 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "cobra/VM/ClassLinker.h"
+#include "cobra/VM/ClassDataAccessor.h"
 
 using namespace cobra;
-using namespace vm;
 
-Class *ClassLinker::loadClass(const File *file, uint32_t classID) {
-  ClassDataAccessor accessor(*file, classID);
-  
+ClassDataAccessor::ClassDataAccessor(const File &file, uint32_t classID)
+    : file_(file), classID_(classID) {
   
 }
+
+const char *ClassDataAccessor::getDescriptor() const {
+  
+}
+

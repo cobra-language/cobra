@@ -15,5 +15,5 @@ add_cobra_library(cobraDriver STATIC ${source_files}
   cobraFrontend
   cobraParser
   cobraSupport
-  cobraVMRuntime
+  cobraRuntime
 )

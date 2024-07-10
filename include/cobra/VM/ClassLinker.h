@@ -9,6 +9,8 @@
 #define ClassLinker_h
 
 #include "cobra/VM/Class.h"
+#include "cobra/VM/File.h"
+#include "cobra/VM/ClassDataAccessor.h"
 
 namespace cobra {
 namespace vm {
@@ -19,6 +21,16 @@ public:
   ClassLinker() = default;
   
   ~ClassLinker();
+  
+  Class *getClass(const uint8_t *descriptor);
+  
+  Class *loadClass(const File *file, uint32_t classID);
+  
+  bool loadFields(Class *klass);
+  
+  bool loadMethods(Class *klass);
+  
+private:
   
 };
 

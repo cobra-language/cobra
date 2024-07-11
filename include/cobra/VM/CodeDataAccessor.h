@@ -10,7 +10,7 @@
 
 #include <string>
 
-#include "cobra/VM/File.h"
+#include "cobra/VM/CotFile.h"
 
 namespace cobra {
 
@@ -19,18 +19,18 @@ namespace cobra {
 class CodeDataAccessor {
 public:
   
-  CodeDataAccessor(const File &file);
+  CodeDataAccessor(const CotFile &file);
   
   ~CodeDataAccessor() = default;
   
-  inline static const uint8_t *getInstructions(const File &file);
+  inline static const uint8_t *getInstructions(const CotFile &file);
   
   const uint8_t *getInstructions() const {
     return instructionsPtr_;
   }
   
 private:
-  const File &file_;
+  const CotFile &file_;
   
   /// Pointer to the instructions, null if there is no code item.
   const uint8_t *instructionsPtr_;
@@ -42,7 +42,7 @@ private:
   
 };
 
-const uint8_t *CodeDataAccessor::getInstructions(const File &file) {
+const uint8_t *CodeDataAccessor::getInstructions(const CotFile &file) {
   // TODO
 }
 

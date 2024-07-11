@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef File_h
-#define File_h
+#ifndef CotFile_h
+#define CotFile_h
 
 #include <string>
 #include "cobra/Support/ArraySlice.h"
@@ -15,7 +15,8 @@ namespace cobra {
 
 const static uint8_t StandardFileMagic[] = { 'c', 'o', 'b', 'r', 'a', '\n' };
 
-class File {
+/// Cot file is the bytecode  binary format file of cobra
+class CotFile {
 public:
   static constexpr size_t kMagicSize = 4;
   static constexpr size_t kVersionSize = 4;
@@ -125,12 +126,12 @@ private:
     
   ArraySlice<const uint8_t> const data_;
   
-  File(const uint8_t *base, std::string location);
+  CotFile(const uint8_t *base, std::string location);
   
 };
 
-std::unique_ptr<const File> openBytecodeFile(std::string_view location);
+std::unique_ptr<const CotFile> openBytecodeFile(std::string_view location);
 
 }
 
-#endif /* File_h */
+#endif /* CotFile_h */

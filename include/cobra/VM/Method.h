@@ -28,7 +28,7 @@ class Method : public Object {
   
   uint16_t methodIndex_;
   
-  const File *file_;
+  const CotFile *file_;
   
 public:
   

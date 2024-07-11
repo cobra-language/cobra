@@ -9,7 +9,7 @@
 
 using namespace cobra;
 
-ClassDataAccessor::ClassDataAccessor(const File &file, uint32_t classID)
+ClassDataAccessor::ClassDataAccessor(const CotFile &file, uint32_t classID)
     : file_(file), classID_(classID) {
   
 }

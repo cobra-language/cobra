@@ -10,7 +10,7 @@
 
 #include <string>
 
-#include "cobra/VM/File.h"
+#include "cobra/VM/CotFile.h"
 
 namespace cobra {
 
@@ -18,7 +18,7 @@ namespace cobra {
 /// And Art ClassDataAccessor
 class ClassDataAccessor {
 public:
-  ClassDataAccessor(const File &file, uint32_t classID);
+  ClassDataAccessor(const CotFile &file, uint32_t classID);
   
   ~ClassDataAccessor() = default;
   
@@ -46,14 +46,14 @@ public:
     return directMethodCount_ + virtualMethodCount_;
   }
   
-  const File &getFile() const {
+  const CotFile &getFile() const {
     return file_;
   }
   
   const char *getDescriptor() const;
   
 private:
-  const File &file_;
+  const CotFile &file_;
   uint32_t classID_;
   uint32_t access_flags_;
   uint32_t staticFieldCount_{0};

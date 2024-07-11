@@ -28,8 +28,12 @@ static ArraySlice<const uint8_t> getData(const uint8_t *base) {
 CotFile::CotFile(const uint8_t *base, std::string location)
     : location_(location),
       header_(reinterpret_cast<const Header*>(base)),
+      stringIds_(getSection<EntityId>(header_->stringIdxOffset)),
+      fieldIds_(getSection<EntityId>(header_->fieldIdxOffset)),
+      methodIds_(getSection<EntityId>(header_->methodIdxOffset)),
+      protoIds_(getSection<EntityId>(header_->protoIdxOffset)),
       data_(getData(base)) {
-
+        
 }
 
 template <typename T>

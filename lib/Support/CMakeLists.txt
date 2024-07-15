@@ -7,5 +7,6 @@ add_cobra_library(cobraSupport
   Base64.cpp
   StringRef.cpp
   OSCompatPosix.cpp
+  zip.cpp
   LINK_LIBS ${link_libs}
 )

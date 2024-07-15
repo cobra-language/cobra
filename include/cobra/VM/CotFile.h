@@ -10,6 +10,7 @@
 
 #include <string>
 #include "cobra/Support/ArraySlice.h"
+#include "cobra/Support/zip.h"
 
 namespace cobra {
 
@@ -180,11 +181,15 @@ public:
   template <typename T>
   const T *getSection(const uint32_t offset);
   
+  static std::unique_ptr<const CotFile> open(std::string_view filename);
+  
 private:
   /// The full absolute path to the dex file.
   const std::string location_;
   
   const Header *const header_;
+  
+  ArraySlice<const uint8_t> const data_;
   
   const EntityId *const stringIds_;
   
@@ -194,14 +199,11 @@ private:
   
   const EntityId *const protoIds_;
   
-    
-  ArraySlice<const uint8_t> const data_;
-  
   CotFile(const uint8_t *base, std::string location);
   
 };
 
-std::unique_ptr<const CotFile> openBytecodeFile(std::string_view location);
+std::unique_ptr<const CotFile> openCotFile(std::string_view location);
 
 }
 

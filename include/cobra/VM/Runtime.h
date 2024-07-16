@@ -15,7 +15,7 @@
 #include "cobra/VM/Handle.h"
 #include "cobra/VM/ClassLinker.h"
 #include "cobra/VM/RuntimeOptions.h"
-#include "cobra/VM/CotFile.h"
+#include "cobra/VM/CexFile.h"
 #include "cobra/VM/StackFrame.h"
 
 namespace cobra {

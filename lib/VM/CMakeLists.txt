@@ -29,7 +29,7 @@ add_cobra_library(cobraRuntime
   ClassLinker.cpp
   RuntimeOptions.cpp
   CobraVM.cpp
-  CotFile.cpp
+  CexFile.cpp
   StackFrame.cpp
   ObjectAccessor.cpp
   FreeList.cpp

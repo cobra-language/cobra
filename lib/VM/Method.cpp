@@ -17,7 +17,7 @@ void Method::invoke(uint32_t *args, uint32_t argCount) {
   auto frame = Runtime::getCurrent()->getCurrentFrame();
   StackFrame *newFrame = StackFrame::create(frame, this, argCount);
   if (!isNative()) {
-    Interpreter::execute(this, newFrame);
+    Interpreter::execute(newFrame);
   }
   
   invokeCompiledCode(args, argCount);

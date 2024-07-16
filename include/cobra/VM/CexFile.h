@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef CotFile_h
-#define CotFile_h
+#ifndef CexFile_h
+#define CexFile_h
 
 #include <string>
 #include "cobra/Support/ArraySlice.h"
@@ -16,7 +16,7 @@ namespace cobra {
 
 const static uint8_t StandardFileMagic[] = { 'c', 'o', 'b', 'r', 'a', '\n' };
 
-class CotFile;
+class CexFile;
 
 class ClassIdxIterator {
 public:
@@ -26,7 +26,7 @@ public:
   using reference = uint32_t &;
   using iterator_category = std::random_access_iterator_tag;
   
-  ClassIdxIterator(const CotFile &file, size_t idx) : file_(file), idx_(idx) {}
+  ClassIdxIterator(const CexFile &file, size_t idx) : file_(file), idx_(idx) {}
   
   ClassIdxIterator(const ClassIdxIterator &other) = default;
   ClassIdxIterator(ClassIdxIterator &&other) = default;
@@ -43,14 +43,14 @@ public:
   }
   
 private:
-  const CotFile &file_;
+  const CexFile &file_;
   size_t idx_;
 };
 
-/// Cot file is the bytecode  binary format file of cobra
+/// CexFile is the bytecode  binary format file of cobra
 /// Ref to ArkCompiler panda_file
 /// and art DexFile
-class CotFile {
+class CexFile {
 public:
   static constexpr size_t kMagicSize = 4;
   static constexpr size_t kVersionSize = 4;
@@ -181,7 +181,7 @@ public:
   template <typename T>
   const T *getSection(const uint32_t offset);
   
-  static std::unique_ptr<const CotFile> open(std::string_view filename);
+  static std::unique_ptr<const CexFile> open(std::string_view filename);
   
 private:
   /// The full absolute path to the dex file.
@@ -199,12 +199,12 @@ private:
   
   const EntityId *const protoIds_;
   
-  CotFile(const uint8_t *base, std::string location);
+  CexFile(const uint8_t *base, std::string location);
   
 };
 
-std::unique_ptr<const CotFile> openCotFile(std::string_view location);
+std::unique_ptr<const CexFile> openCexFile(std::string_view location);
 
 }
 
-#endif /* CotFile_h */
+#endif /* CexFile_h */

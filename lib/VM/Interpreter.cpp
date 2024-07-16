@@ -12,6 +12,10 @@ using namespace cobra;
 using namespace vm;
 using namespace inst;
 
+// Calculate the address of the next instruction given the name of the current
+// one.
+#define NEXTINST(name) ((const Inst *)(&ip->i##name + 1))
+
 static bool isCallType(OpCode opcode) {
   switch (opcode) {
 #define DEFINE_RET_TARGET(name) \
@@ -23,13 +27,20 @@ static bool isCallType(OpCode opcode) {
   }
 }
 
-bool Interpreter::execute(Method *method, StackFrame *frame) {
+bool Interpreter::execute(Method *method, uint32_t *args, uint32_t argCount) {
+  auto frame = Runtime::getCurrent()->getCurrentFrame();
+  StackFrame *newFrame = StackFrame::create(frame, method, argCount);
+}
+
+bool Interpreter::execute(StackFrame *frame) {
+  auto runtime = Runtime::getCurrent();
+  
   const uint8_t *insts = frame->getMethod()->getInstructions();
   frame->setInstructions(insts);
   
-  const Inst *ip = nullptr;
+  const Inst *ip = (Inst const *)insts;
   
-  return true;
+  CBValue* result;
 
   static void *opcodeDispatch[] = {
 #define DEFINE_OPCODE(name) &&case_##name,

@@ -9,7 +9,7 @@
 #define ClassLinker_h
 
 #include "cobra/VM/Class.h"
-#include "cobra/VM/CotFile.h"
+#include "cobra/VM/CexFile.h"
 #include "cobra/VM/ClassDataAccessor.h"
 
 namespace cobra {
@@ -24,7 +24,7 @@ public:
   
   Class *getClass(const uint8_t *descriptor);
   
-  Class *loadClass(const CotFile *file, uint32_t classID);
+  Class *loadClass(const CexFile *file, uint32_t classID);
   
   bool loadFields(Class *klass);
   

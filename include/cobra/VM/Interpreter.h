@@ -12,6 +12,7 @@
 
 #include "cobra/VM/Method.h"
 #include "cobra/VM/StackFrame.h"
+#include "cobra/VM/Runtime.h"
 
 namespace cobra {
 namespace vm {
@@ -25,7 +26,10 @@ struct InterpSaveState {
 class Interpreter {
   
 public:
-  static bool execute(Method *method, StackFrame *frame);
+  static bool execute(Method *method, uint32_t *args, uint32_t argCount);
+  
+  static bool execute(StackFrame *frame);
+  
 };
 
 }

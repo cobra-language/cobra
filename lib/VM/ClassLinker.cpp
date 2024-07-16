@@ -10,7 +10,7 @@
 using namespace cobra;
 using namespace vm;
 
-Class *ClassLinker::loadClass(const CotFile *file, uint32_t classID) {
+Class *ClassLinker::loadClass(const CexFile *file, uint32_t classID) {
   ClassDataAccessor accessor(*file, classID);
   
   

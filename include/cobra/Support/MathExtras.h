@@ -210,6 +210,42 @@ inline unsigned countPopulation(T Value) {
   return PopulationCounter<T, sizeof(T)>::count(Value);
 }
 
+/// This function takes a 64-bit integer and returns the bit equivalent double.
+inline double BitsToDouble(uint64_t Bits) {
+  double D;
+  static_assert(sizeof(uint64_t) == sizeof(double), "Unexpected type sizes");
+  memcpy(&D, &Bits, sizeof(Bits));
+  return D;
+}
+
+/// This function takes a 32-bit integer and returns the bit equivalent float.
+inline float BitsToFloat(uint32_t Bits) {
+  float F;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Unexpected type sizes");
+  memcpy(&F, &Bits, sizeof(Bits));
+  return F;
+}
+
+/// This function takes a double and returns the bit equivalent 64-bit integer.
+/// Note that copying doubles around changes the bits of NaNs on some hosts,
+/// notably x86, so this routine cannot be used if these bits are needed.
+inline uint64_t DoubleToBits(double Double) {
+  uint64_t Bits;
+  static_assert(sizeof(uint64_t) == sizeof(double), "Unexpected type sizes");
+  memcpy(&Bits, &Double, sizeof(Double));
+  return Bits;
+}
+
+/// This function takes a float and returns the bit equivalent 32-bit integer.
+/// Note that copying floats around changes the bits of NaNs on some hosts,
+/// notably x86, so this routine cannot be used if these bits are needed.
+inline uint32_t FloatToBits(float Float) {
+  uint32_t Bits;
+  static_assert(sizeof(uint32_t) == sizeof(float), "Unexpected type sizes");
+  memcpy(&Bits, &Float, sizeof(Float));
+  return Bits;
+}
+
 }
 
 

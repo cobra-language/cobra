@@ -11,6 +11,9 @@
 #include <stdio.h>
 #include <map>
 
+#include "cobra/Support/MathExtras.h"
+#include "cobra/Support/Common.h"
+
 namespace cobra {
 namespace vm {
 
@@ -178,6 +181,29 @@ public:
     return getDouble();
   }
   
+  static CBValue encodeNaNValue() {
+    return CBValue(
+        DoubleToBits(std::numeric_limits<double>::quiet_NaN()));
+  }
+  
+  /// Encode a numeric value into the best possible representation based on the
+  /// static type of the parameter. Right now we only have one representation
+  /// (double), but that could change in the future.
+  inline static CBValue encodeUntrustedNumberValue(double num) {
+    if (COBRA_UNLIKELY(std::isnan(num))) {
+      return encodeNaNValue();
+    }
+    return CBValue(DoubleToBits(num));
+  }
+  
+  /// Encodes \p num as a hermes value without checking for NaNs.
+  /// Should only be used in for values coming from locations within the VM,
+  /// where we know any NaN will be the quiet NaN.
+  inline static CBValue encodeTrustedNumberValue(double num) {
+    CBValue RV(DoubleToBits(num));
+    assert(RV.isDouble() && "value not representable as double");
+    return RV;
+  }
   
 private:
   constexpr explicit CBValue(uint64_t val) : raw_(val) {}
@@ -191,7 +217,7 @@ private:
   /// friends. We cannot use SFINAE in PseudoHandle<CBValue> as that would
   /// require making PseudoHandle<T> not TriviallyCopyable (because we would
   /// have to template or handwrite the move assignment operator).
-  CBValue &operator=(CBValue &&) = default;
+//  CBValue &operator=(CBValue &&) = default;
 
   // 64 raw bits stored and reinterpreted as necessary.
   uint64_t raw_;

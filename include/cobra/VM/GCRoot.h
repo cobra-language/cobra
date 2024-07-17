@@ -27,11 +27,11 @@ class RootVisitor {
 public:
   virtual ~RootVisitor() { }
   
-  void VisitRoot(Object** root, RootType type) {
+  void VisitRoot(Object **root, RootType type) {
     
   }
   
-  virtual void VisitRoots(Object*** roots, size_t count, RootType type) {
+  virtual void VisitRoots(Object ***roots, size_t count, RootType type) {
     
   }
   
@@ -48,7 +48,7 @@ public:
     return root_;
   }
   
-  void VisitRoot(RootVisitor* visitor, RootType type) const {
+  void VisitRoot(RootVisitor *visitor, RootType type) const {
     
   }
   

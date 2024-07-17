@@ -91,6 +91,8 @@ DEFINE_OPCODE_1(NewObject, Reg8)
 /// Arg1 = new Array(Arg2)
 DEFINE_OPCODE_2(NewArray, Reg8, UInt16)
 
+DEFINE_OPCODE_1(NewInstance, Reg8)
+
 /// Create a closure.
 /// Arg1 is the register in which to store the closure.
 /// Arg2 is index in the function table.
@@ -99,23 +101,40 @@ DEFINE_OPCODE_2(NewFunction, Reg8, UInt16)
 /// Arg1 = Arg2 (Register copy)
 DEFINE_OPCODE_2(Mov, Reg8, Reg8)
 
+/// Arg1 = Arg2 (Register copy, long index)
+DEFINE_OPCODE_2(MovLong, Reg32, Reg32)
+
+DEFINE_OPCODE_2(MovObject, Reg8, Reg8)
+
 /// Arg1 = Arg2 == Arg3 (JS equality)
 DEFINE_OPCODE_3(Eq, Reg8, Reg8, Reg8)
 
 /// Arg1 = Arg2 + Arg3
 DEFINE_OPCODE_3(Add, Reg8, Reg8, Reg8)
 
+/// Arg1 = Arg2 + Arg3 (Numeric addition, skips number check)
+DEFINE_OPCODE_3(AddN, Reg8, Reg8, Reg8)
+
 /// Arg1 = Arg2 * Arg3
 DEFINE_OPCODE_3(Mul, Reg8, Reg8, Reg8)
 
+/// Arg1 = Arg2 * Arg3 (Numeric multiplication, skips number check)
+DEFINE_OPCODE_3(MulN, Reg8, Reg8, Reg8)
+
 /// Arg1 = Arg2 / Arg3
 DEFINE_OPCODE_3(Div, Reg8, Reg8, Reg8)
+
+/// Arg1 = Arg2 / Arg3 (Numeric division, skips number check)
+DEFINE_OPCODE_3(DivN, Reg8, Reg8, Reg8)
 
 /// Arg1 = Arg2 % Arg3
 DEFINE_OPCODE_3(Mod, Reg8, Reg8, Reg8)
 
 /// Arg1 = Arg2 - Arg3
 DEFINE_OPCODE_3(Sub, Reg8, Reg8, Reg8)
+
+/// Arg1 = Arg2 - Arg3 (Numeric subtraction, skips number check)
+DEFINE_OPCODE_3(SubN, Reg8, Reg8, Reg8)
 
 
 /// Get an object property by string table index.
@@ -172,6 +191,14 @@ DEFINE_RET_TARGET(Call4)
 /// Return a value from the current function.
 /// return Arg1;
 DEFINE_OPCODE_1(Ret, Reg8)
+
+/// Return a object from the current function.
+/// return Arg1;
+DEFINE_OPCODE_1(RetObject, Reg8)
+
+/// Return void from the current function.
+/// return Arg1;
+DEFINE_OPCODE_1(RetVoid, Reg8)
 
 /// Load a function parameter by index. Starts at 0 with 'this'.
 /// Arg1 = Arg2 == 0 ? this : arguments[Arg2 - 1];

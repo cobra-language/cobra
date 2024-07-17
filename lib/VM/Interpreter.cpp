@@ -7,6 +7,7 @@
 
 #include "cobra/VM/Interpreter.h"
 #include "cobra/Inst/Inst.h"
+#include "cobra/VM/Operations.h"
 
 using namespace cobra;
 using namespace vm;
@@ -15,6 +16,15 @@ using namespace inst;
 // Calculate the address of the next instruction given the name of the current
 // one.
 #define NEXTINST(name) ((const Inst *)(&ip->i##name + 1))
+
+#define REG(index) frameRegs[index]
+
+#define O1REG(name) REG(ip->i##name.op1)
+#define O2REG(name) REG(ip->i##name.op2)
+#define O3REG(name) REG(ip->i##name.op3)
+#define O4REG(name) REG(ip->i##name.op4)
+#define O5REG(name) REG(ip->i##name.op5)
+#define O6REG(name) REG(ip->i##name.op6)
 
 static bool isCallType(OpCode opcode) {
   switch (opcode) {
@@ -30,6 +40,7 @@ static bool isCallType(OpCode opcode) {
 bool Interpreter::execute(Method *method, uint32_t *args, uint32_t argCount) {
   auto frame = Runtime::getCurrent()->getCurrentFrame();
   StackFrame *newFrame = StackFrame::create(frame, method, argCount);
+  return execute(newFrame);
 }
 
 bool Interpreter::execute(StackFrame *frame) {
@@ -39,6 +50,8 @@ bool Interpreter::execute(StackFrame *frame) {
   frame->setInstructions(insts);
   
   const Inst *ip = (Inst const *)insts;
+  
+  CBValue *frameRegs;
   
   CBValue* result;
 
@@ -73,6 +86,11 @@ bool Interpreter::execute(StackFrame *frame) {
       DISPATCH;
     }
     
+    CASE(NewInstance) {
+      
+      DISPATCH;
+    }
+    
     CASE(NewFunction) {
       
       DISPATCH;
@@ -84,6 +102,18 @@ bool Interpreter::execute(StackFrame *frame) {
     }
     
     CASE(Mov) {
+      
+      
+      DISPATCH;
+    }
+    
+    CASE(MovLong) {
+      
+      
+      DISPATCH;
+    }
+    
+    CASE(MovObject) {
       
       
       DISPATCH;
@@ -101,13 +131,32 @@ bool Interpreter::execute(StackFrame *frame) {
       DISPATCH;
     }
     
+    CASE(AddN) {
+      O1REG(AddN) = CBValue::encodeTrustedNumberValue(
+          O2REG(Add).getNumber() + O3REG(Add).getNumber());
+      ip = NEXTINST(Add);
+      DISPATCH;
+    }
+    
     CASE(Mul) {
       
       
       DISPATCH;
     }
     
+    CASE(MulN) {
+      
+      
+      DISPATCH;
+    }
+    
     CASE(Div) {
+      
+      
+      DISPATCH;
+    }
+    
+    CASE(DivN) {
       
       
       DISPATCH;
@@ -120,6 +169,12 @@ bool Interpreter::execute(StackFrame *frame) {
     }
     
     CASE(Sub) {
+      
+      
+      DISPATCH;
+    }
+    
+    CASE(SubN) {
       
       
       DISPATCH;
@@ -161,6 +216,16 @@ bool Interpreter::execute(StackFrame *frame) {
     }
     
     CASE(Ret) {
+      
+      DISPATCH;
+    }
+    
+    CASE(RetObject) {
+      
+      DISPATCH;
+    }
+    
+    CASE(RetVoid) {
       
       DISPATCH;
     }

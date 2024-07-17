@@ -38,6 +38,7 @@ add_cobra_library(cobraRuntime
   CodeDataAccessor.cpp
   CobraCache.cpp
   ClassDataAccessor.cpp
+  Operations.cpp
   LINK_LIBS cobraSupport
 )
 

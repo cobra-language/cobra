@@ -186,6 +186,22 @@ public:
         DoubleToBits(std::numeric_limits<double>::quiet_NaN()));
   }
   
+  constexpr inline static CBValue encodeBoolValue(bool val) {
+    return CBValue((uint64_t)(val), ETag::Bool);
+  }
+
+  inline static constexpr CBValue encodeNullValue() {
+    return CBValue(0, ETag::Null);
+  }
+
+  inline static constexpr CBValue encodeUndefinedValue() {
+    return CBValue(0, ETag::Undefined);
+  }
+
+  inline static constexpr CBValue encodeEmptyValue() {
+    return CBValue(0, ETag::Empty);
+  }
+  
   /// Encode a numeric value into the best possible representation based on the
   /// static type of the parameter. Right now we only have one representation
   /// (double), but that could change in the future.

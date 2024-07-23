@@ -30,6 +30,9 @@ class Method : public Object {
   
   const CexFile *file_;
   
+  /// Method prototype descriptor string (return and argument types).
+  const char *shorty_;
+  
 public:
   
   ~Method() = default;
@@ -105,6 +108,10 @@ public:
   
   const uint8_t *getInstructions() const {
     return CodeDataAccessor::getInstructions(*file_);
+  }
+  
+  const char *getShorty() {
+    return shorty_;
   }
   
   static constexpr uint32_t getArgCountOffset() {

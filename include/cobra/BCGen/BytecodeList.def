@@ -129,6 +129,8 @@ DEFINE_OPCODE_3(DivN, Reg8, Reg8, Reg8)
 
 /// Arg1 = Arg2 % Arg3
 DEFINE_OPCODE_3(Mod, Reg8, Reg8, Reg8)
+/// Arg1 = Arg2 % Arg3 (Numeric subtraction, skips number check)
+DEFINE_OPCODE_3(ModN, Reg8, Reg8, Reg8)
 
 /// Arg1 = Arg2 - Arg3
 DEFINE_OPCODE_3(Sub, Reg8, Reg8, Reg8)
@@ -207,6 +209,9 @@ DEFINE_OPCODE_2(LoadParam, Reg8, UInt8)
 /// Load a constant integer value.
 DEFINE_OPCODE_2(LoadConstUInt8, Reg8, UInt8)
 DEFINE_OPCODE_2(LoadConstInt, Reg8, Imm32)
+
+/// Load a constant double value.
+DEFINE_OPCODE_2(LoadConstDouble, Reg8, Double)
 
 /// Load a constant string value by string table index.
 DEFINE_OPCODE_2(LoadConstString, Reg8, UInt16)

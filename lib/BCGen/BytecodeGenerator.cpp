@@ -187,6 +187,10 @@ void BytecodeFunctionGenerator::generateLoadConstInst(LoadConstInst *Inst, Basic
         this->emitLoadConstZero(output);
       } else if (litNum->isUInt8Representible()) {
         this->emitLoadConstUInt8(output, litNum->asUInt8());
+      } else {
+        // param_t is int64_t, we cannot directly convert a double into that.
+        // Instead we are going to copy it as if it is binary.
+        this->emitLoadConstDoubleDirect(output, litNum->getValue());
       }
       break;
     }

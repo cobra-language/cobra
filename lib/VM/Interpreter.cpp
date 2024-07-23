@@ -8,6 +8,9 @@
 #include "cobra/VM/Interpreter.h"
 #include "cobra/Inst/Inst.h"
 #include "cobra/VM/Operations.h"
+#include "cobra/Support/Common.h"
+
+#include "Interpreter-inl.h"
 
 using namespace cobra;
 using namespace vm;
@@ -38,6 +41,13 @@ static bool isCallType(OpCode opcode) {
 }
 
 bool Interpreter::execute(Method *method, uint32_t *args, uint32_t argCount) {
+  const char *desc = &(method->getShorty()[1]); // [0] is the return type.
+  while (*desc != '\0') {
+    switch (*(desc++)) {
+        // TODO
+    }
+  }
+  
   auto frame = Runtime::getCurrent()->getCurrentFrame();
   StackFrame *newFrame = StackFrame::create(frame, method, argCount);
   return execute(newFrame);
@@ -69,6 +79,15 @@ bool Interpreter::execute(StackFrame *frame) {
   
   for (;;) {
     goto *opcodeDispatch[(unsigned)ip->opCode];
+    
+/// Load a constant.
+/// \param value is the value to store in the output register.
+#define LOAD_CONST(name, value) \
+  CASE(name) {                  \
+    O1REG(name) = value;        \
+    ip = NEXTINST(name);        \
+    DISPATCH;                   \
+  }
     
     DEFAULT_CASE
     CASE(Unreachable) {
@@ -168,6 +187,15 @@ bool Interpreter::execute(StackFrame *frame) {
       DISPATCH;
     }
     
+    CASE(ModN) {
+      O1REG(Mod) = CBValue::encodeUntrustedNumberValue(
+          doMod(O2REG(Mod).getNumber(), O3REG(Mod).getNumber()));
+      ip = NEXTINST(Mod);
+      DISPATCH;
+      
+      DISPATCH;
+    }
+    
     CASE(Sub) {
       
       
@@ -245,48 +273,32 @@ bool Interpreter::execute(StackFrame *frame) {
       DISPATCH;
     }
     
-    CASE(LoadConstUInt8) {
-      
-      DISPATCH;
-    }
+    LOAD_CONST(
+        LoadConstUInt8,
+        CBValue::encodeTrustedNumberValue(ip->iLoadConstUInt8.op2));
     
-    CASE(LoadConstInt) {
-      
-      DISPATCH;
-    }
+    LOAD_CONST(
+        LoadConstInt,
+        CBValue::encodeTrustedNumberValue(ip->iLoadConstInt.op2));
     
-    CASE(LoadConstEmpty) {
-      
-      DISPATCH;
-    }
+    LOAD_CONST(
+        LoadConstDouble,
+        CBValue::encodeTrustedNumberValue(ip->iLoadConstDouble.op2));
     
-    CASE(LoadConstUndefined) {
-      
-      DISPATCH;
-    }
-    
-    CASE(LoadConstNull) {
-      
-      DISPATCH;
-    }
-    
-    CASE(LoadConstTrue) {
-      
-      DISPATCH;
-    }
-    
-    CASE(LoadConstFalse) {
-      
-      DISPATCH;
-    }
-    
-    CASE(LoadConstZero) {
-      
-      DISPATCH;
-    }
+    LOAD_CONST(LoadConstEmpty, CBValue::encodeEmptyValue());
+    LOAD_CONST(LoadConstUndefined, CBValue::encodeUndefinedValue());
+    LOAD_CONST(LoadConstNull, CBValue::encodeNullValue());
+    LOAD_CONST(LoadConstTrue, CBValue::encodeBoolValue(true));
+    LOAD_CONST(LoadConstFalse, CBValue::encodeBoolValue(false));
+    LOAD_CONST(LoadConstZero, CBValue::encodeTrustedNumberValue(0));
     
     CASE(LoadParam) {
-      
+      if (COBRA_LIKELY(ip->iLoadParam.op2 <= frame->getArgCount())) {
+        ip = NEXTINST(LoadParam);
+        DISPATCH;
+      }
+      O1REG(LoadParam) = CBValue::encodeUndefinedValue();
+      ip = NEXTINST(LoadParam);
       DISPATCH;
     }
     

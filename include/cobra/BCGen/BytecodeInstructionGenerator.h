@@ -151,8 +151,10 @@ public:
     };
   #include "cobra/BCGen/BytecodeList.def"
   
+  offset_t emitLoadConstDoubleDirect(param_t dst, double value) {
+    return emitLoadConstDouble(dst, DoubleToBits(value));
+  }
 };
-
 
 }
 #pragma GCC diagnostic pop
